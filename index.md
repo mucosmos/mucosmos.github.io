@@ -8,6 +8,9 @@
 > Le premier montage est destiné à une étude de la radioactivité naturelle. Le suivant nécessite un deuxième tube Geiger-Müller et permet l’étude des rayons cosmiques. Les programmes proposés sont intégralement disponibles au téléchargement.
 > 
 
+> Le détecteur de rayons cosmiques [MicroCosmos](/1microcosmos.md)
+
+> L'étude de la radioactivité [Micro(K)osmos](/2microkosmos.md)
 
 
 <!---
