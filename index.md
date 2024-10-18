@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @mucosmos
-<img src="/Figure15b.jpg" width=50% />
+![microcosmos](/Figure15b.jpg)
 
 <!---
 mucosmos/mucosmos is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
