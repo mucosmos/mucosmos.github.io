@@ -1,4 +1,4 @@
-![microcosmos](/microcosmos.jpg)
+<center> ![microcosmos](/microcosmos.jpg) </center>
 
  
 > Les thèmes liés à l’atome et à la radioactivité sont aujourd’hui étudiés en lycée presque exclusivement à l’aide d’activités documentaires. Nous vous proposons de réinvestir le champ expérimental en vous appuyant sur la popularisation des microcontrôleurs Arduino.
