@@ -3,3 +3,6 @@ Les 2 compteurs Geiger sont branchées sur les ports 2 et 3 de l'arduino en comp
 
 Le programme python va récupérer les données du port série de l'arduino et permet de choisir une durée d'expérience et une durée pour l'acquisition.
 > [Le programme Python pour le MicroCosmos](/MicroCosmosDonnees_Cosmiques_graph.py)
+
+
+[Retour à l'accueil](/index.md)
