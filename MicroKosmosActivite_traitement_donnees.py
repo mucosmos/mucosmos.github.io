@@ -5,7 +5,7 @@ Created on Fri Jun 14 11:24:09 2024
 # -*- coding: utf-8 -*-
 
 
-@author: cedric
+@author: cedric vanden driessche
 """
 
 import matplotlib.pyplot as plt
