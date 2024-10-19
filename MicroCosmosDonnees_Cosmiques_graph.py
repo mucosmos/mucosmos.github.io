@@ -3,7 +3,7 @@
 """
 Created on Wed Feb 21 10:29:08 2024
 
-@author: Jonas Forlot Modifications Compteur Geiger 2024 Cédric Vanden Driessche
+@author: 2024 Cédric Vanden Driessche a partir d une base de Jonas Forlot
 """
 
 #Importation des modules
