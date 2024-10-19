@@ -11,3 +11,4 @@ Le Micro(K)osmos est lui dédié à l'étude de la radioactivité naturelle : [L
 > Ce projet est détaillé dans un article à paraitre dans le Bulletin de l'Union des Physiciens : [C. Vanden Driessche, « Micro(K)osmos, Étude expérimentale de la radioactivité du potassium (40 K) en classe à l’aide d’un Arduino et d’un compteur Geiger», Bull. Un. Prof. Phys. Chim., n° , ](https://www.udppc.asso.fr/)
 
 # Liens utiles et idées de lecture
+[--> Liens](liens.md)
