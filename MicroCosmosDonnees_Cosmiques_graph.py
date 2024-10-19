@@ -32,7 +32,7 @@ def recup_port_Arduino():
     
     for p in ports:
         print(p.description)
-        if "ttyACM0" in p.description or "ttyACM1" in p.description or "ttyACM2" in p.description:
+        if "Arduino Uno" in p.description or "ttyACM0" in p.description or "ttyACM1" in p.description or "ttyACM2" in p.description:
              mData =serial.Serial (p.device,9600)
     print(mData.is_open)
     print(mData.name)
