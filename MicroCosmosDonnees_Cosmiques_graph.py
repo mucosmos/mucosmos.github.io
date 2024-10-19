@@ -11,6 +11,7 @@ import serial
 import serial.tools.list_ports   # pour la communication avec le port série
 import time # gestion du temps
 import matplotlib.pyplot as plt  # pour le tracé de graphe
+import time
 #from matplotlib import animation # pour la figure animée
 
 
@@ -84,4 +85,4 @@ for i in range (len (liste_impulsion)):
     line = (str(liste_impulsion[i])+'\t'+ str(liste_duree[i])+'\n')
     lines.append(line)
 
-fichier = open('data_arduino2.txt', 'w').writelines(lines) # création d'un nouveau fichier texte
+fichier = open('Mesure'+time.strftime("%Y-%m-%d-%H-%M-%S")+'.txt', 'w').writelines(lines) # création d'un nouveau fichier texte # création d'un nouveau fichier texte
