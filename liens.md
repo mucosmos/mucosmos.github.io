@@ -13,9 +13,9 @@ Un autre livre qui recouvre presque tout, des rayons cosmiques aux quarks en pas
 L'auteur utilise une approche historique tout en donnant des équations physiques et en faisant le minimum de math nécéssaires à la compréhension. Très utile comme ouvrage de référence.
 
 # Sites Web
--[Sciences à l'école](https://www.sciencesalecole.org/)
--[Quarknet](https://quarknet.org/)
--[Science In School](https://www.scienceinschool.org/)
--[La physique Autrement](https://vulgarisation.fr/)
+- [Sciences à l'école](https://www.sciencesalecole.org/)
+- [Quarknet](https://quarknet.org/)
+- [Science In School](https://www.scienceinschool.org/)
+- [La physique Autrement](https://vulgarisation.fr/)
 
 [Retour à l'accueil](/index.md)
