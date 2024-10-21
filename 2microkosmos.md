@@ -4,4 +4,4 @@
 
   Voici également un exemple de TP en 1ère Enseignement Scientifique réalisé avec ces programmes : [feuille de mesure](/feuille_mesure.pdf)
 
-[Retour à l'accueil(index.md)]
+[Retour à l'accueil](/index.md)
