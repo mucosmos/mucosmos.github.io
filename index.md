@@ -4,7 +4,7 @@ Ce site héberge les programmes arduino et pyhton des projets MicroCosmos et Mic
 
 # MicroCosmos
 Le MicroCosmos est un détecteur de rayons cosmiques à l'aide de 2 tubes Geiger : [Les programmes pour le MicroCosmos](/1microcosmos.md)
-> Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Physiciens de novembre 2024 : [C. Vanden Driessche, « MicroCosmos, Un détecteur de particules à base d’Arduino », Bull. Un. Prof. Phys. Chim., n° 1066, novembre 2024](https://www.udppc.asso.fr/)
+> Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Physiciens de novembre 2024 : [C. Vanden Driessche, « MicroCosmos, Un détecteur de particules à base d’Arduino », Bull. Un. Prof. Phys. Chim., n° 1068, novembre 2024](https://www.udppc.asso.fr/)
 
 # Micro(K)osmos
 Le Micro(K)osmos est lui dédié à l'étude de la radioactivité naturelle : [Les programmes pour le Micro(K)osmos](/2microkosmos.md)
