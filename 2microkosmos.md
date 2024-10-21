@@ -9,8 +9,4 @@ Pour des acquisitions longues un programme Python est nécéssaire (sauf à pass
 Les données récupérées peuvent être traitées à l'aide d'un tableur ou traitées en Python. Voici un programme de traitement des données :
 > [MicroKosmosActivite_traitement_donnees.py](/MicroKosmosActivite_traitement_donnees.py])
 
-
-
-  Voici également un exemple de TP en 1ère Enseignement Scientifique réalisé avec ces programmes : 
-
 [Retour à l'accueil](/index.md)
