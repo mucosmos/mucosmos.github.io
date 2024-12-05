@@ -8,3 +8,5 @@ La notion d'incertitudes est d'abord abordée grâce à une mesure statistique r
 Suite de l'étude sur les incertitudes avec un titrage comme expérience support 
 >[Titrage de l'acide ascorbique du citron](TitrageCitron12pt-2.pdf)
 >[Memo incertitudes type B](MemoIncertitudesVerrerie.pdf)
+
+[Accueil](index.md)
