@@ -2,7 +2,7 @@
 Les élèves travaillent sur des séries de trente mesures de dix secondes qu'ils relèvent directement à partir du moniteur série de l'Arduino. Il est possible de récupérer ces données directement sur un écran LCD pour simplifier les choses en modifiant le code proposé.
 > [MicroKosmosRadioactivite.ino](/MicroKosmosRadioactivite.ino)
 
-Une évaluation expérimentale est ensuite proposée aux élèves, il y testent une source différente. L'évaluation est en deux parties (30 min expérimentale + 30 min théorique) ce qui permet de faire tourner les élèves.
+Une évaluation expérimentale est ensuite proposée aux élèves, ils y testent une source différente. L'évaluation est en deux parties (30 min expérimentale + 30 min théorique) ce qui permet de faire tourner les élèves.
 
 > [Activité Classe](/Activité_Classe.pdf)
 > 
