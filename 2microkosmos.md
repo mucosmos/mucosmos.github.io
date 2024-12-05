@@ -10,7 +10,7 @@ Une évaluation expérimentale est ensuite proposée aux élèves, il y testent 
 > 
 > [EvalPartieThéorique](/EvalPartieThéorique.pdf)
 
-/
+  
 
 ## En rajoutant Python :-)
 Pour des acquisitions longues un programme Python est nécéssaire (sauf à passer des heures à relever les mesures à l'ancienne ;-) ). Ce programme récupère les données du port série de l'Arduino (attention à avoir bien fermé le moniteur série de l'Arduino)
