@@ -1,6 +1,4 @@
-<p align="center">
-  <img width="460" height="300" src="https://mucosmos.github.io/microcosmos.jpg">
-</p>
+![microcosmos](/microcosmos.jpg) 
 
 Ce site héberge principalement les programmes arduino et pyhton des projets MicroCosmos et Micro(K)osmos. L'objectif est de réinvestir le champ expérimental de la physique des particules et de la physique nucléaire en s'appuyant sur la popularisation des microcontrôleurs Arduino et des capteurs associés.
 
