@@ -1,4 +1,4 @@
-Le programme Arduino, utilisé tel quel en classe, avec la feuille de mesure associée ([feuille de mesure](/feuille_mesure.pdf) ). Les élèves travaillent sur des séries de trente mesures de dix secondes qu'ils relèvent directement à partir du moniteur série. Il est possible de récupérer ces données directement sur un écran LCD pour simplifier les choses en modifiant le code proposé.
+Le programme Arduino, utilisé tel quel en classe, avec la feuille de mesure associée ([feuille de mesure](/Activité_Classe.pdf) ). Les élèves travaillent sur des séries de trente mesures de dix secondes qu'ils relèvent directement à partir du moniteur série. Il est possible de récupérer ces données directement sur un écran LCD pour simplifier les choses en modifiant le code proposé.
 > [MicroKosmosRadioactivite.ino](/MicroKosmosRadioactivite.ino)
 
 
