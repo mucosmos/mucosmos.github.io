@@ -1,4 +1,5 @@
 # Mesure de la constante de Planck
+L'introduction par Planck de ce que l'on nommera plus tard la constante de Planck est généralement considéré comme l'acte de naissance de la mécanique quantique. Aujourd'hui c'est l'une des sept constantes fondamentales que compte la physique. Dans ce TP il s'agit de mesurer la valeur de cette constante à l'aide d'une expérience assez simple.
 >[TP mesure constante de Planck](TPplanck.pdf)
 
 # Les incertitudes
