@@ -1,6 +1,6 @@
 ![microcosmos](/microcosmos.jpg) 
 
-Ce site héberge les programmes arduino et pyhton des projets MicroCosmos et Micro(K)osmos dont l'objectif est de réinvestir le champ expérimental de la physique des particules et de la physique nucléaire en s'appuyant sur la popularisation des microcontrôleurs Arduino et des capteurs associés.
+Ce site héberge principalement les programmes arduino et pyhton des projets MicroCosmos et Micro(K)osmos. L'objectif est de réinvestir le champ expérimental de la physique des particules et de la physique nucléaire en s'appuyant sur la popularisation des microcontrôleurs Arduino et des capteurs associés.
 
 # Etude des rayons cosmiques : MicroCosmos
 Le MicroCosmos est un détecteur de rayons cosmiques à l'aide de 2 tubes Geiger : [Les programmes pour le MicroCosmos](/1microcosmos.md)
