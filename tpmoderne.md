@@ -3,10 +3,10 @@ L'introduction par Planck de ce que l'on nommera plus tard la constante de Planc
 >[TP mesure constante de Planck](TPplanck.pdf)
 
 # Les incertitudes
-La notion d'incertitudes est d'abord abordée grâce à une mesure statistique réalisée sur les rayons cosmiques à l'aide du Cosmodétecteur prêté par Sciences à l'école. La première mesure statistique peut aisément être remplacée par une mesure réalisée avec le MicroCosmos ou le Micro(K)osmos.
+La notion d'incertitudes est aujourd'hui une notion fondamentale des sciences physiques. Au point qu'en physique des particules elle devienne le moyen de valider un résultat (les fameux 5 ou 6 sigma au LHC pour la découverte du boson de Higgs. Cette notion est ici abordée grâce à une mesure statistique réalisée sur les rayons cosmiques à l'aide du Cosmodétecteur prêté par Sciences à l'école (cette première mesure statistique peut aisément être remplacée par une mesure réalisée avec le MicroCosmos ou le Micro(K)osmos).
 >[Activité découverte sur la notion d'incertitudes](Activitedecouverte.pdf)
 
-Suite de l'étude sur les incertitudes avec un titrage comme expérience support 
+La suite de l'étude utilise un titrage comme expérience support 
 >[Titrage de l'acide ascorbique du citron](TitrageCitron12pt-2.pdf)
 >
 >[Memo incertitudes type B](MemoIncertitudesVerrerie.pdf)
