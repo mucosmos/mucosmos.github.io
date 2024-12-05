@@ -1,4 +1,5 @@
 <p align="center">
+  <img width="460" height="300" src="https://mucosmos.github.io/microcosmos.jpg">
 ![microcosmos](/microcosmos.jpg) 
 </p>
 
