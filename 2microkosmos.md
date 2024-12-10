@@ -24,4 +24,3 @@ Les données récupérées peuvent être traitées à l'aide d'un tableur ou tra
 
 [Retour à l'accueil](/index.md)
 
-<iframe src="https://app.arduino.cc/sketches/d2e46e7d-766c-4519-bbb5-3a9acc2f36c1?view-mode=embed" style="height:510px;width:100%;margin:10px 0" frameborder=0></iframe>
