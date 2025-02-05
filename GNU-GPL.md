@@ -1,9 +1,10 @@
+Retour au site : <https://mucosmos.github.io/>
+                    
                     GNU GENERAL PUBLIC LICENSE      
                                                                     
                        Version 3, 29 June 2007
-                      
+                     
 
- <https://mucosmos.github.io/>
  
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
