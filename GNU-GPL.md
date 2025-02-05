@@ -1,5 +1,5 @@
                     GNU GENERAL PUBLIC LICENSE      
-                                                                    [Retour à l'accueil](/index.md)
+                                                                    <https://mucosmos.github.io/>
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
