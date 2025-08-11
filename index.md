@@ -17,7 +17,7 @@ Le Micro(K)osmos est lui dédié à l'étude de la radioactivité naturelle : [L
 >  [Liens](liens.md)
 
 # Cours & Diaporama
->  [Présentation Profs au GANIL 2025](/ressources/DiaporamaRetourExperienceLight.pdf)
+>  [Présentation Profs au GANIL 2025](/ressources/DiaporamaRetourExperience.pdf)
 
 
 
