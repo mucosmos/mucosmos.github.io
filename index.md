@@ -20,4 +20,7 @@ Le Micro(K)osmos est lui dédié à l'étude de la radioactivité naturelle : [L
 >  [Présentation Profs au GANIL 2025](/ressources/DiaporamaRetourExperienceLight.pdf)
 
 
+
+
+
 Le présent site https://mucosmos.github.io/ ainsi que son contenu est placé sous [licence GPL](/GNU-GPL.md), copyright cedric vanden driessche, 2024
