@@ -4,7 +4,7 @@ Ce site héberge principalement les programmes arduino et pyhton des projets Mic
 
 # Etude des rayons cosmiques : MicroCosmos
 Le MicroCosmos est un détecteur de rayons cosmiques à l'aide de 2 tubes Geiger : [Les programmes pour le MicroCosmos](/1microcosmos.md)
-> Ce projet est détaillé dans un article à paraitre dans [le Bulletin de l'Union des Physiciens](https://bupdoc.udppc.asso.fr/index.php) de novembre 2024 : [C. Vanden Driessche, « MicroCosmos - Partie 1 : un détecteur de particules à base d’Arduino », Bull. Un. Prof. Phys. Chim., vol. 118, n° 1068, p. 907-922, novembre 2024](/MicroCosmos-article1.pdf)
+> Ce projet est détaillé dans un article paru dans [le Bulletin de l'Union des Physiciens](https://bupdoc.udppc.asso.fr/index.php) de novembre 2024 : [C. Vanden Driessche, « MicroCosmos - Partie 1 : un détecteur de particules à base d’Arduino », Bull. Un. Prof. Phys. Chim., vol. 118, n° 1068, p. 907-922, novembre 2024](/MicroCosmos-article1.pdf)
 
 # Etude de la radioactivité : Micro(K)osmos
 Le Micro(K)osmos est lui dédié à l'étude de la radioactivité naturelle : [Les programmes et activités pour le Micro(K)osmos](/2microkosmos.md) . Pour se passer de source radioactive trop active et interdite en classe, les expériences réalisées le sont en utilisant du potassium 40. Le détecteur est capable d'étudier l'activité du potassium 40 dans du KCl par exemple, l'effet de la distance, l'effet des écrans mais aussi de différencier et de quantifier les deux types de radioactivité du potassium (bêta à 89% et gamma à 11%).
