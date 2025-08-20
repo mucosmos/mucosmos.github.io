@@ -5,7 +5,7 @@ Le programme python va récupérer les données du port série de l'arduino et p
 > [Le programme Python pour le MicroCosmos](microcosmos/MicroCosmosDonnees_Cosmiques_graph.py)
 
 
-<embed src="https://github.com/mucosmos/mucosmos.github.io/blob/main/ressources/Microcosmos-article1.pdf" type="application/pdf" />
+<a href="https://github.com/mucosmos/mucosmos.github.io/blob/main/ressources/Microcosmos-article1.pdf>Article MicroCosmos en pdf</a>
 
 
 [Retour à l'accueil](/index.md)
