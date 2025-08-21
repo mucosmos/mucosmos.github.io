@@ -6,7 +6,7 @@ Le programme python va récupérer les données du port série de l'arduino et p
 
 ## L'article du BUP
 Ci-dessous l'article en pdf (éviter de diffuser largement, préférer la promotion du BUP ;-) )
-<embed src="./MicroCosmos-article1.pdf" width="800px" height="600px" />
+<embed src="./ressources/MicroCosmos-article1.pdf" width="800px" height="600px" />
 
 
 [Retour à l'accueil](/index.md)
