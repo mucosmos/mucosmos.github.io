@@ -23,7 +23,7 @@ Les données récupérées peuvent être traitées à l'aide d'un tableur ou tra
 
 ## L'article du BUP
 Ci-dessous l'article en pdf (éviter de diffuser largement, préférer la promotion du BUP ;-) )
-<embed src="./MicroKosmos-article2.pdf" width="800px" height="600px" />
+<embed src="./ressources/MicroKosmos-article2.pdf" width="800px" height="600px" />
 
 [Retour à l'accueil](/index.md)
 
