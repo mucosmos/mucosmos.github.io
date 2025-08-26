@@ -12,6 +12,10 @@ Un autre livre qui recouvre presque tout, des rayons cosmiques aux quarks en pas
 > ***Le modèle standard de la physique des particules : de l`électron au boson de Higgs* de Jean-Jacques Samueli** aux éditions ellipses.
 L'auteur utilise une approche historique tout en donnant des équations physiques et en faisant le minimum de math nécéssaires à la compréhension. Très utile comme ouvrage de référence.
 
+
+Le livret pédagogique fourni par Sciences à l'école avec le cosmodétecteur qui contient des notions de base sur la relativité, la physique des particules, les détecteurs et les statistiques :
+> [Livret pédagogique](/ressources/livret_peda_27_4_17.pdf)
+
 # Sites Web
 - [Sciences à l'école](https://www.sciencesalecole.org/)
 - [Quarknet](https://quarknet.org/)
