@@ -33,7 +33,7 @@ Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Ph
 
 >  [Diaporama équation de Drake - vie extraterrestre](/ressources/ConferenceDrake.pdf)
 
->  [Diaporama Ondes Gravitationnelles](/ressources/espace_d_un_temps.pdf)
+>  [Diaporama Ondes Gravitationnelles](/ressources/espace_d_un_temps_CDG.pdf)
 
 >  [Diaporama Relativité Restreinte](/ressources/relativité_restreinte.pdf)
 
