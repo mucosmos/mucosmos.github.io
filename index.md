@@ -31,8 +31,9 @@ Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Ph
 >  [Présentation Profs au CERN 2025](/ressources/DiaporamaRetourExperienceCERN2025.pdf)
 
 >  [Diaporama équation de Drake - vie extraterrestre](/ressources/ConferenceDrake.pdf)
+
 >  [Diaporama Ondes Gravitationnelles](/ressources/espace_d_un_temps_CDG.pdf)
->  [Diaporama Ondes Gravitationnelles (avec animations : format libre office)](/ressources/espace_d_un_temps_CDG.odp)
+
 >  [Diaporama Relativité Restreinte](/ressources/relativité_restreinte.pdf)
 
 
