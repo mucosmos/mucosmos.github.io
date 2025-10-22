@@ -28,6 +28,7 @@ Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Ph
 
 # Cours & Diaporama
 >  [Présentation Profs au GANIL 2025](/ressources/DiaporamaRetourExperience.pdf)
+
 >  [Présentation Profs au CERN 2025](/ressources/DiaporamaRetourExperienceCERN2025.pdf)
 
 >  [Diaporama équation de Drake - vie extraterrestre](/ressources/ConferenceDrake.pdf)
