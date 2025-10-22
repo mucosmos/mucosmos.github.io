@@ -28,6 +28,7 @@ Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Ph
 
 # Cours & Diaporama
 >  [Présentation Profs au GANIL 2025](/ressources/DiaporamaRetourExperience.pdf)
+>  [Présentation Profs au CERN 2025](/ressources/DiaporamaRetourExperienceCERN2025.pdf)
 
 >  [2 activités présentées au stage](https://filesender.renater.fr/?s=download&token=b84bf53b-4152-427f-a4cd-e7fe1613bbed)
 
