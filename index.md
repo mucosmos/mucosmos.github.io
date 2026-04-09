@@ -23,6 +23,9 @@ Ce projet est détaillé dans un article paru dans le Bulletin de l'Union des Ph
 # TP de physique moderne et/ou avec un smartphone et/ou avec Arduino
 >[Travaux pratiques](tpmoderne.md)
 
+# Masterclass Ondes Gravitationnelles
+>[Archive contenant les fichiers de la masterclass](ressources/GW_Masterclass.zip)
+
 # Liens utiles et idées de lecture
 >  [Liens](liens.md)
 
