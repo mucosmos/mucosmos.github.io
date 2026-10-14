@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" role="img" aria-label="Coïncidences : muon vertical, muon incliné et radioactivité naturelle"><title>Coïncidences : muon vertical, muon incliné et radioactivité naturelle</title>
+<defs>
+  <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f4f7fb"/><stop offset=".25" stop-color="#c9d3e0"/>
+    <stop offset=".5" stop-color="#9aa8bb"/><stop offset=".72" stop-color="#d7c9e8"/>
+    <stop offset="1" stop-color="#7d8798"/>
+  </linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f1f1f1"/><stop offset=".5" stop-color="#a9a9a9"/><stop offset="1" stop-color="#d5d5d5"/>
+  </linearGradient>
+  <linearGradient id="uno" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2a8a5a"/><stop offset="1" stop-color="#1c6b45"/>
+  </linearGradient>
+  <filter id="sh" x="-10%" y="-10%" width="130%" height="140%">
+    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#1b2340" flood-opacity=".22"/>
+  </filter>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#5b4bd6"/>
+  </marker>
+</defs><rect width="1000" height="600" fill="#f7f8fc"/><defs><marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#16a36a"/></marker><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d64545"/></marker><marker id="ao" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e08a1e"/></marker></defs>
+<text x="40" y="44" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800" fill="#1e2340" text-anchor="start" >Qui est compté ? Trois situations</text>
+<rect x="20" y="66" width="960" height="40" rx="8" fill="#eef0fb"/>
+<text x="500" y="92" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13.5px;font-weight:600" fill="#4b4f74" text-anchor="middle" >muons venant de la haute atmosphère (environ 1 par cm² et par minute au niveau de la mer)</text>
+<rect x="350" y="239" width="300" height="9" rx="2" fill="#15181f"/>
+<circle cx="500" cy="205" r="26" fill="url(#glass)" stroke="#7f8a9b" stroke-width="2"/>
+<circle cx="500" cy="205" r="2.5" fill="#5c6474"/>
+<text x="670" y="211" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#1e2340" text-anchor="start" >tube 1</text>
+<text x="670" y="229" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#5b4bd6" text-anchor="start" >entrée D2</text>
+<rect x="350" y="379" width="300" height="9" rx="2" fill="#15181f"/>
+<circle cx="500" cy="345" r="26" fill="url(#glass)" stroke="#7f8a9b" stroke-width="2"/>
+<circle cx="500" cy="345" r="2.5" fill="#5c6474"/>
+<text x="670" y="351" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#1e2340" text-anchor="start" >tube 2</text>
+<text x="670" y="369" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#5b4bd6" text-anchor="start" >entrée D3</text>
+<text x="330" y="140" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#7a819a" text-anchor="end" >vue en coupe : les tubes</text>
+<text x="330" y="156" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#7a819a" text-anchor="end" >sont vus par leur extrémité</text>
+<line x1="750" y1="205" x2="750" y2="345" stroke="#5b4bd6" stroke-width="2" marker-start="url(#arr)" marker-end="url(#arr)"/>
+<text x="762" y="280.0" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;font-weight:800" fill="#5b4bd6" text-anchor="start" >3 cm</text>
+<line x1="488" y1="118" x2="510" y2="430" stroke="#16a36a" stroke-width="3.2" marker-end="url(#ag)"/>
+<circle cx="494" cy="205" r="12" fill="#16a36a" fill-opacity=".3"/><circle cx="494" cy="205" r="5" fill="#16a36a"/><circle cx="504" cy="345" r="12" fill="#16a36a" fill-opacity=".3"/><circle cx="504" cy="345" r="5" fill="#16a36a"/><circle cx="462" cy="132" r="15" fill="#16a36a"/><text x="462" y="137" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >1</text>
+<line x1="410" y1="118" x2="640" y2="430" stroke="#d64545" stroke-width="3" stroke-dasharray="8 5" marker-end="url(#ar)"/>
+<circle cx="476" cy="209" r="12" fill="#d64545" fill-opacity=".3"/><circle cx="476" cy="209" r="5" fill="#d64545"/><circle cx="392" cy="132" r="15" fill="#d64545"/><text x="392" y="137" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >2</text>
+<path d="M180,430 Q330,420 472,353" fill="none" stroke="#e08a1e" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#ao)"/>
+<circle cx="478" cy="351" r="12" fill="#e08a1e" fill-opacity=".3"/><circle cx="478" cy="351" r="5" fill="#e08a1e"/><circle cx="170" cy="430" r="15" fill="#e08a1e"/><text x="170" y="435" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >3</text>
+<text x="195" y="460" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:600" fill="#e08a1e" text-anchor="start" >β ou γ (sol, murs, sel de potassium…)</text>
+<rect x="30" y="482" width="300" height="100" rx="10" fill="#fff" stroke="#d9dcea"/>
+<circle cx="56" cy="512" r="15" fill="#16a36a"/><text x="56" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >1</text><text x="80" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#16a36a" text-anchor="start" >Muon presque vertical</text>
+<text x="48" y="545" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >il traverse les deux tubes :</text><text x="48" y="566" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:700" fill="#2b3150" text-anchor="start" >deux impulsions simultanées → N12 + 1</text>
+<rect x="350" y="482" width="300" height="100" rx="10" fill="#fff" stroke="#d9dcea"/>
+<circle cx="376" cy="512" r="15" fill="#d64545"/><text x="376" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >2</text><text x="400" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#d64545" text-anchor="start" >Muon trop incliné</text>
+<text x="368" y="545" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >il manque le tube 2 :</text><text x="368" y="566" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:700" fill="#2b3150" text-anchor="start" >une seule impulsion → non compté</text>
+<rect x="670" y="482" width="300" height="100" rx="10" fill="#fff" stroke="#d9dcea"/>
+<circle cx="696" cy="512" r="15" fill="#e08a1e"/><text x="696" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#fff" text-anchor="middle" >3</text><text x="720" y="517" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#e08a1e" text-anchor="start" >Radioactivité naturelle</text>
+<text x="688" y="545" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >un seul tube touché :</text><text x="688" y="566" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:700" fill="#2b3150" text-anchor="start" >rejeté (bruit de fond)</text></svg>

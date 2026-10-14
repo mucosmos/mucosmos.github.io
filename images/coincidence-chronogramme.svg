@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-label="Chronogramme des impulsions et fenêtre de coïncidence de 1 ms"><title>Chronogramme des impulsions et fenêtre de coïncidence de 1 ms</title>
+<defs>
+  <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f4f7fb"/><stop offset=".25" stop-color="#c9d3e0"/>
+    <stop offset=".5" stop-color="#9aa8bb"/><stop offset=".72" stop-color="#d7c9e8"/>
+    <stop offset="1" stop-color="#7d8798"/>
+  </linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f1f1f1"/><stop offset=".5" stop-color="#a9a9a9"/><stop offset="1" stop-color="#d5d5d5"/>
+  </linearGradient>
+  <linearGradient id="uno" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2a8a5a"/><stop offset="1" stop-color="#1c6b45"/>
+  </linearGradient>
+  <filter id="sh" x="-10%" y="-10%" width="130%" height="140%">
+    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#1b2340" flood-opacity=".22"/>
+  </filter>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#5b4bd6"/>
+  </marker>
+</defs><rect width="1000" height="470" fill="#f7f8fc"/><text x="40" y="44" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:20px;font-weight:800" fill="#1e2340" text-anchor="start" >Ce que voit l’Arduino : un « drapeau » par tube, relu toutes les millisecondes</text>
+<rect x="150.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="217.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="285.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="352.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="420.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="487.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="555.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="622.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="690.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="757.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="825.0" y="80" width="67.5" height="300" fill="#f0f2fa"/>
+<rect x="892.5" y="80" width="67.5" height="300" fill="#ffffff"/>
+<rect x="622.5" y="80" width="67.5" height="300" fill="#16a36a" fill-opacity=".14" stroke="#16a36a" stroke-width="2"/>
+<line x1="150.0" y1="80" x2="150.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="217.5" y1="80" x2="217.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="285.0" y1="80" x2="285.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="352.5" y1="80" x2="352.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="420.0" y1="80" x2="420.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="487.5" y1="80" x2="487.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="555.0" y1="80" x2="555.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="622.5" y1="80" x2="622.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="690.0" y1="80" x2="690.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="757.5" y1="80" x2="757.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="825.0" y1="80" x2="825.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="892.5" y1="80" x2="892.5" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<line x1="960.0" y1="80" x2="960.0" y2="380" stroke="#c8cde0" stroke-dasharray="3 4"/>
+<text x="183.75" y="72" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11.5px;font-weight:700" fill="#6a7090" text-anchor="middle" >1 ms</text>
+<path d="M150,100 L241.125,100 L241.125,150 L261.375,150 L261.375,100 L642.75,100 L642.75,150 L663.0,150 L663.0,100 L960,100" fill="none" stroke="#2b6fd6" stroke-width="3" stroke-linejoin="round"/>
+<text x="134" y="120" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#2b6fd6" text-anchor="end" >tube 1</text>
+<text x="134" y="138" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:500" fill="#7a819a" text-anchor="end" >5 V / 0 V</text>
+<path d="M150,190 L457.125,190 L457.125,240 L477.375,240 L477.375,190 L652.875,190 L652.875,240 L673.125,240 L673.125,190 L838.5,190 L838.5,240 L858.75,240 L858.75,190 L960,190" fill="none" stroke="#e0601e" stroke-width="3" stroke-linejoin="round"/>
+<text x="134" y="210" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#e0601e" text-anchor="end" >tube 2</text>
+<text x="134" y="228" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:500" fill="#7a819a" text-anchor="end" >5 V / 0 V</text>
+<text x="134" y="300" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#1e2340" text-anchor="end" >drapeaux</text>
+<text x="134" y="318" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600" fill="#7a819a" text-anchor="end" >1 · 2</text>
+<text x="183.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="251.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#1e2340" text-anchor="middle">10</text>
+<text x="318.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="386.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="453.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#1e2340" text-anchor="middle">01</text>
+<text x="521.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="588.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="656.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#16a36a" text-anchor="middle">11</text>
+<text x="723.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="791.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="858.75" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#1e2340" text-anchor="middle">01</text>
+<text x="926.25" y="305" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:17px;font-weight:800" fill="#9aa1b8" text-anchor="middle">00</text>
+<text x="251.25" y="350" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#7a819a" text-anchor="middle" >bruit</text>
+<text x="453.75" y="350" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#7a819a" text-anchor="middle" >bruit</text>
+<text x="656.25" y="350" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#16a36a" text-anchor="middle" >N12 + 1</text>
+<text x="858.75" y="350" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#7a819a" text-anchor="middle" >bruit</text>
+<text x="656.25" y="372" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600" fill="#16a36a" text-anchor="middle" >muon</text>
+<text x="40" y="418" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13.5px;font-weight:500" fill="#2b3150" text-anchor="start" >À chaque impulsion, une interruption lève le drapeau du tube. Toutes les millisecondes, la boucle regarde les deux drapeaux :</text>
+<text x="40" y="440" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13.5px;font-weight:500" fill="#2b3150" text-anchor="start" >s’ils sont levés tous les deux (11), une coïncidence est comptée, puis les drapeaux sont baissés. La fenêtre de coïncidence vaut donc 1 ms.</text></svg>

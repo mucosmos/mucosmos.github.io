@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" role="img" aria-label="Schéma du montage à deux tubes Geiger empilés"><title>Schéma du montage à deux tubes Geiger empilés</title>
+<defs>
+  <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f4f7fb"/><stop offset=".25" stop-color="#c9d3e0"/>
+    <stop offset=".5" stop-color="#9aa8bb"/><stop offset=".72" stop-color="#d7c9e8"/>
+    <stop offset="1" stop-color="#7d8798"/>
+  </linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f1f1f1"/><stop offset=".5" stop-color="#a9a9a9"/><stop offset="1" stop-color="#d5d5d5"/>
+  </linearGradient>
+  <linearGradient id="uno" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2a8a5a"/><stop offset="1" stop-color="#1c6b45"/>
+  </linearGradient>
+  <filter id="sh" x="-10%" y="-10%" width="130%" height="140%">
+    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#1b2340" flood-opacity=".22"/>
+  </filter>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#5b4bd6"/>
+  </marker>
+</defs><rect width="1000" height="720" fill="#f7f8fc"/><text x="40" y="46" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:22px;font-weight:800" fill="#1e2340" text-anchor="start" >Montage à deux tubes — rayons cosmiques (MicroCosmos)</text>
+<text x="40" y="72" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:500" fill="#59607a" text-anchor="start" >Deux modules Geiger empilés, tubes parallèles ; chacun sur sa propre entrée d’interruption (D2 et D3).</text>
+<text x="40" y="116" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#5b4bd6" text-anchor="start" >① Vue de dessus : le câblage</text>
+<rect x="586" y="176" width="350" height="170" rx="10" fill="#c9d7ea" fill-opacity=".45" stroke="#a9bdd6"/>
+<g filter="url(#sh)">
+<rect x="590" y="160" width="350" height="170" rx="10" fill="#dfe9f5" fill-opacity=".55" stroke="#a9bdd6"/>
+<rect x="600" y="170" width="330" height="150" rx="8" fill="#15181f"/>
+</g>
+<circle cx="606" cy="176" r="9" fill="#f6f6f2" stroke="#c9c9c0"/>
+<circle cx="924" cy="176" r="9" fill="#f6f6f2" stroke="#c9c9c0"/>
+<circle cx="606" cy="314" r="9" fill="#f6f6f2" stroke="#c9c9c0"/>
+<circle cx="924" cy="314" r="9" fill="#f6f6f2" stroke="#c9c9c0"/>
+<rect x="622" y="258" width="16" height="34" rx="3" fill="url(#metal)"/>
+<rect x="892" y="258" width="16" height="34" rx="3" fill="url(#metal)"/>
+<rect x="640" y="262" width="250" height="26" rx="13.0" fill="url(#glass)" stroke="#7f8a9b"/>
+<line x1="648" y1="275.0" x2="882" y2="275.0" stroke="#5c6474" stroke-width="1.2"/>
+<text x="765.0" y="306" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600" fill="#c9d2e3" text-anchor="middle" >tube Geiger M4011</text>
+<text x="630" y="306" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;font-weight:700" fill="#c9d2e3" text-anchor="middle" >−</text>
+<text x="900" y="306" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;font-weight:700" fill="#c9d2e3" text-anchor="middle" >+</text>
+<circle cx="750" cy="210" r="16" fill="#2b2d33" stroke="#4a4d55"/><circle cx="750" cy="210" r="3" fill="#111"/>
+<text x="750" y="240" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:9px;font-weight:500" fill="#8d96aa" text-anchor="middle" >buzzer</text>
+<circle cx="850" cy="210" r="13" fill="#1f2026" stroke="#55585f"/><rect x="846" y="198" width="8" height="10" rx="2" fill="#3a3c43"/>
+<rect x="692" y="200" width="18" height="12" rx="2" fill="#c9ccd2"/><rect x="697" y="196" width="6" height="8" fill="#55585f"/>
+<rect x="790" y="192" width="6" height="4" fill="#9aa1ad"/>
+<rect x="798" y="206" width="6" height="4" fill="#9aa1ad"/>
+<rect x="806" y="192" width="6" height="4" fill="#9aa1ad"/>
+<rect x="814" y="206" width="6" height="4" fill="#9aa1ad"/>
+<rect x="822" y="192" width="6" height="4" fill="#9aa1ad"/>
+<rect x="830" y="206" width="6" height="4" fill="#9aa1ad"/>
+<rect x="622" y="188" width="30" height="20" rx="2" fill="#f2efe6" stroke="#bdb8a6"/>
+<text x="765.0" y="150" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700" fill="#1e2340" text-anchor="middle" >Pile de deux modules Geiger</text>
+<g filter="url(#sh)">
+<rect x="110" y="300" width="300" height="220" rx="12" fill="url(#uno)"/>
+<rect x="84" y="340" width="62" height="52" rx="4" fill="url(#metal)" stroke="#888"/>
+<rect x="96" y="450" width="52" height="40" rx="5" fill="#15171c"/>
+<rect x="140" y="290" width="262" height="214" rx="10" fill="#20242f" stroke="#3a4152"/>
+</g>
+<rect x="168" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="168" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="168" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="182" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="182" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="182" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="196" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="196" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="196" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="210" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="210" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="210" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="224" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="224" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="224" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="238" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="238" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="238" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="252" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="252" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="252" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="266" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="266" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="266" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="280" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="280" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="280" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="294" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="294" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="294" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="308" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="308" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="308" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="322" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="322" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="322" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="336" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="336" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="336" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="350" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="350" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="350" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="364" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="364" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="364" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="378" y="302" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="378" y="313" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="378" y="324" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="300" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="300" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="300" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="314" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="314" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="314" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="328" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="328" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="328" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="342" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="342" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="342" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="356" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="356" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="356" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="370" y="440" width="8" height="8" rx="1.5" fill="#2b6fd6"/>
+<rect x="370" y="451" width="8" height="8" rx="1.5" fill="#d33c3c"/>
+<rect x="370" y="462" width="8" height="8" rx="1.5" fill="#e8b23a"/>
+<rect x="154" y="350" width="40" height="40" rx="3" fill="#3bbd4f" stroke="#258a37"/>
+<circle cx="174" cy="360" r="6.5" fill="#c9cfd6" stroke="#7d858e"/>
+<circle cx="174" cy="380" r="6.5" fill="#c9cfd6" stroke="#7d858e"/>
+<rect x="210" y="440" width="40" height="40" rx="3" fill="#3bbd4f" stroke="#258a37"/>
+<circle cx="230" cy="450" r="6.5" fill="#c9cfd6" stroke="#7d858e"/>
+<circle cx="230" cy="470" r="6.5" fill="#c9cfd6" stroke="#7d858e"/>
+<rect x="310" y="400" width="22" height="22" rx="3" fill="#cfd3d8"/><circle cx="321" cy="411" r="6" fill="#2d2f34"/>
+<rect x="248" y="360" width="56" height="64" rx="3" fill="none" stroke="#565e70" stroke-width="2"/>
+<rect x="220" y="356" width="16" height="72" rx="2" fill="#2f6fd0"/>
+<text x="354" y="388" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700" fill="#e5e8ef" text-anchor="middle" >DFRobot</text>
+<text x="354" y="402" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:10px;font-weight:500" fill="#aab2c4" text-anchor="middle" >shield E/S</text>
+<path d="M335,328 C315,128 452,78 632,198" fill="none" stroke="#1b1b1b" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M340,328 C320,128 457,78 637,198" fill="none" stroke="#d33c3c" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M345,328 C325,128 462,78 642,198" fill="none" stroke="#2fa36b" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M349,328 C359,208 515,330 583,300" fill="none" stroke="#1b1b1b" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M354,328 C364,208 520,330 588,300" fill="none" stroke="#d33c3c" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M359,328 C369,208 525,330 593,300" fill="none" stroke="#2fa36b" stroke-width="3.2" stroke-linecap="round"/>
+<rect x="332" y="312" width="16" height="22" rx="2" fill="#111" />
+<line x1="340" y1="310" x2="252" y2="272" stroke="#5b4bd6" stroke-width="1.6"/><rect x="230" y="258" width="44" height="26" rx="13" fill="#5b4bd6"/><text x="252" y="276" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#fff" text-anchor="middle" >D3</text>
+<rect x="346" y="312" width="16" height="22" rx="2" fill="#111" />
+<line x1="354" y1="310" x2="416" y2="272" stroke="#5b4bd6" stroke-width="1.6"/><rect x="394" y="258" width="44" height="26" rx="13" fill="#5b4bd6"/><text x="416" y="276" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#fff" text-anchor="middle" >D2</text>
+<text x="770" y="130" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:600" fill="#59607a" text-anchor="middle" >tube 1 (dessus) → D2   ·   tube 2 (dessous) → D3</text>
+<text x="260" y="562" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700" fill="#1e2340" text-anchor="middle" >Arduino Uno + shield Gravity E/S</text>
+<path d="M84,366 C40,366 30,500 50,540" fill="none" stroke="#7b8194" stroke-width="5" stroke-linecap="round"/><text x="30" y="590" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600" fill="#59607a" text-anchor="start" >USB → ordinateur</text>
+<line x1="520" y1="400" x2="960" y2="400" stroke="#e1e4ef"/>
+<text x="540" y="432" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:800" fill="#5b4bd6" text-anchor="start" >② Vue de côté : la pile</text>
+<rect x="600" y="456" width="280" height="12" rx="3" fill="#dfe9f5" fill-opacity=".7" stroke="#a9bdd6"/>
+<rect x="606" y="508" width="268" height="10" rx="2" fill="#15181f"/>
+<rect x="644" y="476" width="14" height="32" rx="3" fill="url(#metal)"/>
+<rect x="822" y="476" width="14" height="32" rx="3" fill="url(#metal)"/>
+<rect x="660" y="478" width="160" height="28" rx="14" fill="url(#glass)" stroke="#7f8a9b"/>
+<line x1="670" y1="492" x2="810" y2="492" stroke="#5c6474" stroke-width="1.2"/>
+<text x="894" y="498" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#1e2340" text-anchor="start" >tube 1</text>
+<text x="894" y="516" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:600" fill="#5b4bd6" text-anchor="start" >→ entrée D2</text>
+<rect x="600" y="548" width="280" height="12" rx="3" fill="#dfe9f5" fill-opacity=".7" stroke="#a9bdd6"/>
+<rect x="606" y="600" width="268" height="10" rx="2" fill="#15181f"/>
+<rect x="644" y="568" width="14" height="32" rx="3" fill="url(#metal)"/>
+<rect x="822" y="568" width="14" height="32" rx="3" fill="url(#metal)"/>
+<rect x="660" y="570" width="160" height="28" rx="14" fill="url(#glass)" stroke="#7f8a9b"/>
+<line x1="670" y1="584" x2="810" y2="584" stroke="#5c6474" stroke-width="1.2"/>
+<text x="894" y="590" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#1e2340" text-anchor="start" >tube 2</text>
+<text x="894" y="608" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:600" fill="#5b4bd6" text-anchor="start" >→ entrée D3</text>
+<rect x="600" y="640" width="280" height="12" rx="3" fill="#dfe9f5" fill-opacity=".7" stroke="#a9bdd6"/>
+<rect x="606" y="456" width="16" height="196" rx="4" fill="#f6f6f2" stroke="#c9c9c0" fill-opacity=".9"/>
+<rect x="858" y="456" width="16" height="196" rx="4" fill="#f6f6f2" stroke="#c9c9c0" fill-opacity=".9"/>
+<line x1="570" y1="492" x2="570" y2="584" stroke="#5b4bd6" stroke-width="2" marker-start="url(#arr)" marker-end="url(#arr)"/>
+<line x1="564" y1="492" x2="640" y2="492" stroke="#5b4bd6" stroke-dasharray="3 3"/>
+<line x1="564" y1="584" x2="640" y2="584" stroke="#5b4bd6" stroke-dasharray="3 3"/>
+<text x="560" y="543.0" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:800" fill="#5b4bd6" text-anchor="end" >≈ 3 cm</text>
+<rect x="40" y="600" width="226" height="94" rx="8" fill="#fff" stroke="#d5d9e8"/>
+<text x="52" y="622" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:700" fill="#1e2340" text-anchor="start" >Câble 3 fils Gravity</text>
+<line x1="54" y1="642" x2="84" y2="642" stroke="#1b1b1b" stroke-width="4" stroke-linecap="round"/>
+<text x="94" y="646" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:500" fill="#1e2340" text-anchor="start" >noir : masse (GND)</text>
+<line x1="54" y1="660" x2="84" y2="660" stroke="#d33c3c" stroke-width="4" stroke-linecap="round"/>
+<text x="94" y="664" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:500" fill="#1e2340" text-anchor="start" >rouge : + 5 V</text>
+<line x1="54" y1="678" x2="84" y2="678" stroke="#2fa36b" stroke-width="4" stroke-linecap="round"/>
+<text x="94" y="682" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;font-weight:500" fill="#1e2340" text-anchor="start" >vert : signal → entrée</text>
+<rect x="290" y="600" width="250" height="78" rx="8" fill="#ffffff" stroke="#d5d9e8"/>
+<text x="301" y="624" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >Un muon traverse les deux tubes</text>
+<text x="301" y="646" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >presque au même instant :</text>
+<text x="301" y="668" style="font-family:'Inter','Segoe UI',Helvetica,Arial,sans-serif;font-size:12.5px;font-weight:500" fill="#2b3150" text-anchor="start" >coïncidence comptée si &lt; 1 ms</text></svg>
