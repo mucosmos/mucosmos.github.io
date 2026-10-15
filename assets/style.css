@@ -310,3 +310,5 @@ table.comparaison td { font-size: .93rem; }
 .actions.dl { margin: 6px 0 8px; }
 .actions.dl .bouton { font-size: .9rem; padding: 10px 16px; }
 .liste-fichiers .type.web { background: #e8f7f0; color: #0f7a4d; }
+.grille > .encart { margin: 0; }
+.chaine .maillon { height: 100%; }
