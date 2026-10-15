@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MicroCosmos — rayons cosmiques et radioactivité avec Arduino</title>
+<meta name="description" content="Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger : détecteur, logiciel libre et activités pour la classe.">
+<meta property="og:title" content="MicroCosmos — rayons cosmiques et radioactivité avec Arduino">
+<meta property="og:description" content="Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger : détecteur, logiciel libre et activités pour la classe.">
+<meta property="og:image" content="https://mucosmos.github.io/images/microcosmos-banner.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html" aria-current="page">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="ressources.html">Ressources</a></nav>
+  </div>
+</header>
+<section class="bandeau accueil"><div class="contenu">
+  <h1 class="visuellement-cache">MicroCosmos</h1>
+  <img class="banniere" src="images/microcosmos-banner.png" width="1280" height="640" alt="MicroCosmos : étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger. Le détecteur à deux tubes et les captures du logiciel.">
+  <div class="intro-accueil">
+    <p class="chapo">Un détecteur de particules à environ 150 €, sans soudure, et un logiciel libre qui s’utilise dans le navigateur :
+    de quoi refaire en classe les expériences fondatrices de la physique des rayons cosmiques et étudier la radioactivité naturelle.</p>
+    <div class="actions">
+      <a class="bouton" href="logiciel.html#telecharger">Télécharger le logiciel</a>
+      <a class="bouton second" href="detecteur.html">Construire le détecteur</a>
+    </div>
+  </div>
+</div></section>
+<main>
+
+<section class="section">
+  <div class="texte">
+    <h2>Le projet</h2>
+    <p>Ce site rassemble les programmes, le logiciel et les activités des projets <strong>MicroCosmos</strong> et
+    <strong>Micro(K)osmos</strong>. L’objectif est de réinvestir le champ expérimental de la physique des particules
+    et de la physique nucléaire en s’appuyant sur les microcontrôleurs Arduino et les capteurs associés.</p>
+    <p>Avec un seul tube Geiger, on étudie la <strong>radioactivité naturelle</strong> du potassium 40 ; en empilant deux
+    tubes et en ne retenant que les impulsions simultanées (les <strong>coïncidences</strong>), on compte les
+    <strong>muons</strong> venus des rayons cosmiques.</p>
+  </div>
+  <div class="chiffres" style="margin-top:12px">
+    <div class="chiffre"><b>≈ 150 €</b><span>de matériel du commerce</span></div>
+    <div class="chiffre"><b>0 soudure</b><span>la coïncidence tient en dix lignes de code Arduino</span></div>
+    <div class="chiffre"><b>1,2 / min</b><span>coïncidences mesurées au niveau de la mer</span></div>
+    <div class="chiffre"><b>146 m⁻² s⁻¹</b><span>flux de muons mesuré (valeur de référence ≈ 170)</span></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Explorer le site</h2>
+  <div class="grille g3">
+    <a class="carte" href="logiciel.html"><div class="icone">💻</div><h3>Le logiciel Microcosmos</h3>
+      <p>Une interface dans le navigateur pour les deux études : comptages, coïncidences, séries de mesures, histogrammes. Linux, Windows, macOS.</p><span class="plus">Télécharger →</span></a>
+    <a class="carte" href="detecteur.html"><div class="icone">🔧</div><h3>Le détecteur</h3>
+      <p>Matériel, schémas des montages à un et deux tubes, principe de la coïncidence et versions autonomes sur batterie.</p><span class="plus">Construire →</span></a>
+    <a class="carte" href="detecteur.html#coincidence"><div class="icone">⏱️</div><h3>La coïncidence</h3>
+      <p>Pourquoi deux tubes empilés sélectionnent les muons : schémas, chronogramme et simulateur interactif.</p><span class="plus">Comprendre →</span></a>
+    <a class="carte" href="rayons-cosmiques.html"><div class="icone">🌌</div><h3>Rayons cosmiques</h3>
+      <p>Gerbes atmosphériques, muons, distribution angulaire et dilatation du temps mesurée entre Caen et l’Alpe d’Huez.</p><span class="plus">Découvrir →</span></a>
+    <a class="carte" href="radioactivite.html"><div class="icone">☢️</div><h3>Radioactivité</h3>
+      <p>Le potassium 40 en classe : bruit de fond, statistique, distance, écrans et séparation des rayonnements β et γ.</p><span class="plus">Expérimenter →</span></a>
+    <a class="carte" href="ressources.html"><div class="icone">📚</div><h3>Ressources</h3>
+      <p>Travaux pratiques, masterclass ondes gravitationnelles, diaporamas, articles, livres et liens utiles.</p><span class="plus">Parcourir →</span></a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="duo">
+    <div>
+      <h2>Les articles du BUP</h2>
+      <p>Le projet est détaillé dans deux articles parus dans le <a href="https://bupdoc.udppc.asso.fr/index.php">Bulletin de l’Union des Professeurs de Physique et de Chimie</a>.</p>
+      <div class="citation">C. Vanden Driessche, « MicroCosmos – Partie 1 : un détecteur de particules à base d’Arduino », <em>Bull. Un. Prof. Phys. Chim.</em>, vol. 118, n° 1068, p. 907-922, novembre 2024.</div>
+      <div class="citation">C. Vanden Driessche, « Micro(K)osmos – Partie 2 : étude expérimentale de la radioactivité du potassium (<sup>40</sup>K) en classe à l’aide d’un Arduino et d’un compteur Geiger », <em>Bull. Un. Prof. Phys. Chim.</em>, vol. 118, n° 1069, p. 1033-1048, décembre 2024.</div>
+      <p class="note">Les articles sont disponibles dans la rubrique <a href="ressources.html#articles">Ressources</a> pour un usage limité : préférez la promotion du BUP :-)</p>
+    </div>
+    <figure><img class="detoure" src="images/montage-2-tubes.webp" width="1100" height="986" loading="lazy" alt="Le MicroCosmos : Arduino avec son shield relié à deux modules Geiger empilés">
+    <figcaption>Le MicroCosmos : un Arduino Uno et deux modules Geiger empilés.</figcaption></figure>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

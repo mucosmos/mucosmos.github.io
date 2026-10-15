@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le détecteur — MicroCosmos</title>
+<meta name="description" content="Construire le détecteur MicroCosmos : matériel, schémas des montages à un et deux tubes Geiger, principe de la coïncidence et détecteurs autonomes.">
+<meta property="og:title" content="Le détecteur — MicroCosmos">
+<meta property="og:description" content="Construire le détecteur MicroCosmos : matériel, schémas des montages à un et deux tubes Geiger, principe de la coïncidence et détecteurs autonomes.">
+<meta property="og:image" content="https://mucosmos.github.io/images/microcosmos-banner.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html" aria-current="page">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="ressources.html">Ressources</a></nav>
+  </div>
+</header>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Construire</span><h1>Le détecteur</h1><p class="chapo">Un Arduino Uno, un shield et un ou deux modules Geiger du commerce : aucune soudure, et la coïncidence tient en quelques lignes de code.</p><nav class="sommaire" aria-label="Sur cette page"><a href="#principe">Principe</a><a href="#materiel">Matériel</a><a href="#montage-1">Montage à 1 tube</a><a href="#montage-2">Montage à 2 tubes</a><a href="#coincidence">La coïncidence</a><a href="#simulateur">Simulateur</a><a href="#autonomes">Détecteurs autonomes</a></nav></div></section>
+<main>
+
+<section class="section" id="principe">
+  <div class="duo">
+    <div>
+      <h2>Le principe</h2>
+      <p>Le cœur du détecteur est le <strong>module Geiger DFRobot Gravity (SEN0463)</strong>. Il porte un tube M4011
+      (10 mm × 88 mm, environ 7 cm² de surface sensible), son alimentation haute tension et la mise en forme des impulsions.
+      Quand une particule ionisante traverse le gaz du tube, elle déclenche une avalanche d’électrons : la sortie du module,
+      au repos à 5 V, tombe à 0 V pendant environ <strong>0,3 ms</strong>.</p>
+      <p>L’Arduino compte ces fronts descendants grâce à ses <strong>entrées d’interruption</strong> D2 et D3 : aucune électronique
+      supplémentaire, aucune soudure. Un tube suffit pour la radioactivité ; deux tubes empilés, lus en coïncidence, sélectionnent les muons cosmiques.</p>
+    </div>
+    <figure><img class="photo" src="images/double-tube.jpg" width="1400" height="787" loading="lazy" alt="Deux modules Geiger DFRobot empilés dans leurs boîtiers acryliques">
+    <figcaption>Deux modules Geiger empilés : tubes parallèles, écartés d’environ 3 cm.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="materiel">
+  <h2>Le matériel</h2>
+  <div class="tableau"><table>
+    <tr><th>Qté</th><th>Élément</th><th>Rôle</th><th style="text-align:right">Prix indicatif</th></tr>
+    <tr><td>1 ou 2</td><td>Module Geiger DFRobot Gravity (SEN0463)</td><td>tube M4011, haute tension et mise en forme intégrées</td><td class="n">≈ 70 € l’unité</td></tr>
+    <tr><td>1</td><td>Arduino Uno (ou compatible)</td><td>comptage des impulsions et des coïncidences</td><td class="n">≈ 25 €</td></tr>
+    <tr><td>1</td><td>Shield DFRobot Gravity E/S (V7)</td><td>connecteurs 3 fils enfichables</td><td class="n">≈ 10 €</td></tr>
+    <tr><td>1</td><td>Câble USB ; ordinateur, ou batterie USB et enregistreur micro-SD</td><td>alimentation et lecture des données</td><td class="n">—</td></tr>
+    <tr><td colspan="3"><strong>Total pour le montage à deux tubes</strong></td><td class="n"><strong>≈ 150 à 175 €</strong></td></tr>
+  </table></div>
+  <p class="note">Sources pour la radioactivité : un sel de potassium du laboratoire de chimie (KCl, thiocyanate de potassium KSCN) ou un manchon de lampe à gaz. Voir la page <a href="radioactivite.html">Radioactivité</a>.</p>
+</section>
+
+<section class="section" id="montage-1">
+  <span class="badge">Micro(K)osmos</span>
+  <h2>Montage à un tube : la radioactivité</h2>
+  <div class="duo">
+    <figure><img class="detoure" src="images/montage-1-tube.webp" width="1100" height="728" loading="lazy" alt="Arduino avec shield relié par un câble 3 fils à un module Geiger">
+    <figcaption>Le montage réel : un module Geiger relié à l’entrée D2.</figcaption></figure>
+    <div>
+      <ol class="etapes">
+        <li>Enficher le shield Gravity sur l’Arduino Uno.</li>
+        <li>Brancher le câble 3 fils du module Geiger sur la broche <strong>D2</strong> (noir sur GND, rouge sur 5 V, vert sur le signal).</li>
+        <li>Téléverser <code>DetectionCosmiques3_0.ino</code> (ou <code>MicroCosmosRadioactivite.ino</code>), puis lancer le <a href="logiciel.html">logiciel Microcosmos</a>, onglet Radioactivité.</li>
+      </ol>
+      <p>Le programme compte les impulsions par tranches de <strong>10 s</strong> : une série de 30 mesures dure 5 minutes,
+      ce qui tient dans une séance de travaux pratiques.</p>
+    </div>
+  </div>
+  <figure class="cadre"><img src="images/schema-montage-1-tube.svg" width="1000" height="610" loading="lazy" alt="Schéma du montage à un tube : Arduino Uno et shield, câble 3 fils vers le module Geiger sur l’entrée D2">
+  <figcaption>Schéma du montage à un tube, dessiné d’après la photo.</figcaption></figure>
+</section>
+
+<section class="section" id="montage-2">
+  <span class="badge">MicroCosmos</span>
+  <h2>Montage à deux tubes : les rayons cosmiques</h2>
+  <div class="duo">
+    <div>
+      <ol class="etapes">
+        <li>Empiler les deux modules sur leurs entretoises, <strong>tubes parallèles et écartés d’environ 3 cm</strong>.</li>
+        <li>Brancher le tube du dessus sur <strong>D2</strong> et celui du dessous sur <strong>D3</strong> : ce sont les deux entrées d’interruption de l’Uno.</li>
+        <li>Téléverser <code>DetectionCosmiques3_0.ino</code> : chaque seconde, il envoie les comptages de chaque tube, les coïncidences N12 et le temps écoulé.</li>
+      </ol>
+    </div>
+    <figure><img class="detoure" src="images/montage-2-tubes.webp" width="1100" height="986" loading="lazy" alt="Arduino avec shield relié à deux modules Geiger empilés">
+    <figcaption>Le montage réel : deux modules empilés, reliés à D2 et D3.</figcaption></figure>
+  </div>
+  <figure class="cadre"><img src="images/schema-montage-2-tubes.svg" width="1000" height="720" loading="lazy" alt="Schéma du montage à deux tubes : câblage vu de dessus vers D2 et D3, et vue de côté de la pile avec 3 cm entre les tubes">
+  <figcaption>Schéma du montage à deux tubes, dessiné d’après les photos : câblage vu de dessus et pile vue de côté.</figcaption></figure>
+</section>
+
+<section class="section" id="coincidence">
+  <h2>La coïncidence, au cœur du détecteur</h2>
+  <div class="texte">
+    <p>Un tube Geiger seul réagit à <strong>toute</strong> particule ionisante : les rayonnements β et γ de la radioactivité naturelle
+    (sol, murs, potassium de notre corps…) comme les rayons cosmiques, soit environ <strong>0,4 à 0,5 coup par seconde</strong>.
+    Impossible, avec un seul tube, de savoir ce qui vient du ciel.</p>
+    <p>Un <strong>muon</strong> au niveau de la mer, lui, se déplace presque à la vitesse de la lumière et traverse la matière sans
+    presque être dévié : il déclenche les deux tubes empilés <strong>au même instant</strong>. Deux impulsions de bruit de fond sans rapport,
+    en revanche, ne tombent presque jamais dans la même milliseconde. Ne compter que les coïncidences N12 sélectionne donc les muons.
+    C’est l’expérience de Bothe et Kohlhörster (1929), où le circuit à lampes de Rossi est remplacé par quelques lignes de code.</p>
+  </div>
+  <figure class="cadre"><img src="images/coincidence-geometrie.svg" width="1000" height="600" loading="lazy" alt="Vue en coupe des deux tubes : un muon vertical traverse les deux tubes et est compté ; un muon incliné ne traverse que le tube 1 ; un rayonnement bêta ou gamma ne touche que le tube 2">
+  <figcaption>Seul le cas ① donne une coïncidence. Les muons trop inclinés (②) sont perdus : l’acceptance géométrique de la pile vaut environ 19,5 % pour des tubes écartés de 3 cm.</figcaption></figure>
+
+  <h3>La coïncidence logicielle</h3>
+  <div>
+    <div class="texte">
+      <p>Chaque tube a sa propre routine d’interruption, qui incrémente son compteur et <strong>lève un drapeau</strong>.
+      La boucle principale regarde les deux drapeaux <strong>toutes les millisecondes</strong> : s’ils sont levés tous les deux, une coïncidence est comptée,
+      puis les deux drapeaux sont baissés. Cela revient à une <strong>fenêtre de coïncidence de 1 ms</strong>, la résolution du premier circuit de Rossi.</p>
+      <p>Les élèves peuvent lire ce code, modifier la fenêtre ou ajouter un troisième tube sur une carte disposant de plus d’entrées d’interruption.</p>
+    </div>
+<pre><span class="k">volatile int</span> Etat1, Etat2;            <span class="c">// un drapeau par tube</span>
+<span class="k">void</span> <span class="n">GeigerISR1</span>(){ Impulsion1++; Etat1 = 1; }  <span class="c">// tube 1</span>
+<span class="k">void</span> <span class="n">GeigerISR2</span>(){ Impulsion2++; Etat2 = 1; }  <span class="c">// tube 2</span>
+<span class="c">// dans setup() : broches 2 et 3, front descendant</span>
+attachInterrupt(digitalPinToInterrupt(2), GeigerISR1, FALLING);
+attachInterrupt(digitalPinToInterrupt(3), GeigerISR2, FALLING);
+
+<span class="k">void</span> <span class="n">loop</span>(){
+  <span class="k">for</span> (<span class="k">int</span> t = 0; t &lt; 1000; t++){       <span class="c">// bilan chaque seconde</span>
+    delay(1);                           <span class="c">// fenêtre de 1 ms</span>
+    <span class="k">if</span> (Etat1 == 1 &amp;&amp; Etat2 == 1) N12++; <span class="c">// un muon</span>
+    Etat1 = 0; Etat2 = 0;               <span class="c">// on baisse les drapeaux</span>
+  }
+  <span class="c">// ... envoi de Impulsion1, Impulsion2, N12, temps écoulé</span>
+}</pre>
+  </div>
+  <figure class="cadre"><img src="images/coincidence-chronogramme.svg" width="1000" height="470" loading="lazy" alt="Chronogramme : impulsions des deux tubes, drapeaux relus toutes les millisecondes ; seule la tranche où les deux drapeaux sont levés compte une coïncidence">
+  <figcaption>Chronogramme (échelle dilatée) : les impulsions isolées sont du bruit de fond ; seule la tranche « 11 » compte un muon.</figcaption></figure>
+
+  <h3>Et les coïncidences fortuites ?</h3>
+  <div class="grille g2">
+    <div class="encart orange"><p>Deux impulsions de bruit peuvent tomber par hasard dans la même milliseconde. Avec un taux R₁ et R₂ sur chaque tube et une fenêtre τ,
+    on en attend <strong>R₁ × R₂ × τ</strong> par seconde. Pour R₁ ≈ R₂ ≈ 0,5 s⁻¹ et τ = 1 ms : 0,5 × 0,5 × 0,001 ≈ 2,5 × 10⁻⁴ s⁻¹,
+    soit <strong>environ une par heure</strong>.</p></div>
+    <div class="encart vert"><p>Pendant ce temps, la pile compte <strong>environ 70 vraies coïncidences par heure</strong> (1,2 par minute).
+    Les fortuites représentent donc à peine 1 à 2 % du signal. Le logiciel Microcosmos affiche d’ailleurs ce nombre de fortuites attendues en direct.</p></div>
+  </div>
+
+  <h3 id="simulateur">Simulateur : voir la coïncidence en action</h3>
+  <p class="texte">Le simulateur reproduit le détecteur avec des taux réalistes : environ 0,4 coup/s de bruit de fond par tube et des muons tirés selon une loi en cos²θ.
+  Le temps est accéléré. Essayez d’agrandir la fenêtre de coïncidence : les fortuites (en jaune) deviennent vite plus nombreuses que les vrais muons (en vert).</p>
+  <div class="simu">
+    <canvas id="simu-canvas" width="960" height="420" aria-label="Animation : particules traversant les deux tubes et chronogramme des impulsions"></canvas>
+    <div class="compteurs">
+      <div class="cpt"><b id="simu-n1">0</b><span>N1 · tube 1</span></div>
+      <div class="cpt"><b id="simu-n2">0</b><span>N2 · tube 2</span></div>
+      <div class="cpt n12"><b id="simu-n12">0</b><span>N12 · <span id="simu-detail"></span></span></div>
+      <div class="cpt"><b id="simu-t" style="font-size:1.15rem;padding:6px 0">0 min 00 s</b><span>temps de mesure</span></div>
+    </div>
+    <div class="reglages">
+      <button id="simu-pause" type="button">❚❚ Pause</button>
+      <button id="simu-raz" type="button">↺ Remettre à zéro</button>
+      <label>Vitesse <input id="simu-vitesse" type="range" min="1" max="120" value="10"><span id="simu-vitesse-v">× 10</span></label>
+      <label>Fenêtre
+        <select id="simu-fenetre"><option value="0.001" selected>1 ms (Arduino)</option><option value="0.01">10 ms</option><option value="0.1">100 ms</option><option value="1">1 s</option></select></label>
+      <span id="simu-attendu" style="color:#fbbf24"></span>
+    </div>
+    <div class="legende"><span><i style="background:#34d399"></i>muon dans les deux tubes (vraie coïncidence)</span><span><i style="background:#f87171"></i>muon dans un seul tube</span>
+    <span><i style="background:#fbbf24"></i>β / γ de la radioactivité naturelle, et coïncidence fortuite</span></div>
+  </div>
+
+  <h3>Compte-t-il vraiment des muons ?</h3>
+  <div class="texte">
+    <p>Une mesure de 4 h 18 min (15 482 s) a donné un taux stable de 0,0199 coïncidence par seconde. En divisant par la surface sensible
+    (A = 7 cm²) et par l’acceptance géométrique de la pile (ε = 19,5 % pour des tubes écartés de 3 cm, calculée par un petit script Monte-Carlo) :</p>
+    <p style="text-align:center;font-size:1.15rem"><strong>Φ = 0,0199 s⁻¹ / (0,195 × 7 × 10⁻⁴ m²) ≈ 146 muons m⁻² s⁻¹</strong></p>
+    <p>C’est cohérent avec la valeur de référence au niveau de la mer (environ 170) et avec les 135 mesurés dans le même lycée avec un détecteur à scintillateur.</p>
+  </div>
+</section>
+
+<section class="section" id="autonomes">
+  <h2>Les détecteurs autonomes</h2>
+  <p class="texte">Sur batterie, avec un écran LCD et une carte micro-SD, le détecteur se passe d’ordinateur : on peut l’emmener en montagne, en avion,
+  ou le laisser compter plusieurs jours.</p>
+  <div class="grille g2">
+    <div class="carte">
+      <figure><img class="photo" src="images/mk-photo3.jpg" width="800" height="339" loading="lazy" alt="Détecteur de rayons cosmiques autonome : boîtier bleu avec écran affichant les comptages, à côté de deux tubes Geiger sur un support orientable imprimé en 3D"></figure>
+      <span class="badge">Rayons cosmiques</span>
+      <h3 style="margin-top:10px">Le MicroCosmos autonome</h3>
+      <p>Un boîtier imprimé en 3D contient l’Arduino, un <strong>écran</strong>, un lecteur de <strong>carte SD</strong> et une <strong>batterie</strong>.
+      Les deux tubes sont montés sur un support orientable gradué : on règle l’angle θ au zénith pour mesurer la distribution angulaire des muons.</p>
+      <p>L’écran affiche en direct :</p>
+      <p><span class="lcd">t_tot: 33
+N1: 17
+N2: 15
+N12: 2
+t_exp: 33
+SD OK</span></p>
+      <p class="note">Durée totale, comptages de chaque tube, coïncidences, durée de l’expérience et état de la carte SD, où chaque mesure est enregistrée.
+      Idéal pour des mesures en altitude, comme la comparaison entre Caen et l’Alpe d’Huez (<a href="rayons-cosmiques.html#altitude">voir l’expérience</a>).</p>
+    </div>
+    <div class="carte">
+      <figure><img class="photo" src="images/mkphoto6.jpg" width="800" height="450" loading="lazy" alt="Micro(K)osmos autonome : boîtier noir avec écran LCD bleu relié à un module Geiger"></figure>
+      <span class="badge">Radioactivité</span>
+      <h3 style="margin-top:10px">Le Micro(K)osmos autonome</h3>
+      <p>Un seul tube Geiger relié à un Arduino logé dans un boîtier imprimé en 3D, avec un <strong>écran LCD</strong> de deux lignes et un bouton.
+      Plus besoin d’ordinateur ni de moniteur série : les élèves lisent directement leurs mesures pour remplir le tableau.</p>
+      <p>L’écran affiche en direct :</p>
+      <p><span class="lcd">N=4    N_MOY=3.58
+n=24   t=240s</span></p>
+      <p class="note">N : impulsions comptées pendant la dernière mesure de 10 s ; N_MOY : moyenne des mesures ; n : nombre de mesures ; t : durée écoulée.
+      Ici, 24 mesures de 10 s en 240 s.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

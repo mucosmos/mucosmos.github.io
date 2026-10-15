@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logiciel Microcosmos — MicroCosmos</title>
+<meta name="description" content="Télécharger le logiciel Microcosmos : interface web pour les rayons cosmiques et la radioactivité, programmes Arduino et notice.">
+<meta property="og:title" content="Logiciel Microcosmos — MicroCosmos">
+<meta property="og:description" content="Télécharger le logiciel Microcosmos : interface web pour les rayons cosmiques et la radioactivité, programmes Arduino et notice.">
+<meta property="og:image" content="https://mucosmos.github.io/images/microcosmos-banner.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html" aria-current="page">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="ressources.html">Ressources</a></nav>
+  </div>
+</header>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Logiciel libre · GPL v3</span><h1>Le logiciel Microcosmos</h1><p class="chapo">Une interface dans le navigateur pour piloter le détecteur, enregistrer les mesures et tracer les histogrammes. Linux, Windows et macOS.</p><nav class="sommaire" aria-label="Sur cette page"><a href="#presentation">Présentation</a><a href="#telecharger">Télécharger</a><a href="#installation">Installation</a><a href="#onglets">Les onglets</a><a href="#contenu">Contenu</a></nav></div></section>
+<main>
+
+<section class="section" id="presentation">
+  <div class="duo">
+    <div>
+      <h2>Un logiciel, deux études</h2>
+      <p><strong>Microcosmos</strong> est une interface qui s’ouvre dans le navigateur pour piloter le détecteur
+      (1 ou 2 tubes Geiger reliés à un Arduino Uno). Deux onglets, deux études :</p>
+      <ul>
+        <li><strong>Rayons cosmiques</strong> : comptages des deux tubes et de leurs coïncidences, expériences de durée réglable, graphique par intervalle et histogramme comparé à la loi de Poisson ;</li>
+        <li><strong>Radioactivité</strong> : séries de 30, 60 ou N mesures de 10 s sur un tube, tableau à recopier dans le cahier et histogramme.</li>
+      </ul>
+      <p>Il fonctionne sous <strong>Linux, Windows et macOS</strong>, enregistre les mesures dans des fichiers texte
+      lisibles par LibreOffice Calc ou Excel, et propose un <strong>mode simulation</strong> pour essayer sans détecteur.</p>
+    </div>
+    <figure><img class="detoure" src="images/montage-2-tubes.webp" width="1100" height="986" loading="lazy" alt="Le détecteur MicroCosmos : un Arduino relié à deux modules Geiger empilés">
+    <figcaption>Le logiciel pilote le détecteur relié en USB : un ou deux tubes Geiger sur un Arduino Uno.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="telecharger">
+  <h2>Télécharger</h2>
+  <div class="carte telecharger">
+    <a href="telechargements/Notice_Microcosmos.pdf"><img src="images/notice-couverture-1.png" alt="Première page de la notice Microcosmos" style="border-radius:8px;border:1px solid var(--ligne)" loading="lazy"></a>
+    <div>
+      <h3 style="margin-top:0">Microcosmos — logiciel, programmes Arduino et notice</h3>
+      <p>L’archive contient le logiciel (Python), l’interface web, les deux programmes Arduino, les scripts de lancement
+      et la notice illustrée. Logiciel libre sous licence GNU GPL v3.</p>
+      <div class="grille g2" style="margin-bottom:16px">
+        <div class="choix">
+          <b>Windows · macOS · Linux</b>
+          <span>Archive complète : logiciel, programmes Arduino, scripts de lancement et notices.</span>
+          <a class="bouton" href="telechargements/microcosmos.zip" download>⬇ microcosmos.zip <span style="opacity:.75;font-weight:500">(1,8 Mo)</span></a>
+        </div>
+        <div class="choix">
+          <b>Linux Mint · Ubuntu · Debian</b>
+          <span>Paquet .deb : installation par double-clic, Microcosmos apparaît dans le menu.</span>
+          <a class="bouton" href="telechargements/microcosmos_1.2.0_all.deb" download>⬇ microcosmos_1.2.0_all.deb <span style="opacity:.75;font-weight:500">(0,9 Mo)</span></a>
+        </div>
+      </div>
+      <ul class="liste-fichiers"><li><a href="telechargements/Notice_Microcosmos.pdf"><span class="type pdf">PDF</span><span>Notice Microcosmos<span class="desc">Installation Windows et Linux, programme Arduino, les deux études (5 pages)</span></span></a></li><li><a href="telechargements/Notice_Microcosmos_Linux.pdf"><span class="type pdf">PDF</span><span>Notice pour Linux (paquet .deb)<span class="desc">Installation par paquet .deb (Linux Mint, Ubuntu, Debian), Arduino et les deux études (5 pages)</span></span></a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation">
+  <h2>Installation en trois étapes</h2>
+  <div class="grille g3">
+    <div class="carte"><h3>1 · Programmer l’Arduino</h3>
+      <p>Ouvrir <code>arduino/DetectionCosmiques3_0/DetectionCosmiques3_0.ino</code> avec l’IDE Arduino, choisir la carte
+      « Arduino Uno » et le bon port, puis <strong>Téléverser</strong>. Ce programme sert aux deux études ; il n’y a à le faire qu’une fois.</p></div>
+    <div class="carte"><h3>2 · Lancer le logiciel</h3>
+      <p><strong>Windows</strong> : installer Python depuis python.org en cochant « Add python.exe to PATH », puis double-cliquer sur <code>lancer.bat</code>.</p>
+      <p><strong>Linux (paquet .deb)</strong> : double-cliquer sur <code>microcosmos_1.2.0_all.deb</code>, puis « Installer le paquet ». Microcosmos apparaît dans le menu (Éducation ou Sciences).</p>
+      <p><strong>Linux (archive)</strong> : <code>sudo apt install python3-serial</code> et <code>sudo usermod -aG dialout $USER</code> (une fois, puis redémarrer), puis double-clic sur <code>lancer.sh</code>.</p></div>
+    <div class="carte"><h3>3 · Mesurer</h3>
+      <p>Le navigateur s’ouvre sur <code>http://localhost:8001</code>. Choisir le port de l’Arduino puis <strong>Connecter</strong>.
+      Laisser la fenêtre noire ouverte pendant l’utilisation. Cocher « Simulation » pour essayer sans détecteur.</p></div>
+  </div>
+  <div class="encart"><p><strong>Ce qu’envoie l’Arduino.</strong> Chaque seconde, une ligne <code>D;seconde;impulsions GM1;impulsions GM2;coïncidences</code>
+  (tube 1 sur l’entrée 2, tube 2 sur l’entrée 3). Une coïncidence est comptée quand les deux tubes réagissent dans la même fenêtre de 1 ms
+  (<a href="detecteur.html#coincidence">voir le principe</a>). Pour la radioactivité, le logiciel additionne les impulsions du tube choisi par tranches de 10 s mesurées par l’Arduino.</p></div>
+  <div class="encart vert"><p><strong>Le paquet .deb pour Linux.</strong> Il installe aussi le module du port série (<code>python3-serial</code>),
+  ajoute « Microcosmos » au menu et donne directement accès aux ports USB : pas de commande <code>usermod</code> ni de redémarrage.
+  Si le détecteur était branché pendant l’installation, le débrancher puis le rebrancher. Les mesures sont rangées dans <code>Documents/Microcosmos</code>.
+  Il remplace la version 1.1.0 si elle est installée. Pour désinstaller : <code>sudo apt remove microcosmos</code> (les mesures sont conservées).
+  Tout est détaillé dans la <a href="telechargements/Notice_Microcosmos_Linux.pdf">notice Linux</a>.</p></div>
+  <p class="note">Options de lancement : <code>--reseau</code> (accès depuis les autres appareils du réseau), <code>--dossier CHEMIN</code>, <code>--port-web 8001</code>.
+  Le logiciel du cosmodétecteur utilisant le port 8000, les deux peuvent fonctionner en même temps.</p>
+</section>
+
+<section class="section" id="onglets">
+  <h2>Les deux onglets</h2>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/capture-cosmiques.png"><img src="images/capture-cosmiques.png" width="1366" height="768" loading="lazy" alt="Capture de l’onglet Rayons cosmiques : compteurs des deux tubes et des coïncidences, réglages de l’expérience, graphique par intervalle et histogramme"></a>
+    <figcaption>Onglet « Rayons cosmiques » : expérience de 2 h en cours, 74 coïncidences en 1 h. Cliquer pour agrandir.</figcaption></figure>
+    <div>
+      <h3>Rayons cosmiques</h3>
+      <ul>
+        <li><strong>Trois cartes</strong> : le total de chaque compteur depuis la remise à zéro et le taux en coups/min avec son incertitude (± √N / t).
+        La carte des coïncidences donne aussi le nombre de <strong>coïncidences fortuites</strong> attendues (R₁ × R₂ × 1 ms).</li>
+        <li><strong>Expérience</strong> : durée (0 = sans limite), intervalle de comptage et commentaire. Une ligne est écrite à la fin de chaque intervalle dans <code>microcosmos_AAAA-MM-JJ_….txt</code>.</li>
+        <li><strong>Graphique</strong> : évolution des comptages par intervalle et histogramme comparé à la loi de Poisson de même moyenne.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/capture-radioactivite.png"><img src="images/capture-radioactivite.png" width="1400" height="787" loading="lazy" alt="Capture de l’onglet Radioactivité : dernière mesure, série de 30 mesures, tableau et histogramme"></a>
+    <figcaption>Onglet « Radioactivité » : série de 30 mesures de 10 s, tableau et histogramme. Cliquer pour agrandir.</figcaption></figure>
+    <div>
+      <h3>Radioactivité</h3>
+      <ul>
+        <li><strong>30 mesures</strong> (5 min), <strong>60 mesures</strong> (10 min) ou un autre nombre ; chaque mesure dure exactement 10 s.</li>
+        <li><strong>Tableau des mesures</strong> en colonnes de 10, facile à recopier ; <strong>Imprimer</strong> n’imprime que le tableau.</li>
+        <li><strong>Histogramme</strong> : la moyenne et l’écart-type ne sont <em>pas</em> affichés, pour que les élèves les calculent eux-mêmes.
+        Ils figurent dans le fichier <code>radioactivite_….txt</code>, pour le professeur.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p><strong>Onglet Fichiers</strong> : téléchargement des mesures (texte avec tabulations, pour LibreOffice Calc ou Excel) et des deux programmes Arduino depuis l’interface.</p>
+</section>
+
+<section class="section" id="contenu">
+  <div class="duo" style="align-items:start">
+    <div>
+      <h2>Contenu de l’archive</h2>
+      <div class="tableau"><table>
+        <tr><th>Fichier</th><th>Rôle</th></tr>
+        <tr><td><code>microcosmos.py</code></td><td>programme principal (serveur de l’interface web)</td></tr>
+        <tr><td><code>station.py</code></td><td>lecture des données, expériences, séries, fichiers</td></tr>
+        <tr><td><code>detecteur.py</code></td><td>liaison série avec l’Arduino et détecteur simulé</td></tr>
+        <tr><td><code>web/index.html</code></td><td>interface</td></tr>
+        <tr><td><code>arduino/DetectionCosmiques3_0/</code></td><td>programme Arduino recommandé (deux études)</td></tr>
+        <tr><td><code>arduino/MicroCosmosRadioactivite/</code></td><td>programme à un seul tube (onglet Radioactivité)</td></tr>
+        <tr><td><code>lancer.sh</code> · <code>lancer.bat</code></td><td>lancement par double-clic</td></tr>
+        <tr><td><code>Notice_Microcosmos*.pdf</code></td><td>notices illustrées</td></tr>
+        <tr><td><code>LICENSE</code></td><td>licence GNU GPL version 3</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <h2>Auteurs et licence</h2>
+      <p>Détecteur et programmes Arduino : <strong>Cédric Vanden Driessche</strong>. Interface Python-web : conception et direction du projet
+      <strong>Cédric Vanden Driessche</strong> (2026), professeur de physique-chimie au lycée Charles de Gaulle à Caen ; développement du code : Claude (Anthropic), sous sa direction.</p>
+      <p>Ce programme est un logiciel libre : vous pouvez le redistribuer et le modifier selon les termes de la
+      <a href="licence.html">licence publique générale GNU (GPL)</a>, version 3 ou toute version ultérieure. Il est distribué sans aucune garantie.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
