@@ -287,3 +287,8 @@ table.mesures-compact th { background: #f0f1f8; }
 .tab-mesures td:first-child { white-space: nowrap; }
 /* photos détourées (fond transparent) */
 img.detoure { display: block; margin: 0 auto; max-height: 460px; width: auto; max-width: 100%; filter: drop-shadow(0 10px 18px rgba(20, 24, 60, .18)); }
+/* dessins ligne claire */
+.dessin-legende { margin: 0 0 1.6em; background: #fff; border: 1px solid var(--ligne); border-radius: 14px; padding: 18px; }
+.dessin-legende img { width: 100%; height: auto; }
+.carte .vignette { display: block; height: 96px; width: auto; max-width: 100%; margin: -4px 0 12px; }
+@media (max-width: 700px) { .dessin-legende { overflow-x: auto; padding: 10px; } .dessin-legende img { width: 680px; max-width: none; } }
