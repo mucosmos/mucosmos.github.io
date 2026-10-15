@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le cosmodétecteur — MicroCosmos</title>
+<meta name="description" content="Le cosmodétecteur de Sciences à l’École, grand frère du MicroCosmos : fonctionnement, expériences, et un nouveau logiciel libre de pilotage et d’étalonnage.">
+<meta property="og:title" content="Le cosmodétecteur — MicroCosmos">
+<meta property="og:description" content="Le cosmodétecteur de Sciences à l’École, grand frère du MicroCosmos : fonctionnement, expériences, et un nouveau logiciel libre de pilotage et d’étalonnage.">
+<meta property="og:image" content="https://mucosmos.github.io/images/microcosmos-banner.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="cosmodetecteur.html" aria-current="page">Cosmodétecteur</a><a href="ressources.html">Ressources</a></nav>
+  </div>
+</header>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Sciences à l’École · Cosmos à l’École</span><h1>Le cosmodétecteur</h1><p class="chapo">Le grand frère du MicroCosmos : un détecteur de muons à scintillateurs et photomultiplicateurs, prêté aux lycées par Sciences à l’École. Et un nouveau logiciel libre pour le piloter.</p><nav class="sommaire" aria-label="Sur cette page"><a href="#presentation">Présentation</a><a href="#fonctionnement">Fonctionnement</a><a href="#experiences">Expériences</a><a href="#comparaison">Et le MicroCosmos ?</a><a href="#logiciel">Nouveau logiciel</a><a href="#documents">Documents</a></nav></div></section>
+<main>
+
+<section class="section" id="presentation">
+  <div class="duo">
+    <div>
+      <h2>Le grand frère du MicroCosmos</h2>
+      <p>Le <strong>cosmodétecteur</strong> est un détecteur de muons cosmiques prêté aux lycées par
+      <a href="https://www.sciencesalecole.org/plan-cosmos-a-lecole-materiel/">Sciences à l’École</a>, dans le cadre du plan
+      <strong>« Cosmos à l’École »</strong>. Cette « roue cosmique » a été conçue au CPPM (Centre de physique des particules de Marseille).
+      Le matériel reste la propriété de l’Observatoire de Paris, qui héberge le dispositif Sciences à l’École ; il est prêté pour trois ans,
+      renouvelables, aux établissements retenus après un appel à candidatures.</p>
+      <p>C’est lui qui a servi d’inspiration au MicroCosmos : même principe de <a href="detecteur.html#coincidence">coïncidence</a>
+      entre plusieurs détecteurs empilés, mêmes expériences de base, mais avec des détecteurs professionnels bien plus sensibles.
+      Le MicroCosmos en est une version modeste et bon marché, qu’on peut multiplier dans une salle de TP.</p>
+      <p>Le cosmodétecteur a aussi servi de référence pour valider les mesures du MicroCosmos : le flux de muons mesuré au lycée
+      avec le cosmodétecteur (135 m⁻² s⁻¹) est cohérent avec celui trouvé avec les tubes Geiger (146 m⁻² s⁻¹).</p>
+    </div>
+    <figure><img class="photo" src="images/cosmodetecteur.jpg" width="723" height="548" loading="lazy" alt="Le cosmodétecteur : trois raquettes de scintillateur montées sur une roue graduée, reliées à un boîtier électronique et à un ordinateur portable">
+    <figcaption>Le cosmodétecteur en fonctionnement, relié à l’ordinateur. Crédit : Sciences à l’École.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="fonctionnement">
+  <h2>Comment il détecte les muons</h2>
+  <p class="texte">Les trois raquettes sont fixées sur une roue graduée qui permet de les incliner. Chaque raquette est suivie de la même chaîne de détection :</p>
+  
+<div class="chaine">
+  <div class="maillon"><b>1</b><h4>Scintillateur</h4><p>Une « raquette » de plastique scintillant (150 × 285 × 10 mm) émet un éclair de lumière au passage d’un muon.</p></div>
+  <div class="fl" aria-hidden="true">→</div>
+  <div class="maillon"><b>2</b><h4>Photomultiplicateur</h4><p>Il convertit cette lumière en impulsion électrique et l’amplifie environ un million de fois.</p></div>
+  <div class="fl" aria-hidden="true">→</div>
+  <div class="maillon"><b>3</b><h4>Discriminateur</h4><p>Il ignore les impulsions sous un seuil réglable et transforme les autres en signaux carrés.</p></div>
+  <div class="fl" aria-hidden="true">→</div>
+  <div class="maillon"><b>4</b><h4>Coïncidence</h4><p>Un « ET » logique ne garde que les signaux simultanés de plusieurs raquettes : ce sont les muons.</p></div>
+</div>
+  <div class="grille g2" style="margin-top:22px">
+    <div class="encart"><p><strong>Pourquoi la coïncidence ?</strong> Chaque photomultiplicateur produit de nombreuses impulsions parasites (bruit d’obscurité),
+    bien plus fréquentes que les muons. Un seul détecteur ne peut donc pas les distinguer. Un muon, lui, traverse les raquettes empilées
+    presque à la vitesse de la lumière : il les déclenche toutes en quelques nanosecondes.</p></div>
+    <div class="encart orange"><p><strong>Les coïncidences fortuites.</strong> Avec 100 coups par seconde sur chaque voie et une fenêtre de 100 ns,
+    on attend N = n₁ × n₂ × T = 100 × 100 × 10⁻⁷ = 10⁻³ coïncidence fortuite par seconde : négligeable devant le millier de muons
+    comptés pendant le même temps. C’est le même calcul que <a href="detecteur.html#coincidence">pour le MicroCosmos</a>, avec une fenêtre 10 000 fois plus courte.</p></div>
+  </div>
+</section>
+
+<section class="section" id="experiences">
+  <h2>Les expériences</h2>
+  <div class="grille g3">
+    <div class="carte"><h3>Distribution angulaire</h3>
+      <p>En inclinant la roue, on mesure les coïncidences en fonction de l’angle au zénith, 5 minutes par angle (environ 2 h en tout).
+      La courbe suit une loi proche de a cos²θ + b : les muons arrivant de l’horizon traversent plus d’atmosphère.</p></div>
+    <div class="carte"><h3>Provenance des muons</h3>
+      <p>Le <strong>module Cerenkov</strong>, un cylindre de plexiglas couplé à un photomultiplicateur, est sensible au sens de traversée
+      des muons. En le tournant vers le haut puis vers le bas, on montre que les muons viennent du ciel.</p></div>
+    <div class="carte"><h3>Temps de vie du muon</h3>
+      <p>Dans le <strong>module temps de vie</strong>, certains muons s’arrêtent puis se désintègrent : on mesure le temps entre les deux signaux.
+      L’histogramme suit une exponentielle de constante τ ≈ 2,2 µs. C’est ce que le MicroCosmos ne peut pas faire.</p></div>
+  </div>
+  <p class="note" style="margin-top:14px">Avant les mesures, il faut régler l’appareil : tension des photomultiplicateurs (plateau d’efficacité),
+  seuils de discrimination (plateau des coïncidences) et temps mort de l’acquisition. Tout est détaillé dans le livret pédagogique.</p>
+</section>
+
+<section class="section" id="comparaison">
+  <h2>Cosmodétecteur et MicroCosmos</h2>
+  
+<div class="tableau"><table class="comparaison">
+  <tr><th></th><th>Cosmodétecteur</th><th>MicroCosmos</th></tr>
+  <tr><th>Détecteurs</th><td>3 raquettes de scintillateur + photomultiplicateurs, et deux modules (temps de vie, Cerenkov)</td><td>2 tubes Geiger-Müller du commerce (7 cm² chacun)</td></tr>
+  <tr><th>Électronique</th><td>boîtier dédié : hautes tensions et seuils réglables, 4 voies, 9 coïncidences</td><td>Arduino Uno et shield, sans soudure</td></tr>
+  <tr><th>Fenêtre de coïncidence</th><td>100 ns</td><td>1 ms</td></tr>
+  <tr><th>Taux de muons</th><td>environ 1 par seconde</td><td>environ 1 par minute</td></tr>
+  <tr><th>Expériences</th><td>distribution angulaire, provenance des muons, <strong>temps de vie du muon</strong></td><td>distribution angulaire, dilatation du temps en altitude, radioactivité</td></tr>
+  <tr><th>Accès</th><td>prêt de Sciences à l’École, sur candidature, pour 3 ans renouvelables</td><td>environ 150 € de matériel : on peut en équiper une classe</td></tr>
+</table></div>
+  <p class="note">Les deux appareils se complètent : le cosmodétecteur pour des mesures précises et le temps de vie du muon,
+  le MicroCosmos pour faire manipuler toute une classe, l’emmener en altitude ou étudier la radioactivité.</p>
+</section>
+
+<section class="section" id="logiciel">
+  <span class="badge">Nouveau · logiciel libre</span>
+  <h2>Un nouveau logiciel pour le cosmodétecteur</h2>
+  <p class="texte">Le cosmodétecteur était piloté par le logiciel LabVIEW « Roue Cosmique » (CPPM, 2011), qui ne fonctionne que sous Windows.
+  Nous l’avons réécrit en Python, avec une interface dans le navigateur, sur le modèle du <a href="logiciel.html">logiciel Microcosmos</a>.
+  Il fonctionne sous <strong>Linux, Windows et macOS</strong>, propose un <strong>mode simulation</strong> pour essayer sans détecteur,
+  et enregistre les mesures <strong>au même format que l’ancien logiciel</strong> : vos feuilles de calcul restent utilisables.</p>
+
+  <div class="grille g2 logiciels">
+    <div class="carte">
+      <figure class="cadre"><a href="images/capture-cosmodetecteur.png"><img src="images/capture-cosmodetecteur.png" width="1366" height="1060" loading="lazy" alt="Capture du logiciel Cosmodétecteur : compteurs des quatre voies, manip de comptage en cours, graphique des intervalles et histogramme"></a>
+      <figcaption>Onglet Comptages (ici en mode simulation).</figcaption></figure>
+      <h3>Cosmodétecteur</h3>
+      <p>Réglage des hautes tensions et des seuils des photomultiplicateurs, comptages de chaque voie, les 9 coïncidences,
+      mesure du temps de vie du muon avec ajustement exponentiel, graphiques et histogrammes comparés à la loi de Poisson.</p>
+      <div class="actions dl">
+        <a class="bouton" href="cosmodetecteur/cosmodetecteur.zip" download>⬇ cosmodetecteur.zip</a>
+        <a class="bouton clair" href="cosmodetecteur/cosmodetecteur_1.1.0_all.deb" download>⬇ paquet .deb (Linux)</a>
+      </div>
+      <p class="note">Notice : <a href="cosmodetecteur/Notice_Cosmodetecteur.pdf">Notice_Cosmodetecteur.pdf</a> · s’ouvre sur http://localhost:8000</p>
+    </div>
+    <div class="carte">
+      <figure class="cadre"><a href="images/capture-cosmodetecteur-etalonnage.png"><img src="images/capture-cosmodetecteur-etalonnage.png" width="1366" height="800" loading="lazy" alt="Capture du logiciel Cosmodétecteur-étalonnage : courbe en S du rapport des coïncidences en fonction de la haute tension, avec le coude et la tension conseillée"></a>
+      <figcaption>Étalonnage de la haute tension d’un PM (ici en mode simulation).</figcaption></figure>
+      <h3>Cosmodétecteur-étalonnage</h3>
+      <p>Logiciel compagnon qui réalise <strong>seul</strong> les trois étalonnages du livret (hautes tensions, seuils, temps mort),
+      par exemple pendant une nuit, puis conseille les réglages. Les hautes tensions ne dépassent jamais 1350 V.</p>
+      <div class="actions dl">
+        <a class="bouton" href="cosmodetecteur/cosmodetecteur-etalonnage.zip" download>⬇ cosmodetecteur-etalonnage.zip</a>
+        <a class="bouton clair" href="cosmodetecteur/cosmodetecteur-etalonnage_1.0.0_all.deb" download>⬇ paquet .deb (Linux)</a>
+      </div>
+      <p class="note">Mode d’emploi dans le fichier LISEZMOI de l’archive · s’ouvre sur http://localhost:8003</p>
+    </div>
+  </div>
+  <div class="encart"><p><strong>Installation.</strong> Sous Linux Mint, Ubuntu ou Debian, double-cliquez sur le paquet <code>.deb</code> puis
+  « Installer le paquet » : le logiciel apparaît dans le menu et a directement accès au port série. Sinon, décompressez l’archive et lancez
+  <code>lancer.sh</code> (Linux) ou <code>lancer.bat</code> (Windows), comme pour le <a href="logiciel.html#installation">logiciel Microcosmos</a>.
+  Les deux logiciels du cosmodétecteur utilisent le même port série : <strong>un seul peut être connecté au boîtier à la fois</strong>.</p></div>
+  <p class="note">Adaptation du logiciel Roue Cosmique (Sciences à l’École, CPPM, Michel Jevaud et Marta Rodo Bordera, 2011) pour le cosmodétecteur (José Busto).
+  Conception et direction du projet : Cédric Vanden Driessche (2026) ; développement du code : Claude (Anthropic), sous sa direction. Licence GNU GPL v3.</p>
+</section>
+
+<section class="section" id="documents">
+  <h2>Documents et liens</h2>
+  <div class="grille g2">
+    <ul class="liste-fichiers"><li><a href="ressources/livret_peda_27_4_17.pdf"><span class="type pdf">PDF</span><span>Livret pédagogique du cosmodétecteur<span class="desc">Sciences à l’École, version 2.1 (2017) : fonctionnement, réglages, expériences, traitement statistique, compléments de physique (165 pages)</span></span></a></li><li><a href="cosmodetecteur/Notice_Cosmodetecteur.pdf"><span class="type pdf">PDF</span><span>Notice du nouveau logiciel<span class="desc">Installation et utilisation du logiciel Cosmodétecteur (3 pages)</span></span></a></li>
+    </ul>
+    <ul class="liste-fichiers"><li><a href="https://www.sciencesalecole.org/plan-cosmos-a-lecole-materiel/"><span class="type web">WEB</span><span>Cosmos à l’École : le matériel<span class="desc">Présentation du cosmodétecteur sur le site de Sciences à l’École</span></span></a></li><li><a href="https://www.sciencesalecole.org/plan-cosmos-a-lecole-presentation/"><span class="type web">WEB</span><span>Cosmos à l’École : présentation<span class="desc">Le plan, les appels à candidatures et le réseau des lycées</span></span></a></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="cosmodetecteur.html">Cosmodétecteur</a></li><li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+<script data-goatcounter="https://mucosmos.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
