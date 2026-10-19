@@ -2,7 +2,7 @@
 
 Pilotez le détecteur Microcosmos (Arduino + 1 ou 2 tubes Geiger) **directement depuis le navigateur**, sans rien installer.
 
-Adresse : **https://mucosmos.github.io/microcosmos/**
+Adresse : **https://mucosmos.github.io/microcosmosWeb/**
 
 ## Ce qu'il faut
 
