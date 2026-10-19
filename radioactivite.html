@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=20261019">
 </head>
 <body>
 <header class="entete">
@@ -23,7 +23,7 @@
     <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html" aria-current="page">Radioactivité</a><a href="cosmodetecteur.html">Cosmodétecteur</a><a href="ressources.html">Ressources</a></nav>
   </div>
 </header>
-<section class="bandeau"><div class="contenu"><span class="surtitre">Micro(K)osmos</span><h1>La radioactivité</h1><p class="chapo">Étude expérimentale de la radioactivité naturelle du potassium 40 en classe, avec un Arduino et un seul tube Geiger.</p><nav class="sommaire" aria-label="Sur cette page"><a href="#potassium">Le potassium 40</a><a href="#rayonnements">α, β, γ</a><a href="#dispositif">Dispositif</a><a href="#experiences">Expériences</a><a href="#beta-gamma">Séparer β et γ</a><a href="#classe">En classe</a><a href="#documents">Documents</a></nav></div></section>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Micro(K)osmos</span><h1>La radioactivité</h1><p class="chapo">Étude expérimentale de la radioactivité naturelle du potassium 40 en classe, avec un Arduino et un seul tube Geiger.</p><nav class="sommaire" aria-label="Sur cette page"><a href="#potassium">Le potassium 40</a><a href="#rayonnements">α, β, γ</a><a href="#dispositif">Dispositif</a><a href="#experiences">Expériences</a><a href="#beta-gamma">Séparer β et γ</a><a href="#radon">Demi-vie du radon</a><a href="#classe">En classe</a><a href="#documents">Documents</a></nav></div></section>
 <main>
 
 <section class="section" id="potassium">
@@ -199,6 +199,80 @@
 
   <div class="encart vert" style="margin-top:22px"><p><strong>Conclusion.</strong> Avec un compteur Geiger, une boîte de sel de potassium et une plaque de plomb de toiture,
   on retrouve les proportions des deux voies de désintégration du potassium 40 : <strong>89 % de β et 11 % de γ</strong>, pour 89,28 % et 10,72 % en théorie.</p></div>
+</section>
+
+<section class="section" id="radon">
+  <span class="badge">Terminale · décroissance radioactive</span>
+  <h2>La demi-vie du radon : un aspirateur et un filtre à café</h2>
+  <p class="texte">Le potassium 40 vit 1,25 milliard d’années : impossible de voir son activité diminuer en classe. Pour observer une
+  <strong>décroissance radioactive</strong>, il faut une source à courte demi-vie… que l’on trouve gratuitement dans l’air de la salle :
+  les descendants du <strong>radon</strong>.</p>
+
+  <div class="exp-bloc">
+    <figure class="exp-img"><img src="images/radon-dispositif.png" width="628" height="776" loading="lazy" alt="Schéma de l’expérience : un filtre à café fixé sur le tube d’un aspirateur aspire l’air de la pièce pendant 40 minutes ; le filtre est ensuite posé sur le tube Geiger relié à l’Arduino, qui compte les impulsions par tranches de 10 s pendant 2 heures">
+    <figcaption>1. Aspiration de l’air pendant 40 min ; 2. comptage pendant 2 h, filtre posé sur le tube.</figcaption></figure>
+    <div>
+      <h3>L’expérience</h3>
+      <p>Un filtre à café est fixé sur le tube d’un aspirateur, qui fonctionne pendant <strong>40 minutes</strong> dans une pièce peu aérée
+      (ici une chambre mansardée). Le filtre est ensuite posé contre le tube Geiger, qui compte les impulsions par tranches de 10 s
+      pendant environ <strong>2 heures</strong>. Le bruit de fond, mesuré sans filtre, vaut 4,2 impulsions en 10 s.</p>
+      <h3>D’où vient le radon ?</h3>
+      <p>L’uranium 238, présent dans les roches (surtout le granite) et les matériaux de construction, donne naissance au radium 226 puis au
+      <strong>radon 222</strong>. Le radon est un <strong>gaz noble</strong> : il s’échappe des murs et du sol et s’accumule dans l’air des pièces
+      peu aérées. Ses descendants (polonium, plomb, bismuth) sont des <strong>métaux</strong> qui se fixent sur les poussières de l’air.
+      Le filtre retient ces poussières : on ne recueille pas le radon, qui traverse le filtre, mais ses « enfants ».</p>
+    </div>
+  </div>
+
+  <figure class="dessin-legende"><img src="images/radon-filiation.png" width="1292" height="468" loading="lazy" alt="Filiation : uranium 238 (4,5 milliards d’années), radium 226 (1600 ans), radon 222 (3,8 jours, gaz), puis sur les poussières : polonium 218 (3,1 min), plomb 214 (26,8 min), bismuth 214 (19,9 min), polonium 214 (164 µs) et plomb 210 (22 ans)">
+  <figcaption>De l’uranium des murs au plomb 210. Le polonium 218 disparaît en un quart d’heure ; le Geiger compte surtout les β⁻ du plomb 214 et du bismuth 214.</figcaption></figure>
+
+  <div class="exp-bloc">
+    <figure class="exp-img"><a href="images/radon-mesure.png"><img src="images/radon-mesure.png" width="1105" height="1170" loading="lazy" alt="Mesures du 16 octobre 2026 : impulsions comptées en 300 s en fonction du temps, de 7300 à 800 en deux heures, ajustées par une exponentielle de demi-vie 36,4 ± 0,8 min ; en dessous, ln(N − bruit de fond) en fonction du temps"></a>
+    <figcaption>Mesures du 16 octobre 2026 (classes de 300 s, barres d’erreur √N). Cliquer pour agrandir.</figcaption></figure>
+    <div>
+      <h3>Les résultats</h3>
+      <p>1 000 mesures de 10 s sont regroupées en classes de 300 s pour limiter les fluctuations. L’ajustement par une exponentielle
+      N₀ e<sup>−λt</sup> + bruit de fond donne :</p>
+      <p class="formule" style="font-size:1.25rem">T<sub>1/2</sub> = 36,4 ± 0,8 min</p>
+      <p>C’est plus que la demi-vie du plomb 214 (26,8 min) attendue. En regardant de près, la courbe n’est pas une simple exponentielle :
+      les points sont sous l’ajustement au début et à la fin, au-dessus au milieu. La pente de ln(N − N<sub>fond</sub>) <strong>augmente</strong>
+      au cours du temps : elle correspond à une demi-vie d’environ <strong>41 min entre 0 et 30 min</strong>, puis
+      <strong>35 min entre 60 et 120 min</strong>.</p>
+      <div class="encart orange"><p>La décroissance est <strong>freinée au début</strong>, puis accélère : on mesure une <strong>demi-vie apparente</strong>.</p></div>
+    </div>
+  </div>
+
+  <div class="texte-radon">
+<h3>L’explication : la filiation radioactive</h3>
+      <p>Le filtre contient à la fois du plomb 214 et du bismuth 214. Or le bismuth 214 n’est pas seulement détruit par ses propres
+      désintégrations : il est aussi <strong>fabriqué en permanence</strong> par la désintégration du plomb 214.</p>
+      <p class="formule-math"><math display="block"><mfrac><mrow><mi>d</mi><msub><mi>N</mi><mi>Bi</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>λ</mi><mi>Pb</mi></msub><msub><mi>N</mi><mi>Pb</mi></msub><mo>−</mo><msub><mi>λ</mi><mi>Bi</mi></msub><msub><mi>N</mi><mi>Bi</mi></msub></math></p>
+      <p>C’est l’image de <strong>deux bassins en cascade</strong> : le premier (plomb 214) se vide dans le second (bismuth 214), qui se vide lui-même.
+      Au début, le second est rempli presque aussi vite qu’il se vide : le comptage baisse lentement. Au bout de quelques heures, le bismuth ne fait
+      plus que suivre le plomb : c’est l’<strong>équilibre de filiation</strong>, et la demi-vie apparente tend vers 26,8 min.</p>
+      <p>Le modèle prévoit environ 50 min au début, puis 31 min entre 1 h et 2 h : c’est le comportement mesuré (41 min puis 35 min).</p>
+  </div>
+  <figure class="dessin-legende"><img src="images/radon-modele.png" width="1540" height="584" loading="lazy" alt="Modèle : activités du plomb 214 et du bismuth 214 et comptage total en fonction du temps ; le comptage total décroît plus lentement que le plomb 214 seul ; ln(comptage) est une courbe dont la pente donne 52 min au début et 29 min entre 2 et 3 heures">
+    <figcaption>Modèle calculé avec les demi-vies réelles (collecte de 40 min, puis mesure).</figcaption></figure>
+
+  <div class="grille g2">
+    <div class="encart vert"><p><strong>À retenir.</strong> Une demi-vie mesurée sur un mélange de noyaux « parents » et « enfants » est une
+    <strong>demi-vie apparente</strong> : elle dépend de l’instant où on la mesure. Le « ± 0,8 min » de l’ajustement ne mesure que le hasard
+    des comptages, pas l’erreur due à un modèle trop simple.</p></div>
+    <div class="encart"><p><strong>Radon et santé.</strong> Après le tabac, le radon est la deuxième cause de cancer du poumon en France
+    (niveau de référence : 300 Bq/m³ dans les bâtiments). <strong>Aérer quelques minutes chaque jour</strong> suffit à réduire fortement sa concentration.
+    Le filtre de l’expérience ne présente aucun danger : son activité est très faible et disparaît en quelques heures.</p></div>
+  </div>
+
+  <div class="grille g2" style="margin-top:22px">
+    <ul class="liste-fichiers">
+      <li><a href="mikrocosmos/fiche_radon.pdf"><span class="type pdf">PDF</span><span>Fiche élève : le radon piégé par un aspirateur<span class="desc">Terminale spécialité : expérience, filiation, exploitation et « pour aller plus loin » (équations de Bateman), 4 pages</span></span></a></li>
+    </ul>
+    <ul class="liste-fichiers">
+      <li><a href="microcosmosWeb/"><span class="type app">APP</span><span>Microcosmos dans le navigateur<span class="desc">Mode « Demi-vie (radon) » : courbe en direct, ajustement de T½ et demi-vie apparente par tranche de temps</span></span></a></li>
+    </ul>
+  </div>
 </section>
 
 <section class="section" id="classe">

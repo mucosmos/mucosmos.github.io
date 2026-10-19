@@ -312,3 +312,9 @@ table.comparaison td { font-size: .93rem; }
 .liste-fichiers .type.web { background: #e8f7f0; color: #0f7a4d; }
 .grille > .encart { margin: 0; }
 .chaine .maillon { height: 100%; }
+/* section radon */
+#radon .dessin-legende { max-width: 900px; margin: 10px auto 28px; }
+#radon .exp-img.large { max-width: 560px; }
+#radon .texte-radon { max-width: 860px; margin-top: 30px; padding-top: 30px; border-top: 1px dashed var(--ligne); }
+#radon .texte-radon h3 { margin-top: 0; }
+#radon .texte-radon .formule-math { max-width: 520px; }
