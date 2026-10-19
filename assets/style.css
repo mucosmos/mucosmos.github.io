@@ -318,3 +318,26 @@ table.comparaison td { font-size: .93rem; }
 #radon .texte-radon { max-width: 860px; margin-top: 30px; padding-top: 30px; border-top: 1px dashed var(--ligne); }
 #radon .texte-radon h3 { margin-top: 0; }
 #radon .texte-radon .formule-math { max-width: 520px; }
+/* page Logiciel 1.4 */
+.activites { list-style: none; padding: 0; display: grid; gap: 10px; }
+.activites li { line-height: 1.55; }
+.pastille { display: inline-block; font-size: .8rem; font-weight: 800; padding: 2px 10px; border-radius: 999px; margin-right: 6px; color: #fff; }
+.pastille.cos { background: #2f8f57; } .pastille.rad { background: #6d4fe0; } .pastille.dv { background: #c4501a; } .pastille.ard { background: #0b7285; }
+.versions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 8px; }
+@media (max-width: 900px) { .versions { grid-template-columns: minmax(0, 1fr); } }
+.version { position: relative; background: #fff; border: 1px solid var(--ligne); border-top: 5px solid var(--violet); border-radius: 14px; padding: 22px 22px 14px; box-shadow: var(--ombre); display: flex; flex-direction: column; }
+.version.web { border-top-color: #0b7285; } .version.linux { border-top-color: #2f8f57; } .version.win { border-top-color: #2b6fd6; }
+.version .lettre { position: absolute; top: 18px; right: 20px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; background: var(--gris); }
+.version.web .lettre { background: #0b7285; } .version.linux .lettre { background: #2f8f57; } .version.win .lettre { background: #2b6fd6; }
+.version h3 { margin: 0; }
+.version .sous { margin: 2px 0 14px; color: var(--gris); font-size: .9rem; }
+.version .bouton { justify-content: center; text-align: center; font-size: .9rem; padding: 11px 14px; overflow-wrap: anywhere; }
+.version.web .bouton { background: #0b7285; box-shadow: 0 6px 18px rgba(11,114,133,.3); }
+.version.linux .bouton { background: #2f8f57; box-shadow: 0 6px 18px rgba(47,143,87,.3); }
+.version.win .bouton { background: #2b6fd6; box-shadow: 0 6px 18px rgba(43,111,214,.3); }
+.version .bouton small { font-weight: 500; opacity: .8; }
+.plus-moins { list-style: none; padding: 0; margin: 16px 0 0; font-size: .9rem; display: grid; gap: 6px; }
+.plus-moins li { padding-left: 22px; position: relative; }
+.plus-moins li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+.plus-moins li.p::before { content: "+"; color: #2f8f57; }
+.plus-moins li.m::before { content: "–"; color: #c4501a; }
