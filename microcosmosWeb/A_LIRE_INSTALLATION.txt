@@ -1,0 +1,40 @@
+MISE EN LIGNE SUR mucosmos.github.io
+====================================
+
+1. Copiez le dossier « microcosmos » (tel quel) à la racine du dépôt mucosmos.github.io,
+   à côté de votre index.html actuel. Ne touchez pas à votre index.html, sauf pour l'étape 3.
+
+   mucosmos.github.io/
+   ├── index.html          <- votre page actuelle (conservée)
+   └── microcosmos/
+       ├── index.html
+       ├── moteur.js
+       ├── LISEZMOI.md
+       ├── LICENSE.txt
+       └── arduino/...
+
+   Sur le site github.com : ouvrez le dépôt, cliquez « Add file » > « Upload files »,
+   glissez le dossier microcosmos entier, puis cliquez « Commit changes ».
+   En ligne de commande : git add microcosmos && git commit -m "Microcosmos web" && git push
+
+2. Attendez 1 à 2 minutes. L'application est alors en ligne à l'adresse :
+   https://mucosmos.github.io/microcosmos/
+
+3. Dans votre index.html, ajoutez un lien vers l'application à l'endroit voulu, par exemple :
+
+   <a href="microcosmos/">Piloter le Microcosmos depuis le navigateur</a>
+
+   ou, sous forme de bouton :
+
+   <p><a href="microcosmos/" style="display:inline-block;padding:10px 18px;border-radius:8px;
+      background:#0b7285;color:#fff;text-decoration:none;font-weight:600">
+      Lancer Microcosmos (rayons cosmiques, radioactivité, demi-vie du radon)</a></p>
+   <p><small>Avec Chrome, Edge ou Firefox 151 (ou plus récent), sur un ordinateur où l'Arduino est branché en USB.</small></p>
+
+Vous pouvez renommer le dossier (par exemple « appli ») : l'adresse devient alors
+https://mucosmos.github.io/appli/ et le lien s'écrit href="appli/". Rien d'autre à modifier.
+
+Tester avant de publier : ouvrez microcosmos/index.html dans Chrome. La simulation marche
+directement. Pour essayer l'Arduino en local, il faut une adresse http://localhost : dans le
+dossier, lancez « python3 -m http.server » puis ouvrez http://localhost:8000/microcosmos/.
+Une fois en ligne (https), tout fonctionne.
