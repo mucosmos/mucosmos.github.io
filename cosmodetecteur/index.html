@@ -1,0 +1,671 @@
+<!doctype html>
+<!--
+  Cosmodétecteur — adaptation du logiciel « Roue Cosmique » [Sciences à l'École, CPPM]
+  [Michel Jevaud, Marta Rodo Bordera, 2011] pour le Cosmodétecteur [José Busto] ;
+  version web — conception et direction du projet : Cédric Vanden Driessche (2026),
+  professeur de physique-chimie au lycée Charles de Gaulle à Caen (cedric.vanden-driessche@ac-normandie.fr) ;
+  développement du code : Claude (Anthropic), sous sa direction.
+  Copyright (C) 2026 Cédric Vanden Driessche — SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosmodétecteur</title>
+<style>
+:root{
+  --fond:#eef1f4; --carte:#ffffff; --encre:#1b2430; --doux:#5f6b7a; --ligne:#d9dfe6;
+  --accent:#1f5fbf; --accent-doux:#e3ecfa; --ok:#1e8a4c; --alerte:#c2410c; --danger:#b42318;
+  --led-off:#c9d0d8;
+  --s1:#1f5fbf; --s2:#d9480f; --s3:#2b8a3e; --s4:#7048e8;
+  --mono: ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fond);color:var(--encre);font:15px/1.4 system-ui,"Segoe UI",Ubuntu,Cantarell,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:#13202f;color:#fff;padding:10px 20px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+header h1{font-size:19px;margin:0;font-weight:650;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+header h1 svg{flex:none}
+.connexion{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-left:auto}
+.connexion select{background:#1f3044;border:1px solid #33475e;color:#fff;border-radius:6px;padding:6px 8px;min-width:180px}
+.connexion label{display:flex;gap:6px;align-items:center;font-size:14px;color:#cfd8e3}
+.pastille{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:13px;background:#2a3a4d;color:#cfd8e3}
+.pastille i{width:9px;height:9px;border-radius:50%;background:#7b8796}
+.pastille.on{background:#16422b;color:#c9f2d9}.pastille.on i{background:#3ddc84}
+.pastille.sim{background:#4a3a12;color:#ffe8a8}.pastille.sim i{background:#ffc53d}
+.horloge{font-family:var(--mono);color:#cfd8e3;font-size:14px}
+nav{display:flex;gap:2px;padding:0 20px;background:#fff;border-bottom:1px solid var(--ligne);overflow-x:auto}
+nav button{border:0;background:none;padding:12px 14px;cursor:pointer;color:var(--doux);border-bottom:3px solid transparent;white-space:nowrap;font-weight:550}
+nav button.actif{color:var(--accent);border-bottom-color:var(--accent)}
+main{padding:18px 20px 40px;max-width:1400px;margin:0 auto}
+.onglet{display:none}.onglet.actif{display:block}
+.bandeau{display:none;margin-bottom:14px;padding:10px 14px;border-radius:8px;background:#fde8e6;color:#7a1a12;border:1px solid #f5c2bc}
+.bandeau.visible{display:block}
+.grille{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+#cartesVoies,#cartesMuon{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+@media (min-width:901px){#cartesVoies{grid-template-columns:repeat(2,1fr)}}
+.g-manip{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);align-items:start}
+@media (max-width:900px){.g-manip{grid-template-columns:1fr}}
+.carte{background:var(--carte);border:1px solid var(--ligne);border-radius:10px;padding:14px 16px}
+.carte h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--doux);margin:0 0 10px;font-weight:650;display:flex;align-items:center;gap:8px}
+.carte h2 .droite{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500}
+.compteur .valeur{font-family:var(--mono);font-size:38px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.compteur .sous{color:var(--doux);font-size:13px;min-height:18px}
+.barre{height:8px;border-radius:4px;background:#edf0f3;overflow:hidden;margin:8px 0 10px}
+.barre>div{height:100%;background:var(--accent);width:0;transition:width .3s}
+.led{width:12px;height:12px;border-radius:50%;background:var(--led-off);display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.led.on{background:#f0592b;box-shadow:0 0 8px #f0592b}
+.ligne{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ligne+.ligne{margin-top:8px}
+.champ{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--doux)}
+input[type=number],input[type=text],textarea,select.clair{border:1px solid var(--ligne);border-radius:6px;padding:6px 8px;background:#fff;min-width:0}
+input[type=number]{width:84px;font-family:var(--mono)}
+textarea{width:100%;resize:vertical;min-height:54px}
+.btn{border:1px solid var(--ligne);background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:550}
+.btn:hover:not(:disabled){border-color:#aab4c0}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.prim{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.vert{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.rouge{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.petit{padding:3px 9px;font-size:13px}
+header .btn{background:#2a3a4d;border-color:#3b5068;color:#fff}
+header .btn.prim{background:#3a7be0;border-color:#3a7be0}
+.etat-manip{display:flex;align-items:center;gap:8px;font-weight:600}
+.infos{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin-top:10px}
+.infos dt{color:var(--doux)}.infos dd{margin:0;font-family:var(--mono)}
+.progression{height:6px;border-radius:3px;background:#edf0f3;overflow:hidden;margin-top:10px}
+.progression>div{height:100%;background:var(--ok);width:0}
+.puces{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.puce{border:1px solid var(--ligne);border-radius:99px;padding:3px 10px;font-size:13px;cursor:pointer;background:#fff;user-select:none}
+.puce.on{color:#fff}
+canvas{width:100%;display:block}
+.graphes{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}
+@media (max-width:900px){.graphes{grid-template-columns:1fr}}
+.stats{font-size:13px;color:var(--doux);margin-top:6px;font-family:var(--mono)}
+.jauge{display:flex;justify-content:center}
+.ht-valeur{text-align:center;font-family:var(--mono);font-size:30px;font-weight:600;margin-top:-8px}
+.ht-valeur small,.compteur small{font-size:15px;color:var(--doux);font-family:system-ui,sans-serif;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--ligne)}
+th{color:var(--doux);font-weight:600;font-size:13px}
+td.num{font-family:var(--mono);text-align:right}
+.journal{font-family:var(--mono);font-size:12.5px;background:#0f1722;color:#d5e1ee;border-radius:8px;padding:12px;height:60vh;overflow:auto;white-space:pre-wrap}
+.note{color:var(--doux);font-size:13px}
+.vide{color:var(--doux);font-style:italic;padding:20px 0;text-align:center}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1b2430;color:#fff;padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw;z-index:10}
+.toast.visible{opacity:1}.toast.erreur{background:var(--danger)}
+.desactive{opacity:.55;pointer-events:none}
+#cartesMuon{grid-template-columns:1fr !important}
+.credits{max-width:1400px;margin:0 auto;padding:0 20px 28px;color:var(--doux);font-size:13px;text-align:center;line-height:1.6}
+.credits a{color:var(--accent)}
+a.btn{text-decoration:none;color:inherit;display:inline-block}
+.version{font-size:12px;color:#9fb0c3;font-weight:500;letter-spacing:0}
+.bandeau.avert-nav{background:#fff7e0;color:#6b4e00;border-color:#f1dc9a}
+.etapes{margin:6px 0 0;padding-left:20px;font-size:14px;color:var(--doux)}
+.etapes li+li{margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#5aa2ff" stroke-width="1.5"/><rect x="5" y="6" width="16" height="2.4" rx="1" fill="#cfe3ff"/><rect x="5" y="11.8" width="16" height="2.4" rx="1" fill="#cfe3ff"/><rect x="5" y="17.6" width="16" height="2.4" rx="1" fill="#cfe3ff"/><line x1="9" y1="2" x2="17" y2="24" stroke="#ff8a4c" stroke-width="1.6"/></svg>
+    Cosmodétecteur <span class="version" id="version">web 1.2.0</span>
+  </h1>
+  <span class="horloge" id="horloge">--:--:--</span>
+  <div class="connexion">
+    <label><input type="checkbox" id="simulation"> Simulation</label>
+    <button class="btn prim" id="btnConnexion">Connecter le boîtier</button>
+    <span class="pastille" id="pastille"><i></i><span>Déconnecté</span></span>
+  </div>
+</header>
+<nav id="onglets">
+  <button data-o="comptages" class="actif">Comptages</button>
+  <button data-o="ht">Haute tension</button>
+  <button data-o="coinc">Coïncidences</button>
+  <button data-o="muon">Vie du muon</button>
+  <button data-o="fichiers">Fichiers et aide</button>
+  <button data-o="journal">Journal</button>
+</nav>
+<main>
+  <div class="bandeau avert-nav" id="bandeauNav"></div>
+  <div class="bandeau" id="bandeau"></div>
+
+  <!-- ================= COMPTAGES ================= -->
+  <section class="onglet actif" id="o-comptages">
+    <div class="grille g-manip">
+      <div class="grille g4" id="cartesVoies"></div>
+      <div class="carte" id="carteManip">
+        <h2>Manip de comptage <span class="droite etat-manip" id="etatManip"><span class="led"></span>Arrêtée</span></h2>
+        <div class="ligne">
+          <div class="champ">Durée<div class="ligne">
+            <input type="number" id="dH" min="0" value="0" style="width:62px"> h
+            <input type="number" id="dM" min="0" max="59" value="10" style="width:62px"> min
+            <input type="number" id="dS" min="0" max="59" value="0" style="width:62px"> s</div></div>
+        </div>
+        <div class="ligne">
+          <div class="champ">Intervalle de temps<div class="ligne"><input type="number" id="intervalle" min="1" value="10"> secondes</div></div>
+        </div>
+        <div class="champ" style="margin-top:8px">Commentaire écrit dans le fichier
+          <textarea id="commentaire" placeholder="ex. coïncidence voies 1 et 2, seuil 40 mV"></textarea></div>
+        <div class="ligne" style="margin-top:10px">
+          <label><input type="checkbox" id="avecFichier" checked> Enregistrer dans un fichier</label>
+        </div>
+        <div class="ligne" style="margin-top:10px">
+          <button class="btn vert" id="btnLancer">Lancer la manip</button>
+          <button class="btn rouge" id="btnArreter" disabled>Arrêter</button>
+        </div>
+        <dl class="infos" id="infosManip"></dl>
+        <div class="progression"><div id="progManip"></div></div>
+        <p class="note">Durée 0 h 0 min 0 s = sans limite. Pendant une manip, les compteurs sont remis à zéro à chaque intervalle et les réglages HT et seuils sont verrouillés.</p>
+      </div>
+    </div>
+
+    <div class="carte" style="margin-top:14px">
+      <h2>Graphique des intervalles
+        <span class="droite ligne">
+          <label class="note"><input type="checkbox" id="son"> Son à chaque coup sur</label>
+          <select class="clair" id="sonSource"></select>
+        </span>
+      </h2>
+      <div class="puces" id="puces"></div>
+      <div class="graphes">
+        <div><canvas id="gTemps" height="280"></canvas></div>
+        <div><canvas id="gHisto" height="280"></canvas><div class="stats" id="statsHisto"></div></div>
+      </div>
+      <p class="note" id="noteGraph">Les points apparaissent à la fin de chaque intervalle pendant une manip. L'histogramme montre la répartition des comptages du premier compteur sélectionné, avec la loi de Poisson de même moyenne (courbe).</p>
+    </div>
+  </section>
+
+  <!-- ================= HAUTE TENSION ================= -->
+  <section class="onglet" id="o-ht">
+    <div class="grille g4" id="cartesHT"></div>
+    <p class="note" style="margin-top:12px">La consigne est envoyée quand vous cliquez sur « Appliquer ». La lecture se met à jour en continu. Toutes les HT sont remises à 0 V à la connexion et à la déconnexion. <b>En fin de séance, cliquez sur « Déconnecter » avant de fermer l'onglet</b> : si l'onglet est fermé directement, la page essaie de couper les HT, sans garantie ; éteignez alors le boîtier.</p>
+  </section>
+
+  <!-- ================= COINCIDENCES ================= -->
+  <section class="onglet" id="o-coinc">
+    <div class="ligne" style="margin-bottom:12px"><button class="btn" id="btnRazTout">Remettre tous les compteurs à zéro</button></div>
+    <div class="grille g4" id="cartesFonctions"></div>
+  </section>
+
+  <!-- ================= VIE DU MUON ================= -->
+  <section class="onglet" id="o-muon">
+    <div class="grille g-manip">
+      <div class="grille g4" id="cartesMuon"></div>
+      <div class="carte">
+        <h2>Manip vie du muon <span class="droite etat-manip" id="etatMuon"><span class="led"></span>Arrêtée</span></h2>
+        <div class="champ">Durée<div class="ligne">
+          <input type="number" id="mH" min="0" value="1" style="width:62px"> h
+          <input type="number" id="mM" min="0" max="59" value="0" style="width:62px"> min
+          <input type="number" id="mS" min="0" max="59" value="0" style="width:62px"> s</div></div>
+        <div class="champ" style="margin-top:8px">Commentaire écrit dans le fichier
+          <textarea id="commentaireMuon"></textarea></div>
+        <div class="ligne" style="margin-top:10px"><label><input type="checkbox" id="avecFichierMuon" checked> Enregistrer dans un fichier</label></div>
+        <div class="ligne" style="margin-top:10px">
+          <button class="btn vert" id="btnLancerMuon">Lancer la manip</button>
+          <button class="btn rouge" id="btnArreterMuon" disabled>Arrêter</button>
+        </div>
+        <dl class="infos" id="infosMuon"></dl>
+        <div class="progression"><div id="progMuon"></div></div>
+      </div>
+    </div>
+    <div class="carte" style="margin-top:14px">
+      <h2>Histogramme des temps de vie
+        <span class="droite ligne">
+                    <button class="btn petit" id="btnEffacerMuons">Effacer</button>
+        </span></h2>
+      <div class="ligne" style="margin-bottom:8px">
+        <label class="champ">Largeur des classes (µs)<input type="number" id="binMuon" value="0.5" min="0.05" step="0.05"></label>
+        <label class="champ">Ajustement de (µs)<input type="number" id="fitMin" value="2.5" min="0" step="0.1"></label>
+        <label class="champ">à (µs)<input type="number" id="fitMax" value="60" min="0.5" step="0.5"></label>
+        <label class="note" style="align-self:flex-end"><input type="checkbox" id="logMuon"> échelle log</label>
+        <label class="note" style="align-self:flex-end"><input type="checkbox" id="fondMuon" checked> avec fond plat</label>
+      </div>
+      <canvas id="gMuon" height="300"></canvas>
+      <div class="stats" id="statsMuon"></div>
+      <p class="note">Ajustement par maximum de vraisemblance d'une exponentielle décroissante <b>plus un fond plat</b> sur la plage choisie. Le fond plat vient des START et STOP sans lien entre eux (deux muons différents) : sur le cosmodétecteur, il représente souvent plus de la moitié des événements, et l'oublier fausse fortement τ. Le photomultiplicateur produit aussi des post-impulsions, vers 300 ns et vers 1,5 µs : commencez l'ajustement vers 2,5 µs. Valeur de référence : 2,197 µs pour le µ+ ; un peu moins en moyenne (≈ 2,1 µs) à cause de la capture des µ− dans la matière.</p>
+    </div>
+  </section>
+
+  <!-- ================= FICHIERS ================= -->
+  <section class="onglet" id="o-fichiers">
+    <div class="carte">
+      <h2>Fichiers de mesure</h2>
+      <table><thead><tr><th>Fichier</th><th>Date</th><th style="text-align:right">Taille</th><th></th></tr></thead><tbody id="listeFichiers"></tbody></table>
+      <p class="note">Les fichiers sont gardés <b>dans ce navigateur, sur cet ordinateur</b> : téléchargez-les pour les conserver (ils arrivent dans le dossier Téléchargements).
+        Même format que l'ancien logiciel (texte avec tabulations) : ils s'ouvrent directement dans LibreOffice Calc ou Excel.</p>
+    </div>
+    <div class="carte" style="margin-top:14px">
+      <h2>Aide</h2>
+      <ul class="etapes">
+        <li><b>Navigateur</b> : Chrome, Edge, Chromium ou Opera sur ordinateur (Windows, macOS, Linux, Chromebook). Firefox 151 et plus récent fonctionne aussi, sauf s'il est installé en « snap » ou soumis à des stratégies (<code>about:policies</code>) : dans ce cas, mettez <code>dom.webserial.enabled</code> à <code>true</code> dans <code>about:config</code>, ou utilisez Chromium. Safari et les téléphones ne savent pas accéder au port USB.</li>
+        <li><b>Connexion</b> : allumez le boîtier, branchez le câble USB, cliquez sur « Connecter le boîtier » et choisissez-le dans la liste (souvent « USB Serial », « FT232R » ou « CP210x »).</li>
+        <li><b>Accès refusé</b> : fermez l'ancien logiciel « Roue Cosmique », le logiciel Cosmodétecteur installé ou un autre onglet qui l'utilise. Sous Linux, une seule fois : <code>sudo usermod -aG dialout $USER</code>, puis fermez et rouvrez la session.</li>
+        <li><b>Le boîtier ne répond pas</b> : éteignez-le, débranchez le câble USB, rallumez, rebranchez, puis reconnectez. L'onglet Journal montre les échanges.</li>
+        <li><b>Hautes tensions</b> : elles sont mises à 0 V à la connexion et à la déconnexion. Cliquez toujours sur « Déconnecter » avant de fermer l'onglet ; sinon, éteignez le boîtier.</li>
+        <li><b>Pendant une manip</b>, gardez cet onglet ouvert et empêchez la mise en veille de l'ordinateur.</li>
+        <li><b>Sans boîtier</b>, cochez « Simulation » : un boîtier simulé (calé sur des mesures réelles) répond comme le vrai.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= JOURNAL ================= -->
+  <section class="onglet" id="o-journal">
+    <div class="ligne" style="margin-bottom:10px">
+      <label><input type="checkbox" id="trames"> Afficher les trames échangées avec le boîtier</label>
+      <span class="note" id="dureeCycle"></span>
+    </div>
+    <div class="journal" id="journal"></div>
+  </section>
+</main>
+<footer class="credits">
+  Adaptation du logiciel <strong>Roue Cosmique</strong> [Sciences à l'École, CPPM] [Michel Jevaud, Marta Rodo Bordera, 2011]
+  pour le Cosmodétecteur [José Busto] ;<br>version web — conception et direction du projet : Cédric Vanden Driessche (2026),
+  professeur de physique-chimie au lycée Charles de Gaulle à Caen
+  (<a href="mailto:cedric.vanden-driessche@ac-normandie.fr">cedric.vanden-driessche@ac-normandie.fr</a>) ;
+  développement du code : Claude (Anthropic), sous sa direction. Logiciel libre sous licence GNU GPL v3 ou ultérieure.
+</footer>
+<div class="toast" id="toast"></div>
+
+<script src="moteur.js"></script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const ST = new Station();
+const COULEURS = ["#1f5fbf","#d9480f","#2b8a3e","#7048e8","#0b7285","#c2255c","#e67700","#5c940d","#495057","#1864ab","#a61e4d","#087f5b","#862e9c"];
+let ETAT = null, HIST = [], MUONS = [], selection = [0];
+let derniereValeurSon = null, ctxAudio = null;
+
+// ---------------------------------------------------------------- utilitaires
+function toast(msg, erreur){ const t=$("#toast"); t.textContent=msg; t.className="toast visible"+(erreur?" erreur":""); clearTimeout(t._t); t._t=setTimeout(()=>t.className="toast",erreur?6000:2500); }
+async function api(chemin, donnees){
+  try{ await ST.api(chemin, donnees||{}); return true; }
+  catch(e){ toast(e.message||String(e),true); return false; }
+  finally{ rafraichir(); }
+}
+const hms = t => new Date(t*1000).toLocaleTimeString("fr-FR");
+const dateHeure = t => new Date(t*1000).toLocaleString("fr-FR");
+function duree(s){ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60; return (h?h+" h ":"")+(h||m?m+" min ":"")+x+" s"; }
+const fmt = (x,d=0) => Number(x).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d});
+function el(tag, attrs, html){ const e=document.createElement(tag); Object.assign(e,attrs||{}); if(html!==undefined) e.innerHTML=html; return e; }
+
+// ---------------------------------------------------------------- onglets
+document.querySelectorAll("#onglets button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#onglets button").forEach(x=>x.classList.toggle("actif",x===b));
+  document.querySelectorAll(".onglet").forEach(o=>o.classList.toggle("actif",o.id==="o-"+b.dataset.o));
+  try{localStorage.setItem("onglet",b.dataset.o);}catch(e){}
+  if(b.dataset.o==="fichiers") chargerFichiers();
+  dessinerTout();
+});
+try{ const o=localStorage.getItem("onglet"); if(o) document.querySelector(`#onglets button[data-o="${o}"]`)?.click(); }catch(e){}
+
+// ---------------------------------------------------------------- construction des cartes
+const NOMS_V=["PM1","PM2","PM3","PM4"];
+const NOMS_F=["PM1xPM2","PM1xPM3","PM1xPM4","PM2xPM3","PM2xPM4","PM3xPM4","PM1xPM2xPM3","PM1xPM2xPM3xPM4","PM1xPM2*xPM3*"];
+const NOMS_TOUS=[...NOMS_V.map(n=>"Voie "+n.slice(2)),...NOMS_F];
+const joli = n => n.replace(/x/g," × ");
+
+NOMS_V.forEach((n,i)=>{
+  const c=el("div",{className:"carte compteur"},`
+    <h2><span class="led" id="led${i}" title="HT appliquée"></span>Voie ${i+1} · ${n}
+      <span class="droite"><button class="btn petit" data-raz="voie" data-i="${i}">RAZ</button></span></h2>
+    <div class="valeur" id="v${i}">0</div>
+    <div class="barre"><div id="bv${i}"></div></div>
+    <div class="sous" id="sv${i}"></div>
+    <div class="ligne reglage"><span class="note">Seuil</span>
+      <input type="number" id="seuil${i}" min="0" max="330" step="1" value="40"> mV
+      <button class="btn petit" data-seuil="${i}">Appliquer</button></div>`);
+  $("#cartesVoies").append(c);
+});
+NOMS_F.forEach((n,i)=>{
+  $("#cartesFonctions").append(el("div",{className:"carte compteur"},`
+    <h2>${joli(n)}<span class="droite"><button class="btn petit" data-raz="fonction" data-i="${i}">RAZ</button></span></h2>
+    <div class="valeur" id="f${i}">0</div><div class="barre"><div id="bf${i}"></div></div><div class="sous" id="sf${i}"></div>`));
+});
+["START = PM4 · STOP = PM4"].forEach((n,i)=>{
+  $("#cartesMuon").append(el("div",{className:"carte compteur"},`
+    <h2>Dernière mesure<span class="droite"><button class="btn petit" data-raz="muon" data-i="${i}">RAZ</button></span></h2>
+    <div class="valeur"><span id="m${i}">0</span> <small style="font-size:18px;color:var(--doux)">ns</small></div>
+    <div class="sous">${n}</div><div class="sous" id="nm${i}"></div>`));
+});
+NOMS_V.forEach((n,i)=>{
+  $("#cartesHT").append(el("div",{className:"carte"},`
+    <h2><span class="led" id="ledh${i}"></span>Haute tension ${n}</h2>
+    <div class="jauge"><canvas id="jauge${i}" width="200" height="120" style="width:200px;height:120px"></canvas></div>
+    <div class="ht-valeur"><span id="htm${i}">0</span> <small>V lus</small></div>
+    <div class="champ reglage" style="margin-top:10px">Consigne (0 à 1500 V)
+      <input type="range" id="htr${i}" min="0" max="1500" step="10" value="0">
+      <div class="ligne"><input type="number" id="htc${i}" min="0" max="1500" step="10" value="0"> V
+        <button class="btn prim petit" data-ht="${i}">Appliquer</button>
+        <span class="note" id="htapp${i}">appliquée : 0 V</span></div>
+    </div>`));
+  $("#htr"+i).oninput=e=>{ $("#htc"+i).value=e.target.value; $("#htc"+i).dataset.modifie="1"; };
+  $("#htc"+i).oninput=e=>{ $("#htr"+i).value=e.target.value; e.target.dataset.modifie="1"; };
+});
+NOMS_TOUS.forEach((n,i)=>{
+  const p=el("span",{className:"puce",textContent:joli(n)}); p.dataset.i=i;
+  p.onclick=()=>{ const k=selection.indexOf(i); if(k>=0) selection.splice(k,1); else selection.push(i); majPuces(); dessinerTout(); };
+  $("#puces").append(p);
+  $("#sonSource").append(el("option",{value:i,textContent:joli(n)}));
+});
+$("#sonSource").value=10;
+function majPuces(){ document.querySelectorAll(".puce").forEach(p=>{ const i=+p.dataset.i, k=selection.indexOf(i); p.classList.toggle("on",k>=0); p.style.background=k>=0?COULEURS[i]:""; p.style.borderColor=k>=0?COULEURS[i]:""; }); }
+majPuces();
+
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.raz) api("/api/raz",{quoi:b.dataset.raz,index:+b.dataset.i});
+  if(b.dataset.seuil!==undefined){ const i=+b.dataset.seuil; if(await api("/api/seuil",{voie:i,mv:+$("#seuil"+i).value})) toast(`Seuil ${NOMS_V[i]} : ${$("#seuil"+i).value} mV`); }
+  if(b.dataset.ht!==undefined){ const i=+b.dataset.ht; delete $("#htc"+i).dataset.modifie; if(await api("/api/ht",{voie:i,volts:+$("#htc"+i).value})) toast(`HT ${NOMS_V[i]} : ${$("#htc"+i).value} V`); }
+});
+
+// ---------------------------------------------------------------- connexion
+if(!("serial" in navigator)){
+  const b=$("#bandeauNav"); b.classList.add("visible");
+  b.innerHTML="Ce navigateur ne peut pas accéder au port USB du boîtier. Ouvrez cette page avec <b>Chrome</b>, <b>Edge</b> ou <b>Chromium</b> sur un ordinateur (ou Firefox 151 et plus récent). La <b>simulation</b> fonctionne partout.";
+  $("#simulation").checked=true;
+}
+$("#simulation").onchange=()=>{ if(!ST.connecte) $("#btnConnexion").textContent=$("#simulation").checked?"Lancer la simulation":"Connecter le boîtier"; };
+$("#simulation").onchange();
+window.addEventListener("beforeunload",e=>{ if(ST.connecte&&(ST.manip||ST.muon||ST.htConsigne.some(v=>v>0))){ e.preventDefault(); e.returnValue=""; } });
+window.addEventListener("pagehide",()=>ST.coupureUrgence());
+$("#btnConnexion").onclick=async()=>{
+  const b=$("#btnConnexion");
+  if(ETAT && ETAT.connecte){
+    if((ETAT.manip||ETAT.muon) && !confirm("Une manip est en cours. Déconnecter quand même ? (les HT seront remises à 0 V)")) return;
+    b.disabled=true; await api("/api/deconnecter"); b.disabled=false; $("#simulation").onchange(); return;
+  }
+  b.disabled=true; b.textContent="Connexion…";
+  const sim=$("#simulation").checked;
+  const ok=await api("/api/connecter",{simulation:sim});
+  b.disabled=false; if(!ok) $("#simulation").onchange();
+  if(ok){ HIST=[]; MUONS=[]; toast(sim?"Boîtier simulé connecté":"Boîtier connecté"); }
+  rafraichir();
+};
+
+// ---------------------------------------------------------------- manips
+function lireDuree(h,m,s){ return (+$(h).value||0)*3600+(+$(m).value||0)*60+(+$(s).value||0); }
+$("#btnLancer").onclick=async()=>{
+  if(!confirm("Une fois la manip lancée, vous ne pourrez plus modifier les réglages (HT, seuils). Continuer ?")) return;
+  const ok=await api("/api/manip/lancer",{duree:lireDuree("#dH","#dM","#dS"),intervalle:+$("#intervalle").value,fichier:$("#avecFichier").checked,commentaire:$("#commentaire").value});
+  if(ok){ HIST=[]; toast("Manip lancée"); }
+};
+$("#btnArreter").onclick=()=>api("/api/manip/arreter");
+$("#btnLancerMuon").onclick=async()=>{
+  if(!confirm("Une fois la manip lancée, vous ne pourrez plus modifier les réglages (HT, seuils). Continuer ?")) return;
+  const ok=await api("/api/muon/lancer",{duree:lireDuree("#mH","#mM","#mS"),fichier:$("#avecFichierMuon").checked,commentaire:$("#commentaireMuon").value});
+  if(ok){ MUONS=[]; toast("Manip vie du muon lancée"); }
+};
+$("#btnArreterMuon").onclick=()=>api("/api/muon/arreter");
+$("#btnEffacerMuons").onclick=async()=>{ if(await api("/api/muon/effacer")){ MUONS=[]; dessinerMuon(); } };
+$("#btnRazTout").onclick=()=>api("/api/raz",{quoi:"tout"});
+["#binMuon","#fitMin","#fitMax","#logMuon","#fondMuon"].forEach(s=>$(s).addEventListener("input",dessinerMuon));
+$("#trames").onchange=e=>api("/api/journal/trames",{actif:e.target.checked});
+$("#commentaire").addEventListener("input",e=>{ if(!$("#commentaireMuon").value) $("#commentaireMuon").placeholder=e.target.value; });
+
+// ---------------------------------------------------------------- mise à jour de l'affichage
+function majManipInfos(m, dl, prog, etatEl, btnL, btnA, typeMuon){
+  const enCours=!!m;
+  etatEl.innerHTML=`<span class="led ${enCours?"on":""}"></span>${enCours?"En cours":"Arrêtée"}`;
+  btnL.disabled=!ETAT.connecte||enCours; btnA.disabled=!enCours;
+  if(!enCours){ dl.innerHTML=""; prog.style.width="0"; return; }
+  const now=ETAT.heure;
+  let h=`<dt>Début</dt><dd>${hms(m.debut)}</dd><dt>Fin prévue</dt><dd>${m.fin?hms(m.fin)+" (dans "+duree(m.fin-now)+")":"sans limite"}</dd>`;
+  if(typeMuon) h+=`<dt>Événements</dt><dd>${fmt(m.evenements)}</dd>`;
+  else h+=`<dt>Intervalles</dt><dd>${m.lignes} — prochain dans ${duree(m.prochaine-now)}</dd>`;
+  h+=`<dt>Fichier</dt><dd>${m.fichier||"aucun"}</dd>`;
+  dl.innerHTML=h;
+  prog.style.width=m.fin?Math.min(100,100*(now-m.debut)/(m.fin-m.debut))+"%":"100%";
+  prog.style.opacity=m.fin?1:.25;
+}
+
+function appliquerEtat(e){
+  ETAT=e;
+  const p=$("#pastille");
+  p.className="pastille"+(e.connecte?(e.simulation?" sim":" on"):"");
+  p.querySelector("span").textContent=e.connecte?(e.simulation?"Simulation":"Connecté · "+e.port):"Déconnecté";
+  if(e.connecte) $("#btnConnexion").textContent="Déconnecter"; else if($("#btnConnexion").textContent==="Déconnecter") $("#simulation").onchange();
+  $("#btnConnexion").className="btn"+(e.connecte?"":" prim");
+  $("#simulation").disabled=e.connecte;
+  const b=$("#bandeau"); b.textContent=e.message||""; b.classList.toggle("visible",!!e.message);
+  $("#horloge").textContent=hms(e.heure);
+
+  const maxV=Math.max(100,...e.voies);
+  e.voies.forEach((v,i)=>{
+    $("#v"+i).textContent=fmt(v);
+    $("#bv"+i).style.width=(100*v/maxV)+"%";
+    $("#led"+i).classList.toggle("on",e.ht_consigne[i]>0);
+    $("#ledh"+i).classList.toggle("on",e.ht_consigne[i]>0);
+    const inp=$("#seuil"+i); if(document.activeElement!==inp && !inp.dataset.modifie) inp.value=e.seuils[i];
+    $("#sv"+i).textContent=e.manip?"depuis le début de l'intervalle":"depuis la dernière remise à zéro";
+    $("#htm"+i).textContent=fmt(e.ht_mesure[i]);
+    $("#htapp"+i).textContent="appliquée : "+fmt(e.ht_consigne[i])+" V";
+    const hc=$("#htc"+i); if(document.activeElement!==hc && document.activeElement!==$("#htr"+i) && !hc.dataset.modifie){ hc.value=e.ht_consigne[i]; $("#htr"+i).value=e.ht_consigne[i]; }
+    dessinerJauge(i,e.ht_mesure[i],e.ht_consigne[i]);
+  });
+  const maxF=Math.max(50,...e.fonctions);
+  e.fonctions.forEach((v,i)=>{ $("#f"+i).textContent=fmt(v); $("#bf"+i).style.width=(100*v/maxF)+"%";
+    $("#sf"+i).textContent=e.manip?"depuis le début de l'intervalle":"depuis la dernière remise à zéro"; });
+  $("#m0").textContent=fmt(e.dernier_muon[0]);
+  const verrou=!e.connecte||!!e.manip||!!e.muon;
+  document.querySelectorAll(".reglage").forEach(r=>r.classList.toggle("desactive",verrou));
+  document.querySelectorAll("[data-raz]").forEach(x=>x.disabled=!e.connecte);
+  $("#btnRazTout").disabled=!e.connecte;
+  majManipInfos(e.manip,$("#infosManip"),$("#progManip"),$("#etatManip"),$("#btnLancer"),$("#btnArreter"),false);
+  majManipInfos(e.muon,$("#infosMuon"),$("#progMuon"),$("#etatMuon"),$("#btnLancerMuon"),$("#btnArreterMuon"),true);
+  $("#dureeCycle").textContent=e.connecte?`Cycle de lecture : ${fmt(e.duree_cycle*1000)} ms`:"";
+  $("#trames").checked=e.journal_trames;
+
+  // son
+  const k=+$("#sonSource").value, val=k<4?e.voies[k]:e.fonctions[k-4];
+  if($("#son").checked && derniereValeurSon!==null && val>derniereValeurSon) bip();
+  derniereValeurSon=val;
+}
+document.querySelectorAll("input[id^=seuil]").forEach(i=>i.addEventListener("input",()=>i.dataset.modifie="1"));
+document.querySelectorAll("[data-seuil]").forEach(b=>b.addEventListener("click",()=>delete $("#seuil"+b.dataset.seuil).dataset.modifie));
+$("#sonSource").onchange=()=>derniereValeurSon=null;
+$("#son").onchange=()=>{ if(!ctxAudio) try{ ctxAudio=new AudioContext(); }catch(e){} };
+
+function bip(){
+  if(!ctxAudio) return;
+  const o=ctxAudio.createOscillator(), g=ctxAudio.createGain();
+  o.frequency.value=880; g.gain.setValueAtTime(.25,ctxAudio.currentTime); g.gain.exponentialRampToValueAtTime(.001,ctxAudio.currentTime+.12);
+  o.connect(g).connect(ctxAudio.destination); o.start(); o.stop(ctxAudio.currentTime+.13);
+}
+
+let enCours=false;
+async function rafraichir(){
+  if(enCours) return; enCours=true;
+  try{
+    const e=ST.etat();
+    if(e.n_historique<HIST.length) HIST=[];
+    if(e.n_muons<MUONS.length) MUONS=[];
+    if(e.n_historique>HIST.length || e.n_muons>MUONS.length){
+      const h=ST.historiqueDepuis(HIST.length, MUONS.length);
+      const ajoutH=h.historique.length, ajoutM=h.muons.length;
+      HIST.push(...h.historique); MUONS.push(...h.muons);
+      if(ajoutH) dessinerGraphes();
+      if(ajoutM) dessinerMuon();
+    }
+    appliquerEtat(e);
+    $("#bandeau").classList.toggle("visible",!!e.message);
+  }catch(err){
+    console.error(err);
+  }
+  enCours=false;
+}
+setInterval(rafraichir,500);
+setInterval(async()=>{
+  if(!$("#o-journal").classList.contains("actif")) return;
+  const j=ST.journalLignes; const d=$("#journal");
+  const enBas=d.scrollTop+d.clientHeight>=d.scrollHeight-5;
+  d.textContent=j.join("\n")||"(vide)"; if(enBas) d.scrollTop=d.scrollHeight;
+},1000);
+
+function telecharger(nom,octets){
+  const u=URL.createObjectURL(new Blob([octets],{type:"text/plain;charset=windows-1252"}));
+  const a=el("a",{href:u,download:nom}); document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000);
+}
+function chargerFichiers(){
+  const t=$("#listeFichiers"); t.innerHTML="";
+  if(!ST.fichiers.liste.length){ t.innerHTML=`<tr><td colspan="4" class="vide">Aucun fichier pour l'instant.</td></tr>`; return; }
+  ST.fichiers.liste.forEach(x=>{
+    const tr=el("tr",{},`<td>${x.nom}</td><td>${dateHeure(x.date/1000)}</td><td class="num">${fmt(x.texte.length/1024,1)} ko</td><td style="white-space:nowrap"></td>`);
+    const bT=el("button",{className:"btn petit",textContent:"Télécharger"}); bT.onclick=()=>telecharger(x.nom,ST.fichiers.octets(x.nom));
+    const bS=el("button",{className:"btn petit",textContent:"Supprimer",title:"Supprimer de ce navigateur"}); bS.style.marginLeft="6px";
+    bS.onclick=()=>{ if([ST.manip,ST.muon].some(m=>m&&m.fichier===x)){ toast("Ce fichier est en cours d'écriture.",true); return; } if(confirm(`Supprimer ${x.nom} de ce navigateur ?`)){ ST.fichiers.supprimer(x.nom); chargerFichiers(); } };
+    tr.lastChild.append(bT,bS); t.append(tr);
+  });
+}
+
+// ---------------------------------------------------------------- dessins
+function preparer(c){
+  if(!c.dataset.h) c.dataset.h=c.getAttribute("height");   // hauteur d'origine (l'attribut change ensuite)
+  const r=window.devicePixelRatio||1, w=c.clientWidth, h=+c.dataset.h;
+  c.style.height=h+"px"; c.width=w*r; c.height=h*r;
+  const ctx=c.getContext("2d"); ctx.setTransform(r,0,0,r,0,0); ctx.clearRect(0,0,w,h);
+  ctx.font="12px system-ui,sans-serif"; return [ctx,w,h];
+}
+function graduations(min,max,n,entier){
+  let brut=(max-min)/n||1; if(entier) brut=Math.max(1,brut);
+  const p=Math.pow(10,Math.floor(Math.log10(brut))), m=brut/p;
+  const pas=(m<1.5?1:m<3?2:m<7?5:10)*p, t=[];
+  for(let v=Math.ceil(min/pas)*pas; v<=max+pas*1e-9; v+=pas) t.push(+v.toFixed(10));
+  return t;
+}
+function axes(ctx,w,h,m,xmin,xmax,ymin,ymax,fx,fy,entier){
+  ctx.strokeStyle="#e3e8ee"; ctx.fillStyle="#5f6b7a"; ctx.lineWidth=1;
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  graduations(ymin,ymax,5,entier).forEach(v=>{ const y=fy(v); ctx.beginPath(); ctx.moveTo(m.g,y); ctx.lineTo(w-m.d,y); ctx.stroke(); ctx.fillText(fmt(v,Math.abs(v)<10&&v%1?1:0),m.g-6,y); });
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  return {texteX:(v,lib)=>{ const x=fx(v), l=ctx.measureText(lib).width/2; ctx.fillText(lib,Math.min(w-l-2,Math.max(l+2,x)),h-m.b+6); }};
+}
+function dessinerGraphes(){
+  // séries temporelles
+  const [ctx,w,h]=preparer($("#gTemps")); const m={g:46,d:12,h:12,b:40};
+  if(!HIST.length){ ctx.fillStyle="#8a95a3"; ctx.textAlign="center"; ctx.fillText("Lancez une manip pour voir les comptages par intervalle",w/2,h/2); }
+  else{
+    const t0=HIST[0].t, t1=Math.max(HIST[HIST.length-1].t,t0+1);
+    let ymax=1; selection.forEach(i=>HIST.forEach(r=>ymax=Math.max(ymax,r.valeurs[i]))); ymax*=1.1;
+    const fx=t=>m.g+(t-t0)/(t1-t0)*(w-m.g-m.d), fy=v=>h-m.b-(v/ymax)*(h-m.h-m.b);
+    const ax=axes(ctx,w,h,m,t0,t1,0,ymax,fx,fy,true);
+    const nb=Math.min(6,HIST.length); for(let k=0;k<nb;k++){ const r=HIST[Math.round(k*(HIST.length-1)/Math.max(1,nb-1))]; ax.texteX(r.t,r.heure); }
+    ctx.fillText("coups par intervalle", m.g+60, 0);
+    selection.forEach(i=>{
+      ctx.strokeStyle=COULEURS[i]; ctx.fillStyle=COULEURS[i]; ctx.lineWidth=1.8; ctx.beginPath();
+      HIST.forEach((r,k)=>{ const x=fx(r.t), y=fy(r.valeurs[i]); k?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.stroke();
+      if(HIST.length<150) HIST.forEach(r=>{ ctx.beginPath(); ctx.arc(fx(r.t),fy(r.valeurs[i]),2.5,0,7); ctx.fill(); });
+    });
+  }
+  // histogramme du premier compteur sélectionné
+  const [c2,w2,h2]=preparer($("#gHisto")); const m2={g:40,d:12,h:12,b:40};
+  const i=selection[0];
+  if(i===undefined || HIST.length<2){ c2.fillStyle="#8a95a3"; c2.textAlign="center"; c2.fillText(i===undefined?"Sélectionnez un compteur":"Pas encore assez d'intervalles",w2/2,h2/2); $("#statsHisto").textContent=""; return; }
+  const vals=HIST.map(r=>r.valeurs[i]); const n=vals.length;
+  const moy=vals.reduce((a,b)=>a+b,0)/n, sd=Math.sqrt(vals.reduce((a,b)=>a+(b-moy)**2,0)/Math.max(1,n-1));
+  let vmin=Math.min(...vals), vmax=Math.max(...vals);
+  const largeur=Math.max(1,Math.ceil((vmax-vmin+1)/25)); vmin=Math.floor(vmin/largeur)*largeur;
+  const nbins=Math.floor((vmax-vmin)/largeur)+1, bins=new Array(nbins).fill(0);
+  vals.forEach(v=>bins[Math.floor((v-vmin)/largeur)]++);
+  // loi de Poisson de même moyenne (approximation gaussienne si grande moyenne)
+  const lnfact=k=>{ let s=0; for(let j=2;j<=k;j++) s+=Math.log(j); return s; };
+  const poisson=k=> moy>200 ? Math.exp(-((k-moy)**2)/(2*moy))/Math.sqrt(2*Math.PI*moy) : Math.exp(k*Math.log(moy||1e-9)-moy-lnfact(k));
+  const attendu=bins.map((_,b)=>{ let s=0; for(let k=vmin+b*largeur;k<vmin+(b+1)*largeur;k++) s+=poisson(k); return s*n; });
+  const ymax=Math.max(...bins,...attendu)*1.15||1, xmax=vmin+nbins*largeur;
+  const fx=v=>m2.g+(v-vmin)/(xmax-vmin)*(w2-m2.g-m2.d), fy=v=>h2-m2.b-(v/ymax)*(h2-m2.h-m2.b);
+  const ax=axes(c2,w2,h2,m2,vmin,xmax,0,ymax,fx,fy,true);
+  graduations(vmin,xmax,5,true).forEach(v=>ax.texteX(v,fmt(v)));
+  c2.fillText("coups par intervalle",(m2.g+w2-m2.d)/2,h2-16);
+  c2.fillStyle=COULEURS[i]+"bb";
+  bins.forEach((c,b)=>{ const x0=fx(vmin+b*largeur), x1=fx(vmin+(b+1)*largeur); c2.fillRect(x0+1,fy(c),Math.max(1,x1-x0-2),fy(0)-fy(c)); });
+  c2.strokeStyle="#1b2430"; c2.lineWidth=1.5; c2.beginPath();
+  attendu.forEach((a,b)=>{ const x=fx(vmin+(b+.5)*largeur), y=fy(a); b?c2.lineTo(x,y):c2.moveTo(x,y); }); c2.stroke();
+  $("#statsHisto").textContent=`${joli(NOMS_TOUS[i])} : ${n} intervalles · moyenne ${fmt(moy,2)} · écart-type ${fmt(sd,2)} · √moyenne ${fmt(Math.sqrt(moy),2)}`;
+}
+
+function dessinerJauge(i,mesure,consigne){
+  const c=$("#jauge"+i), r=window.devicePixelRatio||1; if(c.width!==200*r){ c.width=200*r; c.height=120*r; }
+  const ctx=c.getContext("2d"); ctx.setTransform(r,0,0,r,0,0); ctx.clearRect(0,0,200,120);
+  const cx=100,cy=105,R=82, ang=v=>Math.PI*(1+Math.min(1,Math.max(0,v/1500)));
+  ctx.lineWidth=12; ctx.lineCap="round";
+  ctx.strokeStyle="#e6eaef"; ctx.beginPath(); ctx.arc(cx,cy,R,Math.PI,2*Math.PI); ctx.stroke();
+  const grad=ctx.createLinearGradient(20,0,180,0); grad.addColorStop(0,"#2b8a3e"); grad.addColorStop(.6,"#e67700"); grad.addColorStop(1,"#c92a2a");
+  ctx.strokeStyle=grad; ctx.beginPath(); ctx.arc(cx,cy,R,Math.PI,ang(mesure)); ctx.stroke();
+  ctx.lineWidth=2; ctx.strokeStyle="#1b2430"; const a=ang(consigne);
+  ctx.beginPath(); ctx.moveTo(cx+(R-12)*Math.cos(a),cy+(R-12)*Math.sin(a)); ctx.lineTo(cx+(R+10)*Math.cos(a),cy+(R+10)*Math.sin(a)); ctx.stroke();
+  ctx.fillStyle="#5f6b7a"; ctx.font="11px system-ui"; ctx.textAlign="center";
+  [0,500,1000,1500].forEach(v=>{ const t=ang(v); ctx.fillText(v,cx+(R-24)*Math.cos(t),cy+(R-24)*Math.sin(t)+4); });
+}
+
+function ajusterTau(ts,a,b,avecFond){
+  // maximum de vraisemblance (histogramme fin) : exponentielle + éventuel fond plat sur [a,b]
+  const n=ts.length; if(n<10) return null;
+  const T=b-a, w=Math.min(0.25,T/40), nb=Math.max(1,Math.round(T/w)), c=new Array(nb).fill(0);
+  ts.forEach(t=>{ const k=Math.min(nb-1,Math.floor((t-a)/(T/nb))); if(k>=0) c[k]++; });
+  const bords=[...Array(nb+1).keys()].map(k=>k*T/nb);
+  const fs=avecFond?[...Array(100).keys()].map(i=>i/100):[0];
+  const u=bords.slice(1).map((x,k)=>(x-bords[k])/T);
+  const profil=tau=>{
+    const z=1-Math.exp(-T/tau), e=u.map((_,k)=>(Math.exp(-bords[k]/tau)-Math.exp(-bords[k+1]/tau))/z);
+    let best=-Infinity, bf=0;
+    for(const f of fs){ let s=0; for(let k=0;k<nb;k++) if(c[k]) s+=c[k]*Math.log((1-f)*e[k]+f*u[k]+1e-300);
+      if(s>best){best=s;bf=f;} }
+    return [best,bf]; };
+  // grille grossière puis fine
+  let meilleur=null;
+  for(let i=0;i<=80;i++){ const tau=0.1*Math.pow(1000,i/80); const [v,f]=profil(tau); if(!meilleur||v>meilleur.v) meilleur={v,tau,f}; }
+  const t0=meilleur.tau, pts=[];
+  for(let i=0;i<=120;i++){ const tau=t0*Math.pow(1.6,(i-60)/60); const [v,f]=profil(tau); pts.push([tau,v,f]); if(v>meilleur.v) meilleur={v,tau,f}; }
+  // incertitude : là où la vraisemblance baisse de 0,5
+  const dedans=pts.filter(p=>p[1]>=meilleur.v-0.5).map(p=>p[0]);
+  const err=dedans.length>1?(Math.max(...dedans)-Math.min(...dedans))/2:meilleur.tau/Math.sqrt(n);
+  // affinage des décimales du fond
+  return {tau:meilleur.tau, err, fond:meilleur.f, n};
+}
+function dessinerMuon(){
+  const [ctx,w,h]=preparer($("#gMuon")); const m={g:48,d:14,h:14,b:42};
+  const src=0, ts=MUONS.filter(x=>x.index===src).map(x=>x.ns/1000);
+  const n0=MUONS.filter(x=>x.index===0).length, n1=MUONS.length-n0;
+  $("#nm0").textContent=n0+" événements enregistrés";
+  if(!ts.length){ ctx.fillStyle="#8a95a3"; ctx.textAlign="center"; ctx.fillText("Aucun événement pour l'instant",w/2,h/2); $("#statsMuon").textContent=""; return; }
+  const bw=Math.max(0.01,+$("#binMuon").value||0.5), a=+$("#fitMin").value||0, b=Math.max(a+bw,+$("#fitMax").value||20);
+  const xmax=Math.max(b,Math.min(Math.max(...ts),60)), nb=Math.ceil(xmax/bw), bins=new Array(nb).fill(0);
+  ts.forEach(t=>{ const k=Math.floor(t/bw); if(k<nb) bins[k]++; });
+  // échelle calée sur la plage d'ajustement : les barres plus hautes (post-impulsions) sont écrêtées
+  const log=$("#logMuon").checked;
+  const dansPlage=bins.filter((_,k)=>(k+1)*bw>a), ymaxL=(log?Math.max(...bins):Math.max(...dansPlage,1)*1.3)||1;
+  const fy=log? v=>h-m.b-(Math.log10(Math.max(v,0.5))-Math.log10(0.5))/(Math.log10(ymaxL*3)-Math.log10(0.5))*(h-m.h-m.b) : v=>h-m.b-(v/ymaxL)*(h-m.h-m.b);
+  const fx=t=>m.g+t/xmax*(w-m.g-m.d);
+  ctx.fillStyle="rgba(31,95,191,.07)"; ctx.fillRect(fx(a),m.h,fx(b)-fx(a),h-m.h-m.b);
+  ctx.strokeStyle="#e3e8ee"; ctx.fillStyle="#5f6b7a"; ctx.textAlign="right"; ctx.textBaseline="middle";
+  (log?[1,10,100,1000,10000].filter(v=>v<ymaxL*3):graduations(0,ymaxL,5,true)).forEach(v=>{ const y=fy(v); ctx.beginPath(); ctx.moveTo(m.g,y); ctx.lineTo(w-m.d,y); ctx.stroke(); ctx.fillText(fmt(v),m.g-6,y); });
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  graduations(0,xmax,8).forEach(v=>ctx.fillText(fmt(v,v%1?1:0),fx(v),h-m.b+6));
+  ctx.fillText("temps entre START et STOP (µs)",(m.g+w-m.d)/2,h-18);
+  ctx.fillStyle="#1f5fbfcc";
+  bins.forEach((c,k)=>{ if(!c) return; const x0=fx(k*bw), x1=fx((k+1)*bw), cc=Math.min(c,ymaxL);
+    ctx.fillRect(x0+.5,fy(cc),Math.max(1,x1-x0-1),fy(log?0.5:0)-fy(cc));
+    if(c>ymaxL && c===Math.max(...bins)){ ctx.save(); ctx.fillStyle="#5f6b7a"; ctx.textAlign="left"; ctx.textBaseline="top"; ctx.fillText("▲ barres écrêtées (max "+fmt(c)+")",x1+4,m.h+2); ctx.restore(); } });
+  const avecFond=$("#fondMuon").checked;
+  const dans=ts.filter(t=>t>=a&&t<=b), aj=ajusterTau(dans,a,b,avecFond);
+  let txt=`${ts.length} événements · ${dans.length} dans la plage d'ajustement`;
+  if(aj){
+    const T=b-a, tau=aj.tau, N=dans.length;
+    const densite=t=>N*((1-aj.fond)*Math.exp(-(t-a)/tau)/(tau*(1-Math.exp(-T/tau)))+aj.fond/T)*bw;
+    ctx.strokeStyle="#d9480f"; ctx.lineWidth=2; ctx.beginPath();
+    for(let k=0;k<=300;k++){ const t=a+k*T/300, y=fy(densite(t)); k?ctx.lineTo(fx(t),y):ctx.moveTo(fx(t),y); } ctx.stroke();
+    if(avecFond){ ctx.setLineDash([5,4]); ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(fx(a),fy(N*aj.fond/T*bw)); ctx.lineTo(fx(b),fy(N*aj.fond/T*bw)); ctx.stroke(); ctx.setLineDash([]); }
+    txt+=` · τ ajusté = ${fmt(tau,2)} ± ${fmt(aj.err,2)} µs`;
+    if(avecFond) txt+=` · fond plat : ${fmt(100*aj.fond)} % des événements de la plage (${fmt(N*(1-aj.fond))} désintégrations)`;
+  }
+  $("#statsMuon").textContent=txt;
+}
+function dessinerTout(){ dessinerGraphes(); dessinerMuon(); }
+window.addEventListener("resize",dessinerTout);
+
+rafraichir(); dessinerTout();
+</script>
+</body>
+</html>
