@@ -6,7 +6,7 @@ Aucun serveur n’est nécessaire : ce sont des fichiers HTML, CSS et JavaScript
 
 ## Fonctions
 
-- **Import** : CSV, TXT, DAT, TSV, classeurs ODS, XLSX et XLS, collage depuis un tableur (Ctrl+V) ou glisser-déposer. Rien n’est importé sans validation : l’aperçu montre chaque ligne découpée avec son rôle (noms, unités, données, ignorée) et les cellules non numériques en rouge. Le séparateur de colonnes (point-virgule, virgule, tabulation, espace, barre verticale ou caractère libre), le séparateur décimal, la ligne des noms, la ligne des unités et la première ligne de données sont proposés automatiquement mais peuvent tous être choisis à la main. Chaque colonne peut être cochée ou décochée.
+- **Import** : CSV, TXT, DAT, TSV, classeurs ODS, XLSX et XLS, collage depuis un tableur (Ctrl+V) ou glisser-déposer. Rien n’est importé sans validation : l’aperçu montre chaque ligne découpée avec son rôle (noms, unités, données, ignorée) et les cellules non numériques en rouge. Le séparateur de colonnes (point-virgule, virgule, tabulation, espace, barre verticale ou caractère libre), le séparateur décimal, la ligne des noms, la ligne des unités, la première et la dernière ligne de données sont proposés automatiquement mais peuvent tous être choisis à la main. Chaque colonne peut être cochée ou décochée. Les données s’arrêtent automatiquement à la première ligne vide ou à une ligne de total, pour ne pas compter un total comme une mesure.
 - **Tableau** éditable (double-clic), ajout et suppression de lignes et de variables.
 - **Grandeurs calculées** : `v (m/s) = deriv(x, t)`, `Ec (J) = 0.5*m*v^2`, constantes (`m (kg) = 0.250`), `integ`, `mean`, `std`…
 - **Incertitudes** par variable : un nombre ou une formule (`0.02*U + 0.01`), affichées en barres d’erreur.

@@ -161,6 +161,7 @@ textarea {
 .msg:empty { display: none; }
 .msg .err { color: var(--bad); display: block; }
 .msg .ok { color: var(--ok); display: block; }
+.msg .warn { color: var(--warn); display: block; }
 .help { font-size: 13px; color: var(--muted); }
 .help summary { cursor: pointer; color: var(--ink); }
 .help ul { padding-left: 18px; margin: 6px 0 0; display: grid; gap: 4px; }

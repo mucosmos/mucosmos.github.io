@@ -57,14 +57,19 @@
     return out.map(s => s.trim());
   }
 
+  /* Lignes du texte ; les lignes vides sont conservées (elles délimitent les blocs
+     de données) sauf en début et en fin. */
   function textLines(text) {
-    return text.replace(/\r\n?/g, '\n').split('\n').filter(l => l.trim() !== '');
+    const lines = text.replace(/\r\n?/g, '\n').split('\n');
+    while (lines.length && !lines[0].trim()) lines.shift();
+    while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+    return lines;
   }
 
   function textToRows(text, sep) {
     const lines = textLines(text);
-    if (!sep || sep === 'auto') sep = detectSeparator(lines);
-    return { rows: lines.map(l => splitLine(l, sep)), sep };
+    if (!sep || sep === 'auto') sep = detectSeparator(lines.filter(l => l.trim()));
+    return { rows: lines.map(l => l.trim() ? splitLine(l, sep) : []), sep };
   }
 
   /* Devine le séparateur décimal : virgule si des nombres comme 3,14 apparaissent
@@ -98,35 +103,50 @@
 
   /* Repère la ligne des noms, celle des unités et la première ligne de données.
      Les indices renvoyés sont ceux du tableau rows (0 = première ligne), -1 = aucune. */
+  const SUMMARY = /^(total|totaux|somme|sum|moyenne|mean|average|écart|ecart|std|min|max|bilan)\b/i;
+  const isEmptyRow = r => !r || !r.some(c => String(c ?? '').trim() !== '');
+
   function detectLayout(rows, dec = 'auto') {
     const filled = r => r.filter(c => String(c ?? '').trim()).length;
     const numRatio = r => r.filter(c => !isNaN(parseNumber(c, dec))).length / Math.max(1, filled(r));
     let start = 0;
-    while (start < rows.length && (filled(rows[start]) === 0 || numRatio(rows[start]) < 0.5)) start++;
+    while (start < rows.length && (isEmptyRow(rows[start]) || numRatio(rows[start]) < 0.5)) start++;
     if (start >= rows.length) start = 0;
-    let headerRow = start >= 1 ? start - 1 : -1, unitRow = -1;
-    if (start >= 2) {
-      const prev = rows[start - 2], header = rows[start - 1];
+    let headerRow = -1, unitRow = -1;
+    let h = start - 1;
+    while (h >= 0 && isEmptyRow(rows[h])) h--;
+    if (h >= 0) headerRow = h;
+    let p = h - 1;
+    while (p >= 0 && isEmptyRow(rows[p])) p--;
+    if (h >= 0 && p >= 0) {
+      const prev = rows[p], header = rows[h];
       const unitLike = header.every(c => { const s = String(c ?? '').trim(); return s.length <= 12 && !/[\(\)\[\]]/.test(s) || /^[\(\[].*[\)\]]$/.test(s); });
-      if (filled(header) > 0 && filled(header) <= filled(prev) && unitLike) { headerRow = start - 2; unitRow = start - 1; }
+      if (filled(header) > 0 && filled(header) <= filled(prev) && unitLike) { headerRow = p; unitRow = h; }
     }
-    return { headerRow, unitRow, dataStart: start };
+    // fin des données : première ligne vide suivie d'autres lignes, ou ligne de total
+    let end = rows.length - 1;
+    for (let i = start + 1; i < rows.length; i++) {
+      const first = String((rows[i] || []).find(c => String(c ?? '').trim() !== '') ?? '').trim();
+      if (isEmptyRow(rows[i]) || SUMMARY.test(first)) { end = i - 1; break; }
+    }
+    while (end > start && isEmptyRow(rows[end])) end--;
+    return { headerRow, unitRow, dataStart: start, dataEnd: end };
   }
 
   /* Transforme un tableau de lignes (cellules brutes) en variables.
-     opts : decimal, headerRow, unitRow, dataStart (nombre ou 'auto'), include (booléens par colonne). */
+     opts : decimal, headerRow, unitRow, dataStart, dataEnd (indice ou 'auto'), include (booléens par colonne). */
   function rowsToTable(rows, opts = {}) {
-    rows = rows.filter(r => r.some(c => String(c ?? '').trim() !== ''));
-    if (!rows.length) throw new Error('Aucune donnée trouvée.');
+    if (!rows.some(r => !isEmptyRow(r))) throw new Error('Aucune donnée trouvée.');
     const dec = !opts.decimal || opts.decimal === 'auto' ? detectDecimal(rows) : opts.decimal;
     const auto = detectLayout(rows, dec);
     const pick = (k) => (opts[k] === undefined || opts[k] === 'auto') ? auto[k] : +opts[k];
     const headerRow = pick('headerRow'), unitRow = pick('unitRow');
     const dataStart = Math.min(Math.max(0, pick('dataStart')), rows.length);
+    const dataEnd = Math.min(Math.max(dataStart, pick('dataEnd')), rows.length - 1);
     const header = headerRow >= 0 ? rows[headerRow] : null;
     const units = unitRow >= 0 ? rows[unitRow] : null;
     const ncol = Math.max(...rows.map(r => r.length));
-    const body = rows.slice(dataStart).filter((_, i) => i + dataStart !== headerRow && i + dataStart !== unitRow);
+    const body = rows.slice(dataStart, dataEnd + 1).filter((r, i) => i + dataStart !== headerRow && i + dataStart !== unitRow && !isEmptyRow(r));
     const used = new Set(), vars = [], columns = [];
     for (let j = 0; j < ncol; j++) {
       const col = body.map(r => parseNumber(r[j], dec));
@@ -146,7 +166,7 @@
     }
     const error = !body.length ? 'Aucune ligne de données : choisissez la ligne où commencent les données.'
       : !vars.length ? 'Aucune colonne retenue : cochez au moins une colonne contenant des nombres.' : '';
-    return { error, vars, columns, nrows: body.length, decimal: dec, layout: { headerRow, unitRow, dataStart }, auto, rows };
+    return { error, vars, columns, nrows: body.length, decimal: dec, layout: { headerRow, unitRow, dataStart, dataEnd }, auto, rows };
   }
 
   /* ---------- Algèbre linéaire ---------- */

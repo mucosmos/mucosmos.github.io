@@ -893,7 +893,11 @@
     let hist;
     try { hist = E.histogram(vals, w, start); } catch (e) { $('binInfo').textContent = e.message; return; }
     const centers = hist.counts.map((_, k) => start + (k + 0.5) * w);
-    $('binInfo').textContent = `${hist.counts.length} classe${hist.counts.length > 1 ? 's' : ''}` + (hist.below ? ` · ${hist.below} valeur${hist.below > 1 ? 's' : ''} avant la 1re classe` : '');
+    const ints = vals.every(x => Number.isInteger(x));
+    let bi = `${hist.counts.length} classe${hist.counts.length > 1 ? 's' : ''}` + (hist.below ? ` · ${hist.below} valeur${hist.below > 1 ? 's' : ''} avant la 1re classe` : '');
+    if (hist.counts.length > 150) bi += ' · beaucoup de classes : vérifiez qu’aucune valeur aberrante (une ligne de total par exemple) ne s’est glissée dans les données';
+    else if (ints && Number.isInteger(w) && Number.isInteger(start)) bi += ` · conseil : début à ${E.sig(start - 0.5, 6)} pour centrer chaque classe sur une valeur entière`;
+    $('binInfo').textContent = bi;
     const N = vals.length;
     const ranges = hist.counts.map((_, k) => `[${E.sig(hist.edges[k], 5)} ; ${E.sig(hist.edges[k + 1], 5)}[`);
     const traces = [{
@@ -1001,7 +1005,7 @@
     $('pasteArea').value = '';
     $('selSep').value = 'auto'; $('sepOther').hidden = true; $('sepOther').value = '';
     $('selDec').value = 'auto';
-    ['selHeaderRow', 'selUnitRow', 'selDataStart'].forEach(id => { $(id).innerHTML = '<option value="auto">Automatique</option>'; });
+    ['selHeaderRow', 'selUnitRow', 'selDataStart', 'selDataEnd'].forEach(id => { $(id).innerHTML = '<option value="auto">Automatique</option>'; });
     $('importSource').textContent = sourceText || 'Collez ci-dessous des colonnes copiées depuis un tableur, un fichier texte ou un logiciel d’acquisition, ou ouvrez un fichier.';
     $('previewTable').innerHTML = ''; $('importInfo').innerHTML = '';
     $('btnImportOk').disabled = true; $('btnImportAdd').disabled = true;
@@ -1026,8 +1030,11 @@
 
   function parseSheet() {
     const ws = pendingBook.Sheets[$('selSheet').value];
-    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
-    setRows(rows.filter(r => r.some(c => String(c ?? '').trim() !== '')));
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '', blankrows: true });
+    const empty = r => !r || !r.some(c => String(c ?? '').trim() !== '');
+    while (rows.length && empty(rows[0])) rows.shift();
+    while (rows.length && empty(rows[rows.length - 1])) rows.pop();
+    setRows(rows.map(r => empty(r) ? [] : r));
   }
 
   function setRows(rows) {
@@ -1039,13 +1046,14 @@
   }
 
   function fillRowSelects() {
-    const n = Math.min(imp.rows.length, 60);
+    const N = imp.rows.length, n = Math.min(N, 60);
     const lineOpt = i => {
-      const txt = imp.rows[i].map(c => String(c ?? '')).filter(Boolean).join(' · ');
+      const txt = imp.rows[i].map(c => String(c ?? '')).filter(Boolean).join(' · ') || '(vide)';
       return `<option value="${i}">Ligne ${i + 1} : ${esc(txt.length > 32 ? txt.slice(0, 31) + '…' : txt)}</option>`;
     };
-    const lines = Array.from({ length: n }, (_, i) => lineOpt(i)).join('');
-    [['selHeaderRow', true], ['selUnitRow', true], ['selDataStart', false]].forEach(([id, none]) => {
+    const head = Array.from({ length: n }, (_, i) => lineOpt(i)).join('');
+    const tail = Array.from({ length: Math.min(N, 80) }, (_, k) => lineOpt(N - 1 - k)).join('');
+    [['selHeaderRow', true, head], ['selUnitRow', true, head], ['selDataStart', false, head], ['selDataEnd', false, tail]].forEach(([id, none, lines]) => {
       const el = $(id), cur = el.value;
       el.innerHTML = '<option value="auto">Automatique</option>' + (none ? '<option value="-1">Aucune</option>' : '') + lines;
       el.value = [...el.options].some(o => o.value === cur) ? cur : 'auto';
@@ -1062,7 +1070,7 @@
     }
     const table = E.rowsToTable(imp.rows, {
       decimal: $('selDec').value, headerRow: $('selHeaderRow').value, unitRow: $('selUnitRow').value,
-      dataStart: $('selDataStart').value, include: imp.include || undefined
+      dataStart: $('selDataStart').value, dataEnd: $('selDataEnd').value, include: imp.include || undefined
     });
     if (!imp.include) imp.include = table.columns.map(c => c.numeric > 0);
     const L = table.layout, A = table.auto, dec = table.decimal;
@@ -1071,13 +1079,17 @@
     $('selHeaderRow').options[0].textContent = `Automatique (${autoLine(A.headerRow)})`;
     $('selUnitRow').options[0].textContent = `Automatique (${autoLine(A.unitRow)})`;
     $('selDataStart').options[0].textContent = `Automatique (ligne ${A.dataStart + 1})`;
+    $('selDataEnd').options[0].textContent = `Automatique (ligne ${A.dataEnd + 1})`;
     $('selDec').options[0].textContent = `Automatique (${dec === ',' ? 'virgule' : 'point'})`;
 
     const rows = imp.rows, cols = table.columns;
-    const role = i => i === L.headerRow ? ['r-name', 'noms'] : i === L.unitRow ? ['r-unit', 'unités'] : i >= L.dataStart ? ['r-data', 'données'] : ['r-skip', 'ignorée'];
-    let show = [...Array(Math.min(rows.length, Math.max(20, L.dataStart + 8))).keys()];
-    const hidden = rows.length - show.length;
-    if (hidden > 0) show.push(rows.length - 1);
+    const isEmpty = r => !r.some(c => String(c ?? '').trim() !== '');
+    const role = i => i === L.headerRow ? ['r-name', 'noms'] : i === L.unitRow ? ['r-unit', 'unités']
+      : isEmpty(rows[i]) ? ['r-skip', 'vide'] : i >= L.dataStart && i <= L.dataEnd ? ['r-data', 'données'] : ['r-skip', 'ignorée'];
+    // début du fichier, puis la fin des données et ce qui suit
+    const headN = Math.min(rows.length, Math.max(16, L.dataStart + 6));
+    const show = [...Array(headN).keys()];
+    for (let i = Math.max(headN, L.dataEnd - 2); i < rows.length && i < Math.max(headN, L.dataEnd - 2) + 10; i++) show.push(i);
     let h = '<thead><tr><th class="idx">ligne</th><th class="rolecol">rôle</th>';
     cols.forEach((c, j) => {
       h += `<th class="${imp.include[j] ? '' : 'off'}"><label class="colpick"><input type="checkbox" data-col="${j}" ${imp.include[j] ? 'checked' : ''}> ${esc(c.name)}</label><span class="unit">${esc(c.unit) || '&nbsp;'}</span></th>`;
@@ -1085,13 +1097,13 @@
     h += '</tr></thead><tbody>';
     let bad = 0;
     for (let i = 0; i < rows.length; i++) {
-      if (i >= L.dataStart && i !== L.headerRow && i !== L.unitRow) cols.forEach((c, j) => {
+      if (i >= L.dataStart && i <= L.dataEnd && i !== L.headerRow && i !== L.unitRow) cols.forEach((c, j) => {
         const raw = String(rows[i][j] ?? '').trim();
         if (imp.include[j] && raw && isNaN(E.parseNumber(rows[i][j], dec))) bad++;
       });
     }
     show.forEach((i, k) => {
-      if (hidden > 0 && k === show.length - 1) h += `<tr class="more"><td colspan="${cols.length + 2}">… ${hidden - 1 > 0 ? hidden - 1 + ' lignes non affichées' : ''}</td></tr>`;
+      if (k > 0 && i > show[k - 1] + 1) h += `<tr class="more"><td colspan="${cols.length + 2}">… ${i - show[k - 1] - 1} ligne${i - show[k - 1] - 1 > 1 ? 's' : ''} non affichée${i - show[k - 1] - 1 > 1 ? 's' : ''}</td></tr>`;
       const [rc, rl] = role(i), isData = rc === 'r-data';
       h += `<tr class="${rc}"><td class="idx">${i + 1}</td><td class="rolecol"><span class="role ${rc}">${rl}</span></td>`;
       cols.forEach((c, j) => {
@@ -1111,6 +1123,8 @@
     if (cols.length === 1 && rows.length > 1) info.push('<span class="err">Une seule colonne trouvée : le séparateur de colonnes est sans doute mal choisi.</span>');
     if (sep === ',' && dec === ',') info.push('<span class="err">La virgule ne peut pas séparer à la fois les colonnes et les décimales : changez l’un des deux réglages.</span>');
     if (bad) info.push(`<span class="err">${bad} cellule${bad > 1 ? 's' : ''} non numérique${bad > 1 ? 's' : ''} (en rouge) ser${bad > 1 ? 'ont' : 'a'} laissée${bad > 1 ? 's' : ''} vide${bad > 1 ? 's' : ''}.</span>`);
+    const after = rows.slice(L.dataEnd + 1).filter(r => !isEmpty(r)).length;
+    if (after) info.push(`<span class="warn">${after} ligne${after > 1 ? 's' : ''} après les données ${after > 1 ? 'sont ignorées' : 'est ignorée'} (ligne ${L.dataEnd + 2}${after > 1 ? ' et suivantes' : ''}, par exemple un total). Choisissez « Données jusqu’à » pour l’inclure.</span>`);
     if (msg) info.push(`<span class="err">${esc(msg)}</span>`);
     $('importInfo').innerHTML = info.join('');
     if (table.error) return;
@@ -1146,13 +1160,13 @@
       reader.readAsArrayBuffer(file);
     } else {
       reader.onload = () => {
-        const txt = reader.result;
-        if (txt.includes('\uFFFD')) { // probablement en Latin-1 (Windows)
-          const r2 = new FileReader(); r2.onload = () => { $('pasteArea').value = r2.result; parsePasted(); }; r2.readAsText(file, 'windows-1252'); return;
-        }
-        $('pasteArea').value = txt; parsePasted();
+        // UTF-8 si le fichier est valide en UTF-8, sinon Windows-1252 (fichiers Windows anciens)
+        let txt;
+        try { txt = new TextDecoder('utf-8', { fatal: true }).decode(reader.result); }
+        catch (e) { txt = new TextDecoder('windows-1252').decode(reader.result); }
+        $('pasteArea').value = txt.replace(/^\uFEFF/, ''); parsePasted();
       };
-      reader.readAsText(file, 'utf-8');
+      reader.readAsArrayBuffer(file);
     }
   }
 
@@ -1187,7 +1201,7 @@
       parsePasted();
     };
     $('sepOther').addEventListener('input', parsePasted);
-    ['selDec', 'selHeaderRow', 'selUnitRow', 'selDataStart'].forEach(id => { $(id).onchange = () => buildPreview(); });
+    ['selDec', 'selHeaderRow', 'selUnitRow', 'selDataStart', 'selDataEnd'].forEach(id => { $(id).onchange = () => buildPreview(); });
     $('previewTable').addEventListener('change', e => {
       const c = e.target.dataset.col; if (c === undefined) return;
       imp.include[+c] = e.target.checked; buildPreview();
