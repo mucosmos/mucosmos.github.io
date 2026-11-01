@@ -1,0 +1,54 @@
+# MicroLab
+
+Logiciel de traitement de données expérimentales qui fonctionne dans le navigateur, dans l’esprit de Regressi : tableau de mesures, grandeurs calculées, graphe, modélisation par une fonction avec incertitudes sur les paramètres, statistiques sur des mesures répétées.
+
+Aucun serveur n’est nécessaire : ce sont des fichiers HTML, CSS et JavaScript statiques, prêts pour GitHub Pages.
+
+## Fonctions
+
+- **Import** : CSV, TXT, DAT, TSV (séparateur et virgule décimale détectés), classeurs ODS, XLSX et XLS, collage direct depuis un tableur (Ctrl+V), glisser-déposer d’un fichier. Les en-têtes du type `t (s)`, `x [m]` ou une ligne d’unités sous les noms sont reconnus.
+- **Tableau** éditable (double-clic), ajout et suppression de lignes et de variables.
+- **Grandeurs calculées** : `v (m/s) = deriv(x, t)`, `Ec (J) = 0.5*m*v^2`, constantes (`m (kg) = 0.250`), `integ`, `mean`, `std`…
+- **Incertitudes** par variable : un nombre ou une formule (`0.02*U + 0.01`), affichées en barres d’erreur.
+- **Graphe** sur fond millimétré : plusieurs ordonnées, échelles logarithmiques, zoom, export PNG.
+- **Modélisation** : modèles prédéfinis (linéaire, affine, parabole, exponentielles, 1er ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne…) ou expression libre. Algorithme de Levenberg-Marquardt, valeurs initiales estimées automatiquement, paramètres fixables, domaine choisi à la souris.
+- **Estimateurs** : valeurs ± incertitude-type, incertitude relative, intervalle de confiance à 95 % (Student), R², χ² réduit et probabilité du χ² si l’ajustement est pondéré, écart-type des résidus sinon, graphe des résidus (normalisés par l’incertitude quand elle existe).
+- **Statistiques** : moyenne, écart-type, incertitude-type s/√n, intervalle à 95 %, histogramme, écart normalisé à une valeur de référence.
+- **Sauvegarde** automatique dans le navigateur, export CSV, projet `.json` à rouvrir.
+
+## Mise en ligne sur GitHub Pages
+
+Le site `mucosmos.github.io` est servi depuis le dépôt `mucosmos/mucosmos.github.io`. Le plus simple est d’y ajouter un dossier :
+
+1. Dans le dépôt `mucosmos.github.io`, créez un dossier `microlab/`.
+2. Copiez-y le contenu de ce dossier : `index.html`, `style.css` et le dossier `js/`.
+3. Validez et poussez :
+   ```bash
+   git add microlab
+   git commit -m "Ajout de MicroLab"
+   git push
+   ```
+4. Après une à deux minutes, le logiciel est accessible à l’adresse **https://mucosmos.github.io/microlab/**.
+
+Sur le site web de GitHub, sans ligne de commande : ouvrez le dépôt, *Add file → Upload files*, glissez les fichiers en conservant le dossier `js/`, puis *Commit changes*.
+
+Autre possibilité : un dépôt séparé nommé `microlab`, avec *Settings → Pages → Deploy from a branch → main / (root)*. L’adresse est alors la même : `https://mucosmos.github.io/microlab/`.
+
+## Structure
+
+```
+index.html        page et interface
+style.css         mise en forme (thèmes clair et sombre)
+js/engine.js      lecture des fichiers, ajustement, statistiques (sans dépendance)
+js/examples.js    jeux de données d’exemple
+js/app.js         interface : tableau, graphe, modélisation
+```
+
+Bibliothèques chargées depuis jsDelivr : [math.js](https://mathjs.org) (expressions), [Plotly](https://plotly.com/javascript/) (graphes), [SheetJS](https://sheetjs.com) (ODS / XLSX). Pour un usage hors ligne, téléchargez ces trois fichiers dans un dossier `lib/` et remplacez les adresses dans `index.html`.
+
+## Détails de calcul
+
+- Ajustement non pondéré : u(pᵢ) = √(s²·Cᵢᵢ) avec s² = Σ résidus² / (n − p) et C = (JᵀJ)⁻¹.
+- Ajustement pondéré par u(y) : C = (JᵀWJ)⁻¹ avec W = 1/u². Si x a aussi une incertitude, la méthode de la variance effective est utilisée : u² = u(y)² + (f′(x)·u(x))².
+- Intervalle à 95 % : ± t·u, t étant le coefficient de Student à n − p degrés de liberté.
+- Dérivée numérique : différences centrées (différences simples aux extrémités). Intégrale : méthode des trapèzes.

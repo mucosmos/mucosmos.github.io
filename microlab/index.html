@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MicroLab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Traitement et modélisation de données expérimentales dans le navigateur.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@14.9.1/lib/browser/math.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.3/plotly.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="mark">μ</span><span class="name">MicroLab</span><span class="file" id="projName">—</span></div>
+  <nav class="actions">
+    <button id="btnOpen" class="btn primary" title="CSV, TXT, ODS, XLSX ou projet .json">Ouvrir un fichier</button>
+    <button id="btnPaste" class="btn">Coller</button>
+    <label class="select-btn"><span>Exemples</span>
+      <select id="selExample" aria-label="Charger un exemple">
+        <option value="">Exemples…</option>
+        <option value="rc">Décharge d’un condensateur</option>
+        <option value="chute">Chute libre (pointage vidéo)</option>
+        <option value="ohm">Loi d’Ohm</option>
+        <option value="pendule">Période d’un pendule (mesures répétées)</option>
+        <option value="ressort">Oscillations amorties</option>
+      </select>
+    </label>
+    <button id="btnCsv" class="btn">Exporter CSV</button>
+    <button id="btnSave" class="btn">Enregistrer le projet</button>
+    <button id="btnNew" class="btn ghost">Nouveau</button>
+  </nav>
+  <input type="file" id="fileInput" accept=".csv,.txt,.dat,.tsv,.ods,.xlsx,.xls,.json" hidden>
+</header>
+
+<main class="layout">
+  <!-- Colonne gauche : données -->
+  <section class="panel data-panel">
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="table" role="tab">Tableau</button>
+      <button class="tab" data-tab="vars" role="tab">Grandeurs</button>
+    </div>
+
+    <div class="tabpane" id="pane-table">
+      <div class="toolbar">
+        <span class="count" id="rowCount"></span>
+        <span class="spacer"></span>
+        <button class="btn sm" id="btnAddRow">+ Ligne</button>
+        <button class="btn sm" id="btnAddVar">+ Variable</button>
+      </div>
+      <div class="tablewrap" id="tableWrap">
+        <table class="grid" id="dataTable"></table>
+      </div>
+      <p class="hint">Double-cliquez sur une cellule pour la modifier. Collez un tableau copié depuis un tableur avec Ctrl+V.</p>
+    </div>
+
+    <div class="tabpane" id="pane-vars" hidden>
+      <h3 class="label">Variables mesurées</h3>
+      <div id="varList" class="varlist"></div>
+      <div class="newvar" id="newVarForm" hidden>
+        <input id="newVarName" placeholder="nom (ex. m)" aria-label="Nom de la nouvelle variable">
+        <input id="newVarUnit" placeholder="unité" aria-label="Unité">
+        <button class="btn sm primary" id="btnNewVarOk">Créer</button>
+        <button class="btn sm ghost" id="btnNewVarCancel">Annuler</button>
+      </div>
+
+      <h3 class="label">Grandeurs calculées</h3>
+      <textarea id="calcText" spellcheck="false" rows="7" aria-label="Grandeurs calculées"
+        placeholder="v (m/s) = deriv(y, t)&#10;Ec (J) = 0.5*m*v^2&#10;m (kg) = 0.250"></textarea>
+      <div id="calcMsg" class="msg"></div>
+      <button class="btn sm primary" id="btnCalc">Calculer</button>
+      <details class="help">
+        <summary>Syntaxe des calculs</summary>
+        <ul>
+          <li>Une ligne par grandeur : <code>nom (unité) = expression</code>. L’unité est facultative.</li>
+          <li>Une expression sans variable définit une constante : <code>g (m/s²) = 9.81</code>.</li>
+          <li>Opérations : <code>+ - * / ^</code>, <code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>log10</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>abs</code>, <code>pi</code>. Point décimal : <code>0.5</code>.</li>
+          <li><code>deriv(y, t)</code> : dérivée de y par rapport à t. <code>integ(y, t)</code> : intégrale cumulée.</li>
+          <li><code>mean(x)</code>, <code>min(x)</code>, <code>max(x)</code>, <code>std(x)</code>, <code>sum(x)</code> s’appliquent à toute la colonne.</li>
+          <li>L’incertitude d’une variable peut être un nombre (<code>0.05</code>) ou une formule (<code>0.02*U + 0.01</code>).</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <!-- Colonne droite : graphe et analyse -->
+  <section class="work">
+    <div class="panel graph-panel">
+      <div class="graph-controls">
+        <label class="field"><span>Abscisse</span><select id="selX"></select></label>
+        <div class="field grow"><span>Ordonnée(s)</span><div class="chips" id="yChips"></div></div>
+        <div class="toggles">
+          <label><input type="checkbox" id="optLines"> Relier</label>
+          <label><input type="checkbox" id="optErr" checked> Incertitudes</label>
+          <label><input type="checkbox" id="optLogX"> log x</label>
+          <label><input type="checkbox" id="optLogY"> log y</label>
+          <label><input type="checkbox" id="optRes" checked> Résidus</label>
+        </div>
+      </div>
+      <div id="plot" class="plot"></div>
+    </div>
+
+    <div class="panel analysis-panel">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="model" role="tab">Modélisation</button>
+        <button class="tab" data-tab="stats" role="tab">Statistiques</button>
+      </div>
+
+      <div class="tabpane" id="pane-model">
+        <div class="model-head">
+          <label class="field"><span>Grandeur modélisée</span><select id="selModelY"></select></label>
+          <label class="field grow"><span>Modèle</span><select id="selPreset"></select></label>
+        </div>
+        <div class="formula">
+          <span class="lhs" id="modelLhs">y =</span>
+          <input id="modelExpr" spellcheck="false" aria-label="Expression du modèle">
+        </div>
+        <div class="range-row">
+          <span id="rangeText" class="range-text">Domaine : toutes les données</span>
+          <button class="btn sm" id="btnPickRange">Choisir sur le graphe</button>
+          <button class="btn sm ghost" id="btnClearRange" hidden>Tout utiliser</button>
+          <label class="weight"><input type="checkbox" id="optWeight" checked> Pondérer par les incertitudes</label>
+        </div>
+        <div class="tablewrap small">
+          <table class="params" id="paramTable"></table>
+        </div>
+        <div class="model-actions">
+          <button class="btn primary" id="btnFit">Ajuster le modèle</button>
+          <button class="btn" id="btnGuess">Estimer les valeurs initiales</button>
+          <button class="btn ghost" id="btnClearModel">Effacer</button>
+          <button class="btn ghost" id="btnCopyRes">Copier les résultats</button>
+        </div>
+        <div id="fitMsg" class="msg"></div>
+        <div id="fitResult" class="result"></div>
+      </div>
+
+      <div class="tabpane" id="pane-stats" hidden>
+        <div class="model-head">
+          <label class="field"><span>Variable</span><select id="selStat"></select></label>
+          <label class="field"><span>Valeur de référence (facultatif)</span><input id="statRef" inputmode="decimal" placeholder="ex. 9,81"></label>
+        </div>
+        <div class="stats-grid">
+          <div id="statTable"></div>
+          <div id="histo" class="histo"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Fenêtre d'import -->
+<div class="modal" id="importModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="modal-head">
+      <h2 id="importTitle">Importer des données</h2>
+      <button class="btn ghost sm" id="btnImportClose" aria-label="Fermer">Fermer</button>
+    </div>
+    <div class="import-opts">
+      <label class="field" id="sheetField" hidden><span>Feuille</span><select id="selSheet"></select></label>
+      <label class="field" id="sepField"><span>Séparateur</span>
+        <select id="selSep">
+          <option value="auto">Automatique</option>
+          <option value=";">Point-virgule ;</option>
+          <option value=",">Virgule ,</option>
+          <option value="&#9;">Tabulation</option>
+          <option value=" ">Espace</option>
+        </select>
+      </label>
+    </div>
+    <textarea id="pasteArea" rows="6" spellcheck="false" placeholder="Collez ici des colonnes copiées depuis un tableur, un fichier texte ou un logiciel d’acquisition.&#10;&#10;t (s);x (m)&#10;0;0,00&#10;0,04;0,021"></textarea>
+    <div id="importInfo" class="msg"></div>
+    <div class="tablewrap preview"><table class="grid" id="previewTable"></table></div>
+    <div class="modal-actions">
+      <button class="btn primary" id="btnImportOk" disabled>Remplacer les données</button>
+      <button class="btn" id="btnImportAdd" disabled title="Ajoute les colonnes à côté des données actuelles">Ajouter les colonnes</button>
+    </div>
+  </div>
+</div>
+
+<div class="drop" id="dropOverlay" hidden><div>Déposez le fichier pour l’importer</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/engine.js"></script>
+<script src="js/examples.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
