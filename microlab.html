@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MicroLab — MicroCosmos</title>
+<meta name="description" content="MicroLab : traitement et modélisation de données expérimentales dans le navigateur. Import CSV, TXT, ODS, grandeurs calculées, modélisation avec incertitudes, statistiques et lois de Gauss et de Poisson.">
+<meta property="og:title" content="MicroLab — MicroCosmos">
+<meta property="og:description" content="Traitement et modélisation de données expérimentales dans le navigateur, dans l’esprit de Regressi.">
+<meta property="og:image" content="https://mucosmos.github.io/images/microlab-accueil.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=20261019b">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="cosmodetecteur.html">Cosmodétecteur</a><a href="microlab.html" aria-current="page">MicroLab</a><a href="ressources.html">Ressources</a></nav>
+   </div>
+</header>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Logiciel libre · GPL v3 · dans le navigateur</span><h1>MicroLab</h1><p class="chapo">Traitement et modélisation des données expérimentales, dans l’esprit de Regressi. On importe un fichier de mesures, on calcule de nouvelles grandeurs, on trace, on modélise avec les incertitudes et on compare une série de mesures aux lois de Gauss et de Poisson. Rien à installer.</p>
+<div class="actions"><a class="bouton" href="microlab/">▶ Lancer MicroLab</a><a class="bouton second" href="#aide">Aide-mémoire</a></div>
+<nav class="sommaire" aria-label="Sur cette page"><a href="#presentation">Présentation</a><a href="#utiliser">Utiliser MicroLab</a><a href="#installation">Mise en route</a><a href="#fonctions">Les fonctions</a><a href="#aide">Aide-mémoire</a><a href="#licence">Auteurs et licence</a></nav></div></section>
+<main>
+
+<section class="section" id="presentation">
+  <div class="duo">
+    <div>
+      <h2>Du fichier de mesures au modèle</h2>
+      <p><strong>MicroLab</strong> traite des séries de mesures comme on le fait en TP avec un tableur ou Regressi, mais directement dans le navigateur, sur n’importe quel ordinateur du lycée.</p>
+      <ul class="activites">
+        <li><span class="pastille ard">Importer</span> fichiers CSV, TXT, ODS ou XLSX, ou simple copier-coller depuis un tableur, avec un aperçu qui montre comment chaque ligne est lue.</li>
+        <li><span class="pastille cos">Calculer</span> nouvelles grandeurs à partir des mesures : <code>v = deriv(x, t)</code>, <code>Ec = 0.5*m*v^2</code>, constantes, incertitudes en barres d’erreur.</li>
+        <li><span class="pastille dv">Modéliser</span> treize modèles prêts à l’emploi ou une expression libre ; paramètres avec leur incertitude, R², χ² et graphe des résidus.</li>
+        <li><span class="pastille rad">Statistiques</span> moyenne, écart-type, incertitude-type s/√n, histogramme réglable et comparaison aux lois de Gauss et de Poisson.</li>
+      </ul>
+      <p>Les fichiers enregistrés par <a href="logiciel.html">Microcosmos</a> s’ouvrent directement : on peut ainsi étudier les comptages des tubes Geiger et vérifier qu’ils suivent une loi de Poisson.</p>
+    </div>
+    <figure class="cadre"><a href="images/microlab-accueil.png"><img src="images/microlab-accueil.png" width="1366" height="860" alt="Capture de MicroLab : tableau de mesures de la décharge d’un condensateur, graphe de uC en fonction de t avec barres d’erreur, courbe du modèle exponentiel et graphe des résidus"></a>
+    <figcaption>Décharge d’un condensateur : mesures, modèle exponentiel et résidus. Cliquer pour agrandir.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="utiliser">
+  <h2>Utiliser MicroLab</h2>
+  <p class="texte">MicroLab fonctionne en ligne, sans installation ni compte. Les mesures restent sur l’ordinateur : rien n’est envoyé sur un serveur.</p>
+  <div class="grille g2">
+    <div class="version web">
+      <span class="lettre">▶</span>
+      <h3>Version web</h3>
+      <p class="sous">rien à installer</p>
+      <a class="bouton" href="microlab/">▶ Lancer MicroLab</a>
+      <ul class="plus-moins">
+        <li class="p">Firefox, Chrome, Edge, Safari, sur ordinateur ou tablette</li>
+        <li class="p">travail enregistré automatiquement dans le navigateur, retrouvé à la prochaine ouverture</li>
+        <li class="p">projet <code>.json</code> à enregistrer et à rouvrir, export CSV pour le tableur</li>
+        <li class="m">connexion internet nécessaire au lancement (bibliothèques de calcul et de graphes)</li>
+        <li class="m">sur téléphone, l’écran est petit pour le tableau et le graphe</li>
+      </ul>
+    </div>
+    <div class="carte">
+      <h3>Fichiers acceptés</h3>
+      <div class="tableau">
+        <table>
+          <thead><tr><th>Format</th><th>D’où il vient</th></tr></thead>
+          <tbody>
+            <tr><td><code>.csv</code> <code>.txt</code> <code>.dat</code></td><td>Microcosmos, Latis, Arduino, capteurs, exports de tableur</td></tr>
+            <tr><td><code>.ods</code> <code>.xlsx</code> <code>.xls</code></td><td>LibreOffice Calc, Excel (choix de la feuille)</td></tr>
+            <tr><td>copier-coller</td><td>colonnes copiées dans un tableur ou une page web (Ctrl+V)</td></tr>
+            <tr><td><code>.json</code></td><td>projet MicroLab enregistré</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Séparateur point-virgule, virgule, tabulation, espace ou autre ; virgule ou point décimal ; noms et unités en tête de colonne (<code>t (s)</code>) ou sur une ligne à part.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation">
+  <h2>Mise en route</h2>
+  <div class="grille g3">
+    <div class="carte"><h3>1 · Importer</h3>
+      <p>Cliquez sur <strong>Ouvrir un fichier</strong>, glissez le fichier dans la page ou collez un tableau. L’aperçu indique pour chaque ligne si elle est lue comme <strong>noms</strong>, <strong>unités</strong>, <strong>données</strong> ou <strong>ignorée</strong>.</p>
+      <p>Corrigez si besoin les séparateurs ou les lignes, puis <strong>Remplacer les données</strong>.</p></div>
+    <div class="carte"><h3>2 · Calculer et tracer</h3>
+      <p>Onglet <strong>Grandeurs</strong> : une ligne par grandeur calculée, par exemple <code>vy (m/s) = deriv(y, t)</code>. Indiquez l’incertitude de chaque variable : un nombre ou une formule.</p>
+      <p>Choisissez l’abscisse et les ordonnées au-dessus du graphe.</p></div>
+    <div class="carte"><h3>3 · Modéliser</h3>
+      <p>Choisissez un modèle : les valeurs initiales sont estimées et l’ajustement est immédiat. <strong>Choisir sur le graphe</strong> limite le modèle à une partie des points.</p>
+      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose six jeux de données.</p></div>
+  </div>
+</section>
+
+<section class="section" id="fonctions">
+  <h2>Les fonctions</h2>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-import.png"><img loading="lazy" src="images/microlab-import.png" width="980" height="716" alt="Capture de la fenêtre d’import de MicroLab avec un fichier Microcosmos : réglages des séparateurs et des lignes, aperçu indiquant le rôle de chaque ligne"></a>
+    <figcaption>Import d’un fichier de comptage Microcosmos.</figcaption></figure>
+    <div>
+      <h3>Importer sans surprise</h3>
+      <ul>
+        <li>Les réglages sont proposés automatiquement et <strong>tous modifiables</strong> : séparateur de colonnes, séparateur décimal, ligne des noms, ligne des unités, première et dernière ligne de données.</li>
+        <li>L’<strong>aperçu</strong> montre le rôle de chaque ligne ; les cellules qui ne sont pas des nombres apparaissent en rouge et resteront vides.</li>
+        <li>Chaque colonne se coche ou se décoche. Les lignes de titre et la ligne <strong>TOTAL</strong> d’un fichier Microcosmos sont écartées.</li>
+        <li><strong>Ajouter les colonnes</strong> complète un tableau existant avec une seconde série de même longueur.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-grandeurs.png"><img loading="lazy" src="images/microlab-grandeurs.png" width="1366" height="860" alt="Capture de l’onglet Grandeurs de MicroLab pour une chute libre : incertitudes des variables, grandeurs calculées vy et ay, graphe de y et vy en fonction de t"></a>
+    <figcaption>Chute libre : vitesse calculée par dérivation.</figcaption></figure>
+    <div>
+      <h3>Grandeurs calculées et incertitudes</h3>
+      <ul>
+        <li>Une ligne par grandeur : <code>nom (unité) = expression</code>. Une expression sans variable définit une constante.</li>
+        <li>Fonctions usuelles (<code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>sin</code>…), dérivée <code>deriv(y, t)</code>, intégrale <code>integ(y, t)</code>, et <code>mean</code>, <code>std</code>, <code>max</code> sur toute une colonne.</li>
+        <li>L’incertitude d’une variable est un nombre (<code>0.005</code>) ou une formule (<code>0.02*U + 0.01</code>) ; elle s’affiche en barres d’erreur et sert à pondérer la modélisation.</li>
+        <li>Graphe sur papier millimétré : plusieurs ordonnées, échelles logarithmiques, zoom et export en image.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-modelisation.png"><img loading="lazy" src="images/microlab-modelisation.png" width="920" height="729" alt="Capture du panneau Modélisation de MicroLab : modèle A exp(-t/tau) + B, paramètres ajustés avec incertitudes, R², χ² réduit et intervalles de confiance à 95 %"></a>
+    <figcaption>Modélisation pondérée par les incertitudes.</figcaption></figure>
+    <div>
+      <h3>Modélisation</h3>
+      <ul>
+        <li>Linéaire, affine, parabole, exponentielles, charge du premier ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne… ou <strong>expression libre</strong> avec n’importe quels paramètres.</li>
+        <li>Chaque paramètre est donné avec son <strong>incertitude-type</strong>, son incertitude relative et son intervalle de confiance à 95 % (coefficient de Student). Un paramètre peut être fixé.</li>
+        <li><strong>R²</strong> et, quand les mesures ont une incertitude, <strong>χ² réduit</strong> et sa probabilité : un χ² réduit proche de 1 signifie que le modèle est compatible avec les incertitudes.</li>
+        <li>Le <strong>graphe des résidus</strong> sous la courbe permet de repérer un modèle mal choisi.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-statistiques.png"><img loading="lazy" src="images/microlab-statistiques.png" width="920" height="738" alt="Capture de l’onglet Statistiques de MicroLab : histogramme des coïncidences mesurées par Microcosmos, loi de Poisson superposée, λ = 5,18 ± 0,19 et test du χ²"></a>
+    <figcaption>144 comptages de coïncidences de 5 min comparés à la loi de Poisson.</figcaption></figure>
+    <div>
+      <h3>Statistiques et lois de probabilité</h3>
+      <ul>
+        <li>Moyenne, écart-type expérimental, <strong>incertitude-type s/√n</strong>, intervalle à 95 %, médiane ; écart normalisé à une valeur de référence.</li>
+        <li><strong>Histogramme</strong> : largeur et début des classes choisis à la main, ou automatiques.</li>
+        <li><strong>Loi normale</strong> ou <strong>loi de Poisson</strong> superposée, avec les paramètres estimés, les effectifs attendus et un <strong>test du χ²</strong> d’adéquation.</li>
+        <li>Pour les comptages, le rapport variance / moyenne, proche de 1 pour une loi de Poisson.</li>
+      </ul>
+      <p class="note">Voir aussi la page <a href="radioactivite.html">Radioactivité</a> pour les mesures de comptage.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="aide">
+  <h2>Aide-mémoire</h2>
+  <div class="grille g2">
+    <div style="min-width:0">
+      <h3 style="margin-top:0">Écrire un calcul</h3>
+<pre><span class="c"># une ligne par grandeur, unité facultative</span>
+<span class="n">m</span> (kg) = 0.250
+<span class="n">v</span> (m/s) = <span class="k">deriv</span>(x, t)
+<span class="n">Ec</span> (J) = 0.5*m*v^2
+<span class="n">E</span> (J) = <span class="k">integ</span>(P, t)
+<span class="n">lnN</span> = <span class="k">ln</span>(N - <span class="k">mean</span>(fond))</pre>
+      <p class="note">Point décimal dans les formules (<code>0.5</code>) ; virgule ou point dans le tableau. <code>^</code> pour les puissances, <code>pi</code> pour π.</p>
+    </div>
+    <div style="min-width:0">
+      <h3 style="margin-top:0">Lire les résultats</h3>
+      <div class="tableau">
+        <table>
+          <tbody>
+            <tr><td style="white-space:nowrap"><strong>a = 2,00 ± 0,03</strong></td><td>valeur ± incertitude-type ; l’incertitude est arrondie à 2 chiffres</td></tr>
+            <tr><td><strong>R²</strong></td><td>part de la variation expliquée par le modèle ; ne suffit pas à valider un modèle</td></tr>
+            <tr><td><strong>χ² réduit</strong></td><td>≈ 1 : écarts du même ordre que les incertitudes ; ≫ 1 : modèle ou incertitudes à revoir</td></tr>
+            <tr><td><strong>résidus</strong></td><td>doivent se répartir au hasard autour de 0, sans tendance</td></tr>
+            <tr><td><strong>p du test χ²</strong></td><td>p &lt; 5 % : écart significatif entre l’histogramme et la loi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="encart">
+    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, période d’un pendule, comptage radioactif, oscillations amorties.</p>
+  </div>
+</section>
+
+<section class="section" id="licence">
+  <div class="duo" style="align-items:start">
+    <div>
+      <h2>Sauvegarder et partager</h2>
+      <p>Le travail en cours est gardé dans le navigateur et retrouvé à la prochaine ouverture sur le même ordinateur.
+      Pour le conserver ou le rendre, <strong>Enregistrer le projet</strong> produit un fichier <code>.json</code> (données, calculs et modèle) qui se rouvre avec <strong>Ouvrir un fichier</strong>.</p>
+      <p><strong>Exporter CSV</strong> donne le tableau complet, grandeurs calculées comprises, avec point-virgule et virgule décimale pour LibreOffice et Excel. Le bouton appareil photo du graphe l’enregistre en image.</p>
+    </div>
+    <div>
+      <h2>Auteurs et licence</h2>
+      <p>Conception et direction du projet : <strong>Cédric Vanden Driessche</strong> (2026), professeur de physique-chimie au lycée Charles de Gaulle à Caen ; développement du code web : Claude (Anthropic), sous sa direction.</p>
+      <p>Logiciel libre sous <a href="licence.html">licence GNU GPL</a>, version 3 ou ultérieure, distribué sans aucune garantie. MicroLab utilise les bibliothèques libres math.js, Plotly et SheetJS.</p>
+      <p class="note">Code source : dossier <a href="https://github.com/mucosmos/mucosmos.github.io/tree/main/microlab">microlab</a> du dépôt GitHub.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="microlab.html">MicroLab</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="cosmodetecteur.html">Cosmodétecteur</a></li><li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+<script data-goatcounter="https://mucosmos.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
