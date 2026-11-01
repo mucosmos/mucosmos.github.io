@@ -26,6 +26,7 @@
         <option value="chute">Chute libre (pointage vidéo)</option>
         <option value="ohm">Loi d’Ohm</option>
         <option value="pendule">Période d’un pendule (mesures répétées)</option>
+        <option value="comptage">Comptage radioactif (loi de Poisson)</option>
         <option value="ressort">Oscillations amorties</option>
       </select>
     </label>
@@ -142,9 +143,24 @@
           <label class="field"><span>Variable</span><select id="selStat"></select></label>
           <label class="field"><span>Valeur de référence (facultatif)</span><input id="statRef" inputmode="decimal" placeholder="ex. 9,81"></label>
         </div>
+        <div class="histo-opts">
+          <label class="field"><span>Largeur des classes</span><input id="binWidth" inputmode="decimal" placeholder="auto"></label>
+          <label class="field"><span>Début de la 1<sup>re</sup> classe</span><input id="binStart" inputmode="decimal" placeholder="auto"></label>
+          <label class="field"><span>Loi superposée</span>
+            <select id="selLaw">
+              <option value="">Aucune</option>
+              <option value="gauss">Loi normale (Gauss)</option>
+              <option value="poisson">Loi de Poisson</option>
+            </select>
+          </label>
+          <span class="bin-info" id="binInfo"></span>
+        </div>
         <div class="stats-grid">
           <div id="statTable"></div>
-          <div id="histo" class="histo"></div>
+          <div class="histo-col">
+            <div id="histo" class="histo"></div>
+            <div id="lawResult" class="law"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -158,24 +174,47 @@
       <h2 id="importTitle">Importer des données</h2>
       <button class="btn ghost sm" id="btnImportClose" aria-label="Fermer">Fermer</button>
     </div>
+    <p class="note" id="importSource">Collez des colonnes copiées depuis un tableur, un fichier texte ou un logiciel d’acquisition, ou ouvrez un fichier.</p>
     <div class="import-opts">
       <label class="field" id="sheetField" hidden><span>Feuille</span><select id="selSheet"></select></label>
-      <label class="field" id="sepField"><span>Séparateur</span>
-        <select id="selSep">
+      <div class="field" id="sepField"><span>Séparateur de colonnes</span>
+        <div class="seprow">
+          <select id="selSep">
+            <option value="auto">Automatique</option>
+            <option value=";">Point-virgule ;</option>
+            <option value=",">Virgule ,</option>
+            <option value="&#9;">Tabulation</option>
+            <option value=" ">Espace(s)</option>
+            <option value="|">Barre verticale |</option>
+            <option value="other">Autre…</option>
+          </select>
+          <input id="sepOther" maxlength="3" aria-label="Caractère séparateur" placeholder="|" hidden>
+        </div>
+      </div>
+      <label class="field"><span>Séparateur décimal</span>
+        <select id="selDec">
           <option value="auto">Automatique</option>
-          <option value=";">Point-virgule ;</option>
-          <option value=",">Virgule ,</option>
-          <option value="&#9;">Tabulation</option>
-          <option value=" ">Espace</option>
+          <option value=",">Virgule  3,14</option>
+          <option value=".">Point  3.14</option>
         </select>
       </label>
+      <label class="field"><span>Ligne des noms</span><select id="selHeaderRow"></select></label>
+      <label class="field"><span>Ligne des unités</span><select id="selUnitRow"></select></label>
+      <label class="field"><span>Données à partir de</span><select id="selDataStart"></select></label>
     </div>
-    <textarea id="pasteArea" rows="6" spellcheck="false" placeholder="Collez ici des colonnes copiées depuis un tableur, un fichier texte ou un logiciel d’acquisition.&#10;&#10;t (s);x (m)&#10;0;0,00&#10;0,04;0,021"></textarea>
-    <div id="importInfo" class="msg"></div>
+    <details id="rawBox" open>
+      <summary>Texte brut (modifiable)</summary>
+      <textarea id="pasteArea" rows="6" spellcheck="false" placeholder="t (s);x (m)&#10;0;0,00&#10;0,04;0,021"></textarea>
+    </details>
+    <div class="preview-head">
+      <h3 class="label">Aperçu</h3>
+      <span class="legend"><span class="role r-name">noms</span><span class="role r-unit">unités</span><span class="role r-data">données</span><span class="role r-skip">ignorée</span></span>
+    </div>
     <div class="tablewrap preview"><table class="grid" id="previewTable"></table></div>
+    <div id="importInfo" class="msg"></div>
     <div class="modal-actions">
       <button class="btn primary" id="btnImportOk" disabled>Remplacer les données</button>
-      <button class="btn" id="btnImportAdd" disabled title="Ajoute les colonnes à côté des données actuelles">Ajouter les colonnes</button>
+      <button class="btn" id="btnImportAdd" disabled title="Ajoute les colonnes à côté des données actuelles (même nombre de lignes)">Ajouter les colonnes</button>
     </div>
   </div>
 </div>

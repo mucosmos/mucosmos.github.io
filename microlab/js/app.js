@@ -51,6 +51,8 @@
     st.calc = ex.calc || '';
     Object.assign(st.graph, ex.graph);
     Object.assign(st.model, ex.model, { expr: '', init: {}, fixed: {}, result: null, range: null });
+    st.hist = Object.assign({ width: '', start: '', law: '' }, ex.hist || {});
+    if (ex.statVar) st.statVar = ex.statVar;
     return st;
   }
 
@@ -309,7 +311,7 @@
       const txt = e.clipboardData.getData('text');
       if (!txt || !/\n/.test(txt.trim())) return;
       e.preventDefault();
-      openImport(); $('pasteArea').value = txt; parsePasted();
+      openImport('Données collées depuis le presse-papiers. Vérifiez le découpage dans l’aperçu.'); pendingName = 'Données collées'; $('pasteArea').value = txt; parsePasted();
     });
   }
 
@@ -823,7 +825,7 @@
     $('selStat').innerHTML = names.map(n => `<option ${n === S.statVar ? 'selected' : ''} value="${esc(n)}">${esc(labelOf(n))}</option>`).join('');
     if ($('pane-stats').hidden) return;
     const v = D.cols[S.statVar] || [], st = E.describe(v), un = unitOf(S.statVar), U = un ? ' ' + esc(un) : '';
-    if (!st.n || !window.Plotly) { $('statTable').innerHTML = '<p class="note">Aucune valeur numérique.</p>'; if (window.Plotly) Plotly.purge($('histo')); return; }
+    if (!st.n || !window.Plotly) { $('statTable').innerHTML = '<p class="note">Aucune valeur numérique.</p>'; if (window.Plotly) Plotly.purge($('histo')); $('lawResult').innerHTML = ''; return; }
     const fu = E.formatValU(st.mean, st.u);
     const ex = fu.exp !== undefined ? ` ×10<sup>${fu.exp}</sup>` : '';
     const rows = [
@@ -843,21 +845,133 @@
       rows.push(['Écart normalisé z = |x̄ − réf| / u', `${E.sig(z, 2)} <span class="pill ${z <= 2 ? 'good' : 'badp'}">${z <= 2 ? 'compatible' : 'non compatible'}</span>`, 'hl']);
     }
     $('statTable').innerHTML = `<table class="stat-table"><tbody>${rows.map(r => `<tr class="${r[2] || ''}"><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table>`;
-    // histogramme
-    const vals = v.filter(isFinite);
-    const nb = Math.max(4, Math.ceil(Math.log2(vals.length) + 1));
+    renderHisto(v.filter(isFinite), st, ref);
+  }
+
+  /* largeur « ronde » : 1, 2, 2,5 ou 5 × 10^k */
+  function niceWidth(x) {
+    const e = Math.floor(Math.log10(x)), f = x / 10 ** e;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * 10 ** e;
+  }
+
+  function autoBins(vals, userW) {
+    const min = Math.min(...vals), max = Math.max(...vals), span = max - min;
+    const ints = vals.every(x => Number.isInteger(x));
+    let w = userW;
+    if (!(w > 0)) {
+      if (ints && span <= 40) w = 1;
+      else w = span > 0 ? niceWidth(span / Math.max(4, Math.ceil(Math.log2(vals.length) + 1))) : 1;
+      if (ints) w = Math.max(1, Math.round(w));
+    }
+    // valeurs entières et largeur entière : classes centrées sur les entiers
+    const start = ints && Number.isInteger(w) ? min - 0.5 : Math.floor(min / w) * w;
+    return { w, start };
+  }
+
+  /* regroupe les classes voisines jusqu'à un effectif attendu d'au moins 5 */
+  function chi2Test(obs, exp, nParams) {
+    const O = [], Ex = [];
+    let o = 0, e = 0;
+    obs.forEach((ob, i) => { o += ob; e += exp[i]; if (e >= 5) { O.push(o); Ex.push(e); o = 0; e = 0; } });
+    if (e > 0 || o > 0) { if (Ex.length) { O[O.length - 1] += o; Ex[Ex.length - 1] += e; } else { O.push(o); Ex.push(e); } }
+    const chi2 = O.reduce((s, ob, i) => s + (ob - Ex[i]) ** 2 / Ex[i], 0);
+    const dof = O.length - 1 - nParams;
+    return { chi2, dof, groups: O.length, p: dof > 0 ? E.chi2Q(chi2, dof) : NaN };
+  }
+
+  function renderHisto(vals, st, ref) {
+    const H = S.hist = Object.assign({ width: '', start: '', law: '' }, S.hist);
+    $('binWidth').value = document.activeElement === $('binWidth') ? $('binWidth').value : H.width;
+    $('binStart').value = document.activeElement === $('binStart') ? $('binStart').value : H.start;
+    $('selLaw').value = H.law;
+    const userW = E.parseNumber(H.width), userS = E.parseNumber(H.start);
+    const auto = autoBins(vals, userW);
+    const w = userW > 0 ? userW : auto.w;
+    const start = isFinite(userS) ? userS : auto.start;
+    $('binWidth').placeholder = 'auto (' + E.sig(auto.w, 4) + ')';
+    $('binStart').placeholder = 'auto (' + E.sig(auto.start, 6) + ')';
+    let hist;
+    try { hist = E.histogram(vals, w, start); } catch (e) { $('binInfo').textContent = e.message; return; }
+    const centers = hist.counts.map((_, k) => start + (k + 0.5) * w);
+    $('binInfo').textContent = `${hist.counts.length} classe${hist.counts.length > 1 ? 's' : ''}` + (hist.below ? ` · ${hist.below} valeur${hist.below > 1 ? 's' : ''} avant la 1re classe` : '');
+    const N = vals.length;
+    const ranges = hist.counts.map((_, k) => `[${E.sig(hist.edges[k], 5)} ; ${E.sig(hist.edges[k + 1], 5)}[`);
+    const traces = [{
+      x: centers, y: hist.counts, type: 'bar', width: w * 0.94, name: 'effectif',
+      marker: { color: cssVar('--accent'), opacity: 0.72 }, customdata: ranges,
+      hovertemplate: '%{customdata} : %{y}<extra></extra>'
+    }];
+    const model = cssVar('--model');
+    let lawHtml = '';
+    if (H.law === 'gauss' && st.s > 0) {
+      const mu = st.mean, s = st.s;
+      const lo = Math.min(start, mu - 4 * s), hi = Math.max(hist.edges[hist.edges.length - 1], mu + 4 * s);
+      const cx = [], cy = [];
+      for (let i = 0; i <= 300; i++) { const x = lo + (hi - lo) * i / 300; cx.push(x); cy.push(N * w * Math.exp(-((x - mu) ** 2) / (2 * s * s)) / (s * Math.sqrt(2 * Math.PI))); }
+      traces.push({ x: cx, y: cy, mode: 'lines', name: 'loi normale', line: { color: model, width: 2.2 }, hoverinfo: 'skip' });
+      const expc = hist.counts.map((_, k) => N * ((k === hist.counts.length - 1 ? 1 : E.normCdf(hist.edges[k + 1], mu, s)) - (k === 0 ? 0 : E.normCdf(hist.edges[k], mu, s))));
+      traces.push({ x: centers, y: expc, mode: 'markers', name: 'effectif attendu', marker: { color: model, size: 7, symbol: 'diamond-open', line: { width: 1.6 } }, hovertemplate: 'attendu : %{y:.1f}<extra></extra>' });
+      const fm = E.formatValU(mu, st.u), fs = E.formatValU(s, s / Math.sqrt(2 * (N - 1)));
+      lawHtml = lawBlock('Loi normale', [
+        ['Moyenne μ', fm], ['Écart-type σ', fs]
+      ], chi2Test(hist.counts, expc, 2), N,
+      `Paramètres estimés à partir des mesures (μ = x̄, σ = s). Environ 68 % des valeurs doivent se trouver entre μ − σ et μ + σ, et 95 % entre μ − 2σ et μ + 2σ.`
+      + ` Ici : ${pct(vals, mu - s, mu + s)} et ${pct(vals, mu - 2 * s, mu + 2 * s)}.`);
+    } else if (H.law === 'poisson') {
+      const lam = st.mean;
+      const okData = vals.every(x => x >= 0 && Number.isInteger(x));
+      if (lam > 0) {
+        const pmfBin = (a, b) => { let p = 0; for (let k = Math.max(0, Math.ceil(a - 1e-9)); k < b - 1e-9; k++) p += E.poissonPmf(k, lam); return p; };
+        const expc = hist.counts.map((_, k) => {
+          const a = k === 0 ? -0.5 : hist.edges[k], b = k === hist.counts.length - 1 ? lam + 20 * Math.sqrt(lam) + 50 : hist.edges[k + 1];
+          return N * pmfBin(a, b);
+        });
+        traces.push({ x: centers, y: expc, mode: 'lines+markers', name: 'loi de Poisson', line: { color: model, width: 1.5, dash: 'dot' },
+          marker: { color: model, size: 8, symbol: 'diamond' }, hovertemplate: 'attendu : %{y:.1f}<extra></extra>' });
+        const vr = st.s * st.s / lam;
+        lawHtml = lawBlock('Loi de Poisson', [
+          ['Paramètre λ (moyenne)', E.formatValU(lam, Math.sqrt(lam / N))],
+          ['Écart-type attendu √λ', { v: E.sig(Math.sqrt(lam), 3), u: '' }],
+          ['Variance / moyenne', { v: E.sig(vr, 3), u: '' }, Math.abs(vr - 1) < 2 * Math.sqrt(2 / (N - 1)) ? ['good', '≈ 1'] : ['mid', 'loin de 1']]
+        ], chi2Test(hist.counts, expc, 1), N,
+        'Pour une loi de Poisson, la variance est égale à la moyenne λ. Les effectifs attendus sont N·P(k) pour chaque classe.'
+        + (okData ? '' : ' <b>Attention :</b> la loi de Poisson s’applique à des comptages (entiers positifs), ce qui n’est pas le cas de ces données.')
+        + (Number.isInteger(w) && w === 1 ? '' : ' Une largeur de classe de 1 donne une comparaison valeur par valeur.'));
+      } else lawHtml = '<p class="note">La loi de Poisson demande une moyenne positive.</p>';
+    }
+    $('lawResult').innerHTML = lawHtml;
+
     const { layout, axis } = plotLayoutBase();
-    layout.margin = { l: 44, r: 10, t: 10, b: 44 };
+    layout.margin = { l: 48, r: 10, t: 10, b: 44 };
     layout.xaxis = axis(labelOf(S.statVar)); layout.yaxis = axis('effectif');
-    layout.dragmode = 'zoom'; layout.bargap = 0.06; layout.showlegend = false;
-    layout.shapes = [{ type: 'line', x0: st.mean, x1: st.mean, yref: 'paper', y0: 0, y1: 1, line: { color: cssVar('--model'), width: 2 } }];
+    layout.dragmode = 'zoom'; layout.bargap = 0; layout.showlegend = traces.length > 1;
+    layout.legend = Object.assign(layout.legend, { y: 1, yanchor: 'top', x: 1, xanchor: 'right', bgcolor: cssVar('--panel') });
+    layout.shapes = [{ type: 'line', x0: st.mean, x1: st.mean, yref: 'paper', y0: 0, y1: 1, line: { color: model, width: 1.5, dash: 'dash' } }];
     if (isFinite(ref)) layout.shapes.push({ type: 'line', x0: ref, x1: ref, yref: 'paper', y0: 0, y1: 1, line: { color: cssVar('--ink'), width: 1.5, dash: 'dash' } });
-    Plotly.react($('histo'), [{ x: vals, type: 'histogram', nbinsx: nb, marker: { color: cssVar('--accent'), opacity: 0.75 }, hovertemplate: '%{x} : %{y}<extra></extra>' }], layout, { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
+    Plotly.react($('histo'), traces, layout, { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
+  }
+
+  function pct(vals, a, b) { return E.sig(100 * vals.filter(x => x >= a && x <= b).length / vals.length, 2) + ' %'; }
+
+  function lawBlock(title, params, test, N, note) {
+    const val = f => `${f.v}${f.u ? ' ± ' + f.u : ''}${f.exp !== undefined ? ` ×10<sup>${f.exp}</sup>` : ''}`;
+    let t = '';
+    if (test.dof > 0) {
+      const p = test.p, pill = p >= 0.05 ? ['good', 'compatible'] : p >= 0.01 ? ['mid', 'douteux'] : ['badp', 'rejeté'];
+      t = `<tr class="hl"><td>Test du χ² (${test.groups} groupes, ddl = ${test.dof})</td><td>χ² = ${E.sig(test.chi2, 3)} · p = ${E.sig(100 * p, 2)} % <span class="pill ${pill[0]}">${pill[1]}</span></td></tr>`;
+    } else t = `<tr><td>Test du χ²</td><td class="muted">trop peu de classes (effectifs attendus ≥ 5)</td></tr>`;
+    return `<h3 class="label">${title} — ${N} mesures</h3><table class="stat-table"><tbody>
+      ${params.map(([k, f, pill]) => `<tr><td>${k}</td><td>${val(f)}${pill ? ` <span class="pill ${pill[0]}">${pill[1]}</span>` : ''}</td></tr>`).join('')}${t}</tbody></table>
+      <p class="note">${note} Le test du χ² compare les effectifs observés et attendus (classes regroupées pour avoir au moins 5 valeurs attendues) ; p &lt; 5 % indique un écart significatif à la loi.</p>`;
   }
 
   function bindStats() {
     $('selStat').onchange = e => { S.statVar = e.target.value; renderStats(); save(); };
     $('statRef').addEventListener('input', () => renderStats());
+    const H = () => (S.hist = Object.assign({ width: '', start: '', law: '' }, S.hist));
+    $('binWidth').addEventListener('input', e => { H().width = e.target.value.trim(); renderStats(); save(); });
+    $('binStart').addEventListener('input', e => { H().start = e.target.value.trim(); renderStats(); save(); });
+    $('selLaw').onchange = e => { H().law = e.target.value; renderStats(); save(); };
   }
 
   /* ---------- onglets ---------- */
@@ -874,56 +988,140 @@
   }
 
   /* ---------- import ---------- */
-  let pending = null, pendingBook = null;
+  // Rien n'est importé sans clic sur « Remplacer » ou « Ajouter » : l'aperçu montre
+  // le découpage des lignes et chaque réglage détecté peut être forcé à la main.
+  let pending = null, pendingBook = null, pendingName = '';
+  const imp = { rows: [], include: null, ncol: 0 };
+  const SEP_LABEL = { ';': 'point-virgule', ',': 'virgule', '\t': 'tabulation', ' ': 'espace', '|': 'barre verticale' };
 
-  function openImport() {
+  function openImport(sourceText) {
     $('importModal').hidden = false; pending = null; pendingBook = null;
-    $('sheetField').hidden = true; $('sepField').hidden = false;
-    $('pasteArea').hidden = false; $('pasteArea').value = '';
+    imp.rows = []; imp.include = null; imp.ncol = 0;
+    $('sheetField').hidden = true; $('sepField').hidden = false; $('rawBox').hidden = false; $('rawBox').open = true;
+    $('pasteArea').value = '';
+    $('selSep').value = 'auto'; $('sepOther').hidden = true; $('sepOther').value = '';
+    $('selDec').value = 'auto';
+    ['selHeaderRow', 'selUnitRow', 'selDataStart'].forEach(id => { $(id).innerHTML = '<option value="auto">Automatique</option>'; });
+    $('importSource').textContent = sourceText || 'Collez ci-dessous des colonnes copiées depuis un tableur, un fichier texte ou un logiciel d’acquisition, ou ouvrez un fichier.';
     $('previewTable').innerHTML = ''; $('importInfo').innerHTML = '';
     $('btnImportOk').disabled = true; $('btnImportAdd').disabled = true;
     setTimeout(() => $('pasteArea').focus(), 30);
   }
   function closeImport() { $('importModal').hidden = true; }
 
-  function showPreview(table, info) {
-    pending = table;
-    const v = table.vars, n = Math.min(table.nrows, 8);
-    let h = '<thead><tr>' + v.map(c => `<th>${esc(c.name)}<span class="unit">${esc(c.unit) || '&nbsp;'}</span></th>`).join('') + '</tr></thead><tbody>';
-    for (let i = 0; i < n; i++) h += '<tr>' + v.map(c => `<td>${fmt(c.data[i])}</td>`).join('') + '</tr>';
-    if (table.nrows > n) h += `<tr class="more"><td colspan="${v.length}">… ${table.nrows - n} autres lignes</td></tr>`;
-    $('previewTable').innerHTML = h + '</tbody>';
-    $('importInfo').innerHTML = `<span class="ok">${table.nrows} lignes, ${v.length} colonnes numériques${info ? ' · ' + esc(info) : ''}.</span>`;
-    $('btnImportOk').disabled = false;
-    $('btnImportAdd').disabled = !(S.vars.length && table.nrows === nrows());
+  function sepChoice() {
+    const v = $('selSep').value;
+    return v === 'other' ? $('sepOther').value.replace(/\\t/g, '\t') : v;
   }
-  function importError(e) {
-    pending = null; $('previewTable').innerHTML = '';
-    $('importInfo').innerHTML = `<span class="err">${esc(e.message || e)}</span>`;
-    $('btnImportOk').disabled = true; $('btnImportAdd').disabled = true;
-  }
-  const sepName = s => ({ ';': 'séparateur point-virgule', ',': 'séparateur virgule', '\t': 'séparateur tabulation', ' ': 'séparateur espace' }[s] || '');
 
   function parsePasted() {
     const txt = $('pasteArea').value;
-    if (!txt.trim()) { importError({ message: '' }); $('importInfo').innerHTML = ''; return; }
-    try { const r = E.textToRows(txt, $('selSep').value); showPreview(E.rowsToTable(r.rows), sepName(r.sep)); }
-    catch (e) { importError(e); }
+    if (!txt.trim()) { imp.rows = []; buildPreview(); return; }
+    const sep = sepChoice();
+    if (!sep) { imp.rows = []; buildPreview('Indiquez le caractère qui sépare les colonnes.'); return; }
+    const r = E.textToRows(txt, sep);
+    $('selSep').options[0].textContent = 'Automatique' + ($('selSep').value === 'auto' ? ` (${SEP_LABEL[r.sep] || r.sep})` : '');
+    setRows(r.rows);
   }
 
   function parseSheet() {
-    try {
-      const ws = pendingBook.Sheets[$('selSheet').value];
-      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
-      showPreview(E.rowsToTable(rows), 'feuille « ' + $('selSheet').value + ' »');
-    } catch (e) { importError(e); }
+    const ws = pendingBook.Sheets[$('selSheet').value];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+    setRows(rows.filter(r => r.some(c => String(c ?? '').trim() !== '')));
   }
 
-  let pendingName = '';
+  function setRows(rows) {
+    imp.rows = rows;
+    const ncol = rows.reduce((m, r) => Math.max(m, r.length), 0);
+    if (ncol !== imp.ncol) { imp.include = null; imp.ncol = ncol; }
+    fillRowSelects();
+    buildPreview();
+  }
+
+  function fillRowSelects() {
+    const n = Math.min(imp.rows.length, 60);
+    const lineOpt = i => {
+      const txt = imp.rows[i].map(c => String(c ?? '')).filter(Boolean).join(' · ');
+      return `<option value="${i}">Ligne ${i + 1} : ${esc(txt.length > 32 ? txt.slice(0, 31) + '…' : txt)}</option>`;
+    };
+    const lines = Array.from({ length: n }, (_, i) => lineOpt(i)).join('');
+    [['selHeaderRow', true], ['selUnitRow', true], ['selDataStart', false]].forEach(([id, none]) => {
+      const el = $(id), cur = el.value;
+      el.innerHTML = '<option value="auto">Automatique</option>' + (none ? '<option value="-1">Aucune</option>' : '') + lines;
+      el.value = [...el.options].some(o => o.value === cur) ? cur : 'auto';
+    });
+  }
+
+  function buildPreview(msg) {
+    pending = null;
+    $('btnImportOk').disabled = true; $('btnImportAdd').disabled = true;
+    if (!imp.rows.length) {
+      $('previewTable').innerHTML = '';
+      $('importInfo').innerHTML = msg ? `<span class="err">${esc(msg)}</span>` : '';
+      return;
+    }
+    const table = E.rowsToTable(imp.rows, {
+      decimal: $('selDec').value, headerRow: $('selHeaderRow').value, unitRow: $('selUnitRow').value,
+      dataStart: $('selDataStart').value, include: imp.include || undefined
+    });
+    if (!imp.include) imp.include = table.columns.map(c => c.numeric > 0);
+    const L = table.layout, A = table.auto, dec = table.decimal;
+    // ce que l'automatique a trouvé, affiché dans les listes
+    const autoLine = v => v >= 0 ? `ligne ${v + 1}` : 'aucune';
+    $('selHeaderRow').options[0].textContent = `Automatique (${autoLine(A.headerRow)})`;
+    $('selUnitRow').options[0].textContent = `Automatique (${autoLine(A.unitRow)})`;
+    $('selDataStart').options[0].textContent = `Automatique (ligne ${A.dataStart + 1})`;
+    $('selDec').options[0].textContent = `Automatique (${dec === ',' ? 'virgule' : 'point'})`;
+
+    const rows = imp.rows, cols = table.columns;
+    const role = i => i === L.headerRow ? ['r-name', 'noms'] : i === L.unitRow ? ['r-unit', 'unités'] : i >= L.dataStart ? ['r-data', 'données'] : ['r-skip', 'ignorée'];
+    let show = [...Array(Math.min(rows.length, Math.max(20, L.dataStart + 8))).keys()];
+    const hidden = rows.length - show.length;
+    if (hidden > 0) show.push(rows.length - 1);
+    let h = '<thead><tr><th class="idx">ligne</th><th class="rolecol">rôle</th>';
+    cols.forEach((c, j) => {
+      h += `<th class="${imp.include[j] ? '' : 'off'}"><label class="colpick"><input type="checkbox" data-col="${j}" ${imp.include[j] ? 'checked' : ''}> ${esc(c.name)}</label><span class="unit">${esc(c.unit) || '&nbsp;'}</span></th>`;
+    });
+    h += '</tr></thead><tbody>';
+    let bad = 0;
+    for (let i = 0; i < rows.length; i++) {
+      if (i >= L.dataStart && i !== L.headerRow && i !== L.unitRow) cols.forEach((c, j) => {
+        const raw = String(rows[i][j] ?? '').trim();
+        if (imp.include[j] && raw && isNaN(E.parseNumber(rows[i][j], dec))) bad++;
+      });
+    }
+    show.forEach((i, k) => {
+      if (hidden > 0 && k === show.length - 1) h += `<tr class="more"><td colspan="${cols.length + 2}">… ${hidden - 1 > 0 ? hidden - 1 + ' lignes non affichées' : ''}</td></tr>`;
+      const [rc, rl] = role(i), isData = rc === 'r-data';
+      h += `<tr class="${rc}"><td class="idx">${i + 1}</td><td class="rolecol"><span class="role ${rc}">${rl}</span></td>`;
+      cols.forEach((c, j) => {
+        const raw = String(rows[i][j] ?? '').trim();
+        const nan = isData && raw && isNaN(E.parseNumber(rows[i][j], dec));
+        const cls = [imp.include[j] ? '' : 'off', nan ? 'bad' : '', isData ? '' : 'txt'].join(' ').trim();
+        h += `<td class="${cls}" title="${nan ? 'Valeur non numérique : la cellule restera vide' : ''}">${esc(raw.length > 24 ? raw.slice(0, 23) + '…' : raw)}</td>`;
+      });
+      h += '</tr>';
+    });
+    $('previewTable').innerHTML = h + '</tbody>';
+
+    const info = [];
+    const sep = $('sepField').hidden ? '' : (sepChoice() === 'auto' ? E.detectSeparator(E.textLines($('pasteArea').value)) : sepChoice());
+    if (table.error) info.push(`<span class="err">${esc(table.error)}</span>`);
+    else info.push(`<span class="ok">${table.nrows} ligne${table.nrows > 1 ? 's' : ''} de données, ${table.vars.length} colonne${table.vars.length > 1 ? 's' : ''} retenue${table.vars.length > 1 ? 's' : ''} : ${table.vars.map(v => esc(v.name)).join(', ')}.</span>`);
+    if (cols.length === 1 && rows.length > 1) info.push('<span class="err">Une seule colonne trouvée : le séparateur de colonnes est sans doute mal choisi.</span>');
+    if (sep === ',' && dec === ',') info.push('<span class="err">La virgule ne peut pas séparer à la fois les colonnes et les décimales : changez l’un des deux réglages.</span>');
+    if (bad) info.push(`<span class="err">${bad} cellule${bad > 1 ? 's' : ''} non numérique${bad > 1 ? 's' : ''} (en rouge) ser${bad > 1 ? 'ont' : 'a'} laissée${bad > 1 ? 's' : ''} vide${bad > 1 ? 's' : ''}.</span>`);
+    if (msg) info.push(`<span class="err">${esc(msg)}</span>`);
+    $('importInfo').innerHTML = info.join('');
+    if (table.error) return;
+    pending = table;
+    $('btnImportOk').disabled = false;
+    $('btnImportAdd').disabled = !(S.vars.length && table.nrows === nrows());
+  }
+
   function handleFile(file) {
     if (!file) return;
     const name = file.name, ext = name.split('.').pop().toLowerCase();
-    pendingName = name.replace(/\.[^.]+$/, '');
     const reader = new FileReader();
     if (ext === 'json') {
       reader.onload = () => {
@@ -932,22 +1130,23 @@
       };
       reader.readAsText(file); return;
     }
-    openImport();
+    openImport(`Fichier « ${name} ». Vérifiez le découpage dans l’aperçu et corrigez les réglages si besoin.`);
+    pendingName = name.replace(/\.[^.]+$/, '');
     if (['ods', 'xlsx', 'xls'].includes(ext)) {
-      if (!window.XLSX) { importError({ message: 'La bibliothèque de lecture des tableurs n’a pas pu être chargée. Vérifiez la connexion internet.' }); return; }
+      $('rawBox').hidden = true; $('sepField').hidden = true;
+      if (!window.XLSX) { buildPreview('La bibliothèque de lecture des tableurs n’a pas pu être chargée. Vérifiez la connexion internet.'); return; }
       reader.onload = () => {
         try {
           pendingBook = XLSX.read(new Uint8Array(reader.result), { type: 'array' });
-          $('pasteArea').hidden = true; $('sepField').hidden = true;
           $('selSheet').innerHTML = pendingBook.SheetNames.map(s => `<option>${esc(s)}</option>`).join('');
           $('sheetField').hidden = pendingBook.SheetNames.length < 2;
           parseSheet();
-        } catch (e) { importError({ message: 'Impossible de lire ce classeur : ' + e.message }); }
+        } catch (e) { buildPreview('Impossible de lire ce classeur : ' + e.message); }
       };
       reader.readAsArrayBuffer(file);
     } else {
       reader.onload = () => {
-        let txt = reader.result;
+        const txt = reader.result;
         if (txt.includes('\uFFFD')) { // probablement en Latin-1 (Windows)
           const r2 = new FileReader(); r2.onload = () => { $('pasteArea').value = r2.result; parsePasted(); }; r2.readAsText(file, 'windows-1252'); return;
         }
@@ -976,13 +1175,24 @@
   function bindImport() {
     $('btnOpen').onclick = () => $('fileInput').click();
     $('fileInput').onchange = e => { handleFile(e.target.files[0]); e.target.value = ''; };
-    $('btnPaste').onclick = () => { pendingName = 'Données collées'; openImport(); };
+    $('btnPaste').onclick = () => { openImport(); pendingName = 'Données collées'; };
     $('btnImportClose').onclick = closeImport;
     $('importModal').addEventListener('click', e => { if (e.target === $('importModal')) closeImport(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('importModal').hidden) closeImport(); });
-    $('pasteArea').addEventListener('input', () => { pendingName = pendingName || 'Données collées'; parsePasted(); });
-    $('selSep').onchange = parsePasted;
-    $('selSheet').onchange = parseSheet;
+    let t;
+    $('pasteArea').addEventListener('input', () => { pendingName = pendingName || 'Données collées'; clearTimeout(t); t = setTimeout(parsePasted, 200); });
+    $('selSep').onchange = () => {
+      const other = $('selSep').value === 'other';
+      $('sepOther').hidden = !other; if (other) $('sepOther').focus();
+      parsePasted();
+    };
+    $('sepOther').addEventListener('input', parsePasted);
+    ['selDec', 'selHeaderRow', 'selUnitRow', 'selDataStart'].forEach(id => { $(id).onchange = () => buildPreview(); });
+    $('previewTable').addEventListener('change', e => {
+      const c = e.target.dataset.col; if (c === undefined) return;
+      imp.include[+c] = e.target.checked; buildPreview();
+    });
+    $('selSheet').onchange = () => { imp.include = null; parseSheet(); };
     $('btnImportOk').onclick = () => applyImport(false);
     $('btnImportAdd').onclick = () => applyImport(true);
     let depth = 0;

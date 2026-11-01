@@ -7,12 +7,17 @@
 
   /* ---------- Nombres ---------- */
 
-  function parseNumber(v) {
+  /* dec : 'auto' (virgule ou point), ',' ou '.' ; l'autre caractère est alors
+     traité comme séparateur de milliers. */
+  function parseNumber(v, dec = 'auto') {
     if (typeof v === 'number') return isFinite(v) ? v : NaN;
     if (v === null || v === undefined) return NaN;
-    let s = String(v).trim().replace(/ | /g, '').replace(/\s+/g, '');
+    let s = String(v).trim().replace(/[  \s]+/g, '');
     if (s === '') return NaN;
-    s = s.replace(/×10\^?/i, 'e').replace(/,/g, '.');
+    s = s.replace(/×10\^?/i, 'e');
+    if (dec === ',') s = s.replace(/\./g, '').replace(/,/g, '.');
+    else if (dec === '.') s = s.replace(/,/g, '');
+    else s = s.replace(/,/g, '.');
     if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return NaN;
     return parseFloat(s);
   }
@@ -22,7 +27,7 @@
   /* ---------- Lecture de texte (CSV, TXT, collage) ---------- */
 
   function detectSeparator(lines) {
-    const cands = ['\t', ';', ',', ' '];
+    const cands = ['\t', ';', '|', ',', ' '];
     let best = '\t', bestScore = -1;
     const sample = lines.slice(0, 40);
     for (const sep of cands) {
@@ -40,6 +45,7 @@
 
   function splitLine(line, sep) {
     if (sep === ' ') return line.trim().split(/\s+/);
+    if (sep.length > 1) return line.split(sep).map(x => x.trim());
     const out = []; let cur = '', q = false;
     for (let i = 0; i < line.length; i++) {
       const c = line[i];
@@ -51,10 +57,26 @@
     return out.map(s => s.trim());
   }
 
+  function textLines(text) {
+    return text.replace(/\r\n?/g, '\n').split('\n').filter(l => l.trim() !== '');
+  }
+
   function textToRows(text, sep) {
-    const lines = text.replace(/\r\n?/g, '\n').split('\n').filter(l => l.trim() !== '');
+    const lines = textLines(text);
     if (!sep || sep === 'auto') sep = detectSeparator(lines);
     return { rows: lines.map(l => splitLine(l, sep)), sep };
+  }
+
+  /* Devine le séparateur décimal : virgule si des nombres comme 3,14 apparaissent
+     dans des cellules (et pas de point décimal). */
+  function detectDecimal(rows) {
+    let comma = 0, dot = 0;
+    rows.slice(0, 60).forEach(r => r.forEach(c => {
+      const s = String(c ?? '').trim();
+      if (/^[-+]?\d*,\d+(e[-+]?\d+)?$/i.test(s)) comma++;
+      if (/^[-+]?\d*\.\d+(e[-+]?\d+)?$/i.test(s)) dot++;
+    }));
+    return comma > dot ? ',' : '.';
   }
 
   /* "t (s)", "t[s]", "t / s", "t_s" -> {name:'t', unit:'s'} */
@@ -74,44 +96,57 @@
     return s;
   }
 
-  /* Transforme un tableau de lignes (cellules brutes) en variables.
-   * Repère automatiquement une ligne de noms et une ligne d'unités. */
-  function rowsToTable(rows) {
-    rows = rows.filter(r => r.some(c => String(c ?? '').trim() !== ''));
-    if (!rows.length) throw new Error('Aucune donnée trouvée dans ce fichier.');
-    const ncol = Math.max(...rows.map(r => r.length));
-    let start = 0, header = null, units = null;
-    // on saute les lignes de titre (moins de la moitié de cellules numériques)
-    const numRatio = r => r.filter(isNumericCell).length / Math.max(1, r.filter(c => String(c ?? '').trim() !== '').length);
-    while (start < rows.length && numRatio(rows[start]) < 0.5) start++;
-    if (start >= 1) header = rows[start - 1];
+  /* Repère la ligne des noms, celle des unités et la première ligne de données.
+     Les indices renvoyés sont ceux du tableau rows (0 = première ligne), -1 = aucune. */
+  function detectLayout(rows, dec = 'auto') {
+    const filled = r => r.filter(c => String(c ?? '').trim()).length;
+    const numRatio = r => r.filter(c => !isNaN(parseNumber(c, dec))).length / Math.max(1, filled(r));
+    let start = 0;
+    while (start < rows.length && (filled(rows[start]) === 0 || numRatio(rows[start]) < 0.5)) start++;
+    if (start >= rows.length) start = 0;
+    let headerRow = start >= 1 ? start - 1 : -1, unitRow = -1;
     if (start >= 2) {
-      const prev = rows[start - 2];
-      // deux lignes de texte : noms puis unités (unités courtes, même nombre de cellules)
-      const filled = r => r.filter(c => String(c ?? '').trim()).length;
+      const prev = rows[start - 2], header = rows[start - 1];
       const unitLike = header.every(c => { const s = String(c ?? '').trim(); return s.length <= 12 && !/[\(\)\[\]]/.test(s) || /^[\(\[].*[\)\]]$/.test(s); });
-      if (filled(prev) === filled(header) && filled(prev) > 0 && unitLike) {
-        units = header; header = prev;
-      }
+      if (filled(header) > 0 && filled(header) <= filled(prev) && unitLike) { headerRow = start - 2; unitRow = start - 1; }
     }
-    const body = rows.slice(start);
-    if (!body.length) throw new Error('Aucune ligne numérique trouvée.');
-    const used = new Set();
-    const vars = [];
+    return { headerRow, unitRow, dataStart: start };
+  }
+
+  /* Transforme un tableau de lignes (cellules brutes) en variables.
+     opts : decimal, headerRow, unitRow, dataStart (nombre ou 'auto'), include (booléens par colonne). */
+  function rowsToTable(rows, opts = {}) {
+    rows = rows.filter(r => r.some(c => String(c ?? '').trim() !== ''));
+    if (!rows.length) throw new Error('Aucune donnée trouvée.');
+    const dec = !opts.decimal || opts.decimal === 'auto' ? detectDecimal(rows) : opts.decimal;
+    const auto = detectLayout(rows, dec);
+    const pick = (k) => (opts[k] === undefined || opts[k] === 'auto') ? auto[k] : +opts[k];
+    const headerRow = pick('headerRow'), unitRow = pick('unitRow');
+    const dataStart = Math.min(Math.max(0, pick('dataStart')), rows.length);
+    const header = headerRow >= 0 ? rows[headerRow] : null;
+    const units = unitRow >= 0 ? rows[unitRow] : null;
+    const ncol = Math.max(...rows.map(r => r.length));
+    const body = rows.slice(dataStart).filter((_, i) => i + dataStart !== headerRow && i + dataStart !== unitRow);
+    const used = new Set(), vars = [], columns = [];
     for (let j = 0; j < ncol; j++) {
-      const col = body.map(r => parseNumber(r[j]));
-      if (col.every(isNaN)) continue;
+      const col = body.map(r => parseNumber(r[j], dec));
       const nu = splitNameUnit(header ? header[j] : '');
       let name = sanitizeName(nu.name, j);
       let unit = nu.unit;
       if (units && String(units[j] ?? '').trim()) unit = String(units[j]).trim().replace(/^[\(\[]|[\)\]]$/g, '');
       let base = name, k = 2;
       while (used.has(name)) name = base + '_' + (k++);
+      const numeric = col.filter(v => !isNaN(v)).length;
+      const info = { index: j, name, unit, numeric, total: col.length, data: col };
+      columns.push(info);
+      const wanted = opts.include && opts.include[j] !== undefined ? opts.include[j] : numeric > 0;
+      if (!wanted) continue;
       used.add(name);
       vars.push({ name, unit, data: col });
     }
-    if (!vars.length) throw new Error('Aucune colonne numérique trouvée.');
-    return { vars, nrows: body.length, skipped: start };
+    const error = !body.length ? 'Aucune ligne de données : choisissez la ligne où commencent les données.'
+      : !vars.length ? 'Aucune colonne retenue : cochez au moins une colonne contenant des nombres.' : '';
+    return { error, vars, columns, nrows: body.length, decimal: dec, layout: { headerRow, unitRow, dataStart }, auto, rows };
   }
 
   /* ---------- Algèbre linéaire ---------- */
@@ -384,7 +419,29 @@
     return { v: v.toFixed(d).replace('.', ','), u: u.toFixed(d).replace('.', ',') };
   }
 
-  const Engine = { parseNumber, textToRows, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
+  /* ---------- Histogramme et lois ---------- */
+
+  function histogram(values, width, start) {
+    const v = values.filter(x => isFinite(x));
+    if (!v.length || !(width > 0)) return { edges: [], counts: [] };
+    const max = Math.max(...v);
+    let nb = Math.floor((max - start) / width + 1e-9) + 1;
+    if (nb > 2000) throw new Error('Trop de classes : augmentez la largeur.');
+    nb = Math.max(1, nb);
+    const counts = new Array(nb).fill(0);
+    let below = 0;
+    v.forEach(x => {
+      const k = Math.floor((x - start) / width + 1e-9);
+      if (k < 0) below++; else counts[Math.min(k, nb - 1)]++;
+    });
+    const edges = Array.from({ length: nb + 1 }, (_, i) => start + i * width);
+    return { edges, counts, below };
+  }
+
+  function normCdf(x, mu, s) { return 0.5 * (1 + (x - mu >= 0 ? 1 : -1) * gammp(0.5, ((x - mu) / s) ** 2 / 2)); }
+  function poissonPmf(k, lam) { return k < 0 || k !== Math.floor(k) ? 0 : Math.exp(-lam + k * Math.log(lam) - lnGamma(k + 1)); }
+
+  const Engine = { parseNumber, textToRows, textLines, splitLine, detectDecimal, detectLayout, histogram, normCdf, poissonPmf, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
     fit, linreg, describe, studentT, chi2Q, derivative, integral, solve, invert, sig, formatValU };
   if (typeof module !== 'undefined' && module.exports) module.exports = Engine;
   else root.Engine = Engine;

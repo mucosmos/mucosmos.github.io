@@ -6,14 +6,14 @@ Aucun serveur n’est nécessaire : ce sont des fichiers HTML, CSS et JavaScript
 
 ## Fonctions
 
-- **Import** : CSV, TXT, DAT, TSV (séparateur et virgule décimale détectés), classeurs ODS, XLSX et XLS, collage direct depuis un tableur (Ctrl+V), glisser-déposer d’un fichier. Les en-têtes du type `t (s)`, `x [m]` ou une ligne d’unités sous les noms sont reconnus.
+- **Import** : CSV, TXT, DAT, TSV, classeurs ODS, XLSX et XLS, collage depuis un tableur (Ctrl+V) ou glisser-déposer. Rien n’est importé sans validation : l’aperçu montre chaque ligne découpée avec son rôle (noms, unités, données, ignorée) et les cellules non numériques en rouge. Le séparateur de colonnes (point-virgule, virgule, tabulation, espace, barre verticale ou caractère libre), le séparateur décimal, la ligne des noms, la ligne des unités et la première ligne de données sont proposés automatiquement mais peuvent tous être choisis à la main. Chaque colonne peut être cochée ou décochée.
 - **Tableau** éditable (double-clic), ajout et suppression de lignes et de variables.
 - **Grandeurs calculées** : `v (m/s) = deriv(x, t)`, `Ec (J) = 0.5*m*v^2`, constantes (`m (kg) = 0.250`), `integ`, `mean`, `std`…
 - **Incertitudes** par variable : un nombre ou une formule (`0.02*U + 0.01`), affichées en barres d’erreur.
 - **Graphe** sur fond millimétré : plusieurs ordonnées, échelles logarithmiques, zoom, export PNG.
 - **Modélisation** : modèles prédéfinis (linéaire, affine, parabole, exponentielles, 1er ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne…) ou expression libre. Algorithme de Levenberg-Marquardt, valeurs initiales estimées automatiquement, paramètres fixables, domaine choisi à la souris.
 - **Estimateurs** : valeurs ± incertitude-type, incertitude relative, intervalle de confiance à 95 % (Student), R², χ² réduit et probabilité du χ² si l’ajustement est pondéré, écart-type des résidus sinon, graphe des résidus (normalisés par l’incertitude quand elle existe).
-- **Statistiques** : moyenne, écart-type, incertitude-type s/√n, intervalle à 95 %, histogramme, écart normalisé à une valeur de référence.
+- **Statistiques** : moyenne, écart-type, incertitude-type s/√n, intervalle à 95 %, écart normalisé à une valeur de référence. Histogramme avec largeur et début des classes réglables, et superposition d’une loi normale (Gauss) ou d’une loi de Poisson : paramètres estimés avec leur incertitude, effectifs attendus par classe et test d’adéquation du χ².
 - **Sauvegarde** automatique dans le navigateur, export CSV, projet `.json` à rouvrir.
 
 ## Mise en ligne sur GitHub Pages

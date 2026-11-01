@@ -61,6 +61,29 @@
         calc: '# Longueur du fil\nL (m) = 0.500\ngexp (m/s²) = 4*pi^2*L/T^2',
         graph: { x: 'essai', ys: ['T'] },
         model: { y: 'T', preset: 'const' },
+        hist: { law: 'gauss' },
+        statVar: 'T',
+        tab: 'stats'
+      };
+    },
+    comptage() {
+      // nombre de désintégrations détectées par intervalle de 10 s (loi de Poisson, λ ≈ 4,3)
+      let a = 2026;
+      const u = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+      const pois = lam => { let k = 0, p = 1; const L = Math.exp(-lam); do { k++; p *= u(); } while (p > L); return k - 1; };
+      const n = range(120, i => i + 1);
+      return {
+        title: 'Comptage radioactif',
+        vars: [
+          { name: 'essai', unit: '', u: '', data: n },
+          { name: 'N', unit: 'coups', u: '', data: n.map(() => pois(4.3)) }
+        ],
+        calc: '# Activité mesurée sur 10 s\nA (Bq) = N/10',
+        graph: { x: 'essai', ys: ['N'] },
+        model: { y: 'N', preset: 'const' },
+        hist: { width: '1', law: 'poisson' },
+        statVar: 'N',
         tab: 'stats'
       };
     },
