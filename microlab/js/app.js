@@ -28,7 +28,24 @@
     { id: 'gauss',  label: 'Gaussienne',               tpl: 'A*exp(-(x - m)^2/(2*s^2))' },
     { id: 'libre',  label: 'Expression libre',         tpl: '' }
   ];
-  const presetExpr = (p, x) => p.tpl.replace(/\bx\b/g, x);
+  const isDeg = () => S && S.angle === 'deg';
+  // en degrés, un tour vaut 360 au lieu de 2π dans les modèles sinusoïdaux
+  const presetExpr = (p, x) => (isDeg() ? p.tpl.replace('2*pi*x/T', '360*x/T') : p.tpl).replace(/\bx\b/g, x);
+
+  /* Fonctions trigonométriques en degrés : elles remplacent celles de math.js
+     dans la portée des calculs quand l'option « degrés » est choisie.
+     Une valeur écrite avec une unité (30 deg, 1.2 rad) reste convertie correctement. */
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+  const toRad = v => (v && typeof v.toNumber === 'function') ? v.toNumber('rad') : v * D2R;
+  const TRIG_DEG = {
+    sin: v => Math.sin(toRad(v)), cos: v => Math.cos(toRad(v)), tan: v => Math.tan(toRad(v)),
+    cot: v => 1 / Math.tan(toRad(v)), sec: v => 1 / Math.cos(toRad(v)), csc: v => 1 / Math.sin(toRad(v)),
+    asin: v => Math.asin(v) * R2D, acos: v => Math.acos(v) * R2D, atan: v => Math.atan(v) * R2D,
+    atan2: (y, x) => Math.atan2(y, x) * R2D
+  };
+  // sin(30) vaut exactement 0,5 en degrés (évite 0,49999999999999994)
+  ['sin', 'cos', 'tan'].forEach(k => { const f = TRIG_DEG[k]; TRIG_DEG[k] = v => { const r = f(v); return Math.abs(r - Math.round(r * 1e12) / 1e12) < 1e-15 ? Math.round(r * 1e12) / 1e12 : r; }; });
+  const angleScope = base => isDeg() ? Object.assign({}, base, TRIG_DEG) : Object.assign({}, base);
 
   /* ---------- état ---------- */
   let S = null;          // état sérialisable
@@ -40,6 +57,7 @@
       vars: [{ name: 'x', unit: '', u: '', data: Array(8).fill(NaN) },
              { name: 'y', unit: '', u: '', data: Array(8).fill(NaN) }],
       calc: '',
+      angle: 'rad',
       graph: { x: 'x', ys: ['y'], lines: false, err: true, logx: false, logy: false, res: true },
       model: { y: 'y', preset: 'aff', expr: '', init: {}, fixed: {}, range: null, weight: true, result: null }
     };
@@ -49,6 +67,8 @@
     const st = emptyState();
     st.title = ex.title; st.vars = ex.vars.map(v => ({ ...v, data: v.data.slice() }));
     st.calc = ex.calc || '';
+    st.angle = ex.angle || 'rad';
+    st.uCalc = Object.assign({}, ex.uCalc || {});
     Object.assign(st.graph, ex.graph);
     Object.assign(st.model, ex.model, { expr: '', init: {}, fixed: {}, result: null, range: null });
     st.hist = Object.assign({ width: '', start: '', law: '' }, ex.hist || {});
@@ -79,7 +99,7 @@
     let tmp = 0;
     const extra = {};
     const rowEval = (nd) => {
-      const c = nd.compile(), sc = Object.assign({}, consts), arr = new Array(n);
+      const c = nd.compile(), sc = angleScope(consts), arr = new Array(n);
       let firstErr = null, nerr = 0;
       for (let i = 0; i < n; i++) {
         for (const k in cols) sc[k] = cols[k][i];
@@ -110,7 +130,7 @@
     });
     const isCol = dependsOnColumns(node, cols, extra);
     if (!isCol) {
-      const v = node.compile().evaluate(Object.assign({}, consts));
+      const v = node.compile().evaluate(angleScope(consts));
       if (typeof v !== 'number') throw new Error('Résultat non numérique.');
       return { scalar: v };
     }
@@ -221,6 +241,7 @@
     renderCalcMsg();
     renderGraphControls();
     renderModelControls(opts.keepParams);
+    renderAngle();
     renderPlot();
     renderStats();
     save();
@@ -372,10 +393,31 @@
       toast(`Variable ${nm} ajoutée : saisissez ses valeurs dans le tableau.`);
     };
     $('btnNewVarCancel').onclick = () => { $('newVarForm').hidden = true; };
+    ['selAngle', 'selAngle2'].forEach(id => { $(id).onchange = e => setAngle(e.target.value); });
     $('btnCalc').onclick = () => { S.calc = $('calcText').value; refreshAll({ keepParams: true }); if (!D.errors.length) toast('Calculs mis à jour'); };
     $('calcText').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('btnCalc').click(); });
   }
   function showNewVar() { $('newVarForm').hidden = false; $('newVarName').value = ''; $('newVarUnit').value = ''; $('newVarName').focus(); }
+
+  function renderAngle() {
+    ['selAngle', 'selAngle2'].forEach(id => { $(id).value = S.angle === 'deg' ? 'deg' : 'rad'; });
+    const trig = /\b(a?sin|a?cos|a?tan|atan2|cot|sec|csc)\s*\(/.test(S.model.expr || '');
+    $('angleModel').hidden = !trig && S.angle !== 'deg';
+  }
+
+  function setAngle(mode) {
+    if ((S.angle || 'rad') === mode) return;
+    const p = PRESETS.find(q => q.id === S.model.preset);
+    const wasPreset = p && p.tpl && presetExpr(p, S.graph.x).replace(/\s/g, '') === (S.model.expr || '').replace(/\s/g, '');
+    const hadFit = !!S.model.result;
+    S.angle = mode;
+    if (wasPreset) { S.model.expr = presetExpr(p, S.graph.x); S.model.init = {}; }
+    else if ('phi' in (S.model.init || {})) S.model.init.phi *= mode === 'deg' ? R2D : D2R;
+    S.model.result = null;
+    refreshAll();
+    if (hadFit || wasPreset) doFit(true);
+    toast(mode === 'deg' ? 'Angles en degrés : sin(90) = 1' : 'Angles en radians : sin(pi/2) = 1');
+  }
 
   function renderCalcMsg() {
     if ($('calcText').value !== S.calc && document.activeElement !== $('calcText')) $('calcText').value = S.calc;
@@ -632,7 +674,7 @@
           const f = compileModel(params);
           let best = Infinity, bphi = 0;
           for (let j = 0; j < 24; j++) {
-            const phi = -Math.PI + j * Math.PI / 12;
+            const phi = (-Math.PI + j * Math.PI / 12) * (isDeg() ? R2D : 1);
             const pv = params.map(p => p === 'phi' ? phi : (p in base ? base[p] : 1));
             let s = 0; for (let i = 0; i < n; i++) s += (Y[i] - f(X[i], pv)) ** 2;
             if (s < best) { best = s; bphi = phi; }
@@ -652,7 +694,7 @@
 
   function compileModel(params) {
     const c = math.parse(S.model.expr).compile();
-    const scope = Object.assign({}, D.consts);
+    const scope = angleScope(D.consts);
     const xn = S.graph.x;
     return (x, p) => {
       scope[xn] = x;
@@ -791,7 +833,7 @@
         S.model.preset = 'libre'; $('selPreset').value = 'libre';
       }
       clearTimeout(exprTimer);
-      exprTimer = setTimeout(() => { S.model.result = null; ensureInit(); renderParams(); renderFitResult(); renderPlot(); save(); }, 250);
+      exprTimer = setTimeout(() => { S.model.result = null; ensureInit(); renderAngle(); renderParams(); renderFitResult(); renderPlot(); save(); }, 250);
     });
     $('modelExpr').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doFit(); } });
     $('paramTable').addEventListener('change', e => {

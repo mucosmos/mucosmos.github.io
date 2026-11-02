@@ -66,6 +66,22 @@
         tab: 'stats'
       };
     },
+    refraction() {
+      // air -> plexiglas : sin(i1) = n sin(i2), n = 1,49 ; angles lus au rapporteur (0,5°)
+      const g = rng(17), i1 = [10, 20, 30, 40, 50, 60, 70, 80];
+      return {
+        title: 'Réfraction (Snell-Descartes)',
+        angle: 'deg',
+        vars: [
+          { name: 'i1', unit: '°', u: '0.5', data: i1 },
+          { name: 'i2', unit: '°', u: '0.5', data: i1.map(a => Math.round(2 * (Math.asin(Math.sin(a * Math.PI / 180) / 1.49) * 180 / Math.PI + 0.35 * g())) / 2) }
+        ],
+        calc: '# angles en degrés (réglage « Angles » ci-dessus)\nsin_i1 = sin(i1)\nsin_i2 = sin(i2)',
+        uCalc: { sin_i1: 'abs(cos(i1))*0.5*pi/180', sin_i2: 'abs(cos(i2))*0.5*pi/180' },
+        graph: { x: 'sin_i2', ys: ['sin_i1'] },
+        model: { y: 'sin_i1', preset: 'lin' }
+      };
+    },
     comptage() {
       // nombre de désintégrations détectées par intervalle de 10 s (loi de Poisson, λ ≈ 4,3)
       let a = 2026;

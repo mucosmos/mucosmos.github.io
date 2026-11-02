@@ -299,3 +299,11 @@ td.muted { color: var(--muted); font-family: var(--f-sans) !important; }
 .import-opts .seprow input { width: 5ch; flex: none; }
 .pill { font-family: var(--f-sans); font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
 .law .stat-table td:last-child { white-space: normal; }
+
+/* unité des angles */
+.angle-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.angle-row .label { margin: 0; }
+.angle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.angle select { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); padding: 3px 6px; font-size: 13px; color: var(--ink); }
+.range-row .angle { margin-left: auto; }
+.range-row .angle + .weight { margin-left: 0; }

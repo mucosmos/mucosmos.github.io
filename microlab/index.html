@@ -25,6 +25,7 @@
         <option value="rc">Décharge d’un condensateur</option>
         <option value="chute">Chute libre (pointage vidéo)</option>
         <option value="ohm">Loi d’Ohm</option>
+        <option value="refraction">Réfraction (angles en degrés)</option>
         <option value="pendule">Période d’un pendule (mesures répétées)</option>
         <option value="comptage">Comptage radioactif (loi de Poisson)</option>
         <option value="ressort">Oscillations amorties</option>
@@ -68,7 +69,15 @@
         <button class="btn sm ghost" id="btnNewVarCancel">Annuler</button>
       </div>
 
-      <h3 class="label">Grandeurs calculées</h3>
+      <div class="angle-row">
+        <h3 class="label">Grandeurs calculées</h3>
+        <label class="angle">Angles
+          <select id="selAngle" aria-label="Unité des angles pour sin, cos, tan">
+            <option value="rad">en radians</option>
+            <option value="deg">en degrés</option>
+          </select>
+        </label>
+      </div>
       <textarea id="calcText" spellcheck="false" rows="7" aria-label="Grandeurs calculées"
         placeholder="v (m/s) = deriv(y, t)&#10;Ec (J) = 0.5*m*v^2&#10;m (kg) = 0.250"></textarea>
       <div id="calcMsg" class="msg"></div>
@@ -78,7 +87,8 @@
         <ul>
           <li>Une ligne par grandeur : <code>nom (unité) = expression</code>. L’unité est facultative.</li>
           <li>Une expression sans variable définit une constante : <code>g (m/s²) = 9.81</code>.</li>
-          <li>Opérations : <code>+ - * / ^</code>, <code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>log10</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>abs</code>, <code>pi</code>. Point décimal : <code>0.5</code>.</li>
+          <li>Opérations : <code>+ - * / ^</code>, <code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>log10</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>asin</code>, <code>acos</code>, <code>atan</code>, <code>abs</code>, <code>pi</code>. Point décimal : <code>0.5</code>.</li>
+          <li>Angles : le réglage <b>Angles en degrés / en radians</b> s’applique à <code>sin</code>, <code>cos</code>, <code>tan</code> et à leurs inverses, dans les calculs, les incertitudes et les modèles. On peut aussi préciser l’unité d’une valeur : <code>sin(30 deg)</code>, <code>cos(1.2 rad)</code>.</li>
           <li><code>deriv(y, t)</code> : dérivée de y par rapport à t. <code>integ(y, t)</code> : intégrale cumulée.</li>
           <li><code>mean(x)</code>, <code>min(x)</code>, <code>max(x)</code>, <code>std(x)</code>, <code>sum(x)</code> s’appliquent à toute la colonne.</li>
           <li>L’incertitude d’une variable peut être un nombre (<code>0.05</code>) ou une formule (<code>0.02*U + 0.01</code>).</li>
@@ -123,6 +133,12 @@
           <span id="rangeText" class="range-text">Domaine : toutes les données</span>
           <button class="btn sm" id="btnPickRange">Choisir sur le graphe</button>
           <button class="btn sm ghost" id="btnClearRange" hidden>Tout utiliser</button>
+          <label class="angle" id="angleModel" hidden>Angles
+            <select id="selAngle2" aria-label="Unité des angles dans le modèle">
+              <option value="rad">en radians</option>
+              <option value="deg">en degrés</option>
+            </select>
+          </label>
           <label class="weight"><input type="checkbox" id="optWeight" checked> Pondérer par les incertitudes</label>
         </div>
         <div class="tablewrap small">
