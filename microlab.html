@@ -23,7 +23,7 @@
     <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="cosmodetecteur.html">Cosmodétecteur</a><a href="microlab.html" aria-current="page">MicroLab</a><a href="ressources.html">Ressources</a></nav>
    </div>
 </header>
-<section class="bandeau"><div class="contenu"><span class="surtitre">Logiciel libre · GPL v3 · dans le navigateur</span><h1>MicroLab</h1><p class="chapo">Traitement et modélisation des données expérimentales. On importe un fichier de mesures, on calcule de nouvelles grandeurs, on trace, on modélise avec les incertitudes et on compare une série de mesures aux lois de Gauss et de Poisson. Rien à installer.</p>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Logiciel libre · GPL v3 · dans le navigateur</span><h1>MicroLab</h1><p class="chapo">Traitement et modélisation des données expérimentales, dans l’esprit de Regressi. On importe un fichier de mesures, on calcule de nouvelles grandeurs, on trace, on modélise avec les incertitudes et on compare une série de mesures aux lois de Gauss et de Poisson. Rien à installer.</p>
 <div class="actions"><a class="bouton" href="microlab/">▶ Lancer MicroLab</a><a class="bouton second" href="#aide">Aide-mémoire</a></div>
 <nav class="sommaire" aria-label="Sur cette page"><a href="#presentation">Présentation</a><a href="#utiliser">Utiliser MicroLab</a><a href="#installation">Mise en route</a><a href="#fonctions">Les fonctions</a><a href="#aide">Aide-mémoire</a><a href="#licence">Auteurs et licence</a></nav></div></section>
 <main>
@@ -92,7 +92,7 @@
       <p>Choisissez l’abscisse et les ordonnées au-dessus du graphe.</p></div>
     <div class="carte"><h3>3 · Modéliser</h3>
       <p>Choisissez un modèle : les valeurs initiales sont estimées et l’ajustement est immédiat. <strong>Choisir sur le graphe</strong> limite le modèle à une partie des points.</p>
-      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose six jeux de données.</p></div>
+      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose sept jeux de données.</p></div>
   </div>
 </section>
 
@@ -120,7 +120,7 @@
       <h3>Grandeurs calculées et incertitudes</h3>
       <ul>
         <li>Une ligne par grandeur : <code>nom (unité) = expression</code>. Une expression sans variable définit une constante.</li>
-        <li>Fonctions usuelles (<code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>sin</code>…), dérivée <code>deriv(y, t)</code>, intégrale <code>integ(y, t)</code>, et <code>mean</code>, <code>std</code>, <code>max</code> sur toute une colonne.</li>
+        <li>Fonctions usuelles (<code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>sin</code>…), angles en <strong>degrés ou en radians</strong> au choix, dérivée <code>deriv(y, t)</code>, intégrale <code>integ(y, t)</code>, et <code>mean</code>, <code>std</code>, <code>max</code> sur toute une colonne.</li>
         <li>L’incertitude d’une variable est un nombre (<code>0.005</code>) ou une formule (<code>0.02*U + 0.01</code>) ; elle s’affiche en barres d’erreur et sert à pondérer la modélisation.</li>
         <li>Graphe sur papier millimétré : plusieurs ordonnées, échelles logarithmiques, zoom et export en image.</li>
       </ul>
@@ -168,7 +168,7 @@
 <span class="n">Ec</span> (J) = 0.5*m*v^2
 <span class="n">E</span> (J) = <span class="k">integ</span>(P, t)
 <span class="n">lnN</span> = <span class="k">ln</span>(N - <span class="k">mean</span>(fond))</pre>
-      <p class="note">Point décimal dans les formules (<code>0.5</code>) ; virgule ou point dans le tableau. <code>^</code> pour les puissances, <code>pi</code> pour π.</p>
+      <p class="note">Point décimal dans les formules (<code>0.5</code>) ; virgule ou point dans le tableau. <code>^</code> pour les puissances, <code>pi</code> pour π. Angles de <code>sin</code>, <code>cos</code>, <code>tan</code> en radians ou en <strong>degrés</strong> selon le réglage « Angles » ; <code>sin(30 deg)</code> fonctionne dans les deux cas.</p>
     </div>
     <div style="min-width:0">
       <h3 style="margin-top:0">Lire les résultats</h3>
@@ -186,7 +186,7 @@
     </div>
   </div>
   <div class="encart">
-    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, période d’un pendule, comptage radioactif, oscillations amorties.</p>
+    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, réfraction (angles en degrés), période d’un pendule, comptage radioactif, oscillations amorties.</p>
   </div>
 </section>
 
