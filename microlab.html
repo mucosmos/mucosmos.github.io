@@ -37,7 +37,8 @@
         <li><span class="pastille ard">Importer</span> fichiers CSV, TXT, ODS ou XLSX, ou simple copier-coller depuis un tableur, avec un aperçu qui montre comment chaque ligne est lue.</li>
         <li><span class="pastille cos">Calculer</span> nouvelles grandeurs à partir des mesures : <code>v = deriv(x, t)</code>, <code>Ec = 0.5*m*v^2</code>, constantes, incertitudes en barres d’erreur.</li>
         <li><span class="pastille dv">Modéliser</span> treize modèles prêts à l’emploi ou une expression libre ; paramètres avec leur incertitude, R², χ² et graphe des résidus.</li>
-        <li><span class="pastille rad">Statistiques</span> moyenne, écart-type, incertitude-type s/√n, histogramme réglable et comparaison aux lois de Gauss et de Poisson.</li>
+        <li><span class="pastille rad">Statistiques</span> moyenne, écart-type, incertitude-type s/√n, histogramme réglable, tableau des classes et comparaison aux lois de Gauss et de Poisson.</li>
+        <li><span class="pastille cos">Titrer</span> équivalence d’un titrage pH-métrique (tangentes parallèles et dérivée) ou conductimétrique (deux demi-droites).</li>
       </ul>
       <p>Les fichiers enregistrés par <a href="logiciel.html">Microcosmos</a> s’ouvrent directement : on peut ainsi étudier les comptages des tubes Geiger et vérifier qu’ils suivent une loi de Poisson.</p>
     </div>
@@ -92,7 +93,7 @@
       <p>Choisissez l’abscisse et les ordonnées au-dessus du graphe.</p></div>
     <div class="carte"><h3>3 · Modéliser</h3>
       <p>Choisissez un modèle : les valeurs initiales sont estimées et l’ajustement est immédiat. <strong>Choisir sur le graphe</strong> limite le modèle à une partie des points.</p>
-      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose sept jeux de données.</p></div>
+      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose dix jeux de données.</p></div>
   </div>
 </section>
 
@@ -148,11 +149,42 @@
       <h3>Statistiques et lois de probabilité</h3>
       <ul>
         <li>Moyenne, écart-type expérimental, <strong>incertitude-type s/√n</strong>, intervalle à 95 %, médiane ; écart normalisé à une valeur de référence.</li>
-        <li><strong>Histogramme</strong> : largeur et début des classes choisis à la main, ou automatiques.</li>
+        <li><strong>Histogramme</strong> : largeur, début et fin des classes choisis à la main, ou automatiques.</li>
         <li><strong>Loi normale</strong> ou <strong>loi de Poisson</strong> superposée, avec les paramètres estimés, les effectifs attendus et un <strong>test du χ²</strong> d’adéquation.</li>
         <li>Pour les comptages, le rapport variance / moyenne, proche de 1 pour une loi de Poisson.</li>
       </ul>
       <p class="note">Voir aussi la page <a href="radioactivite.html">Radioactivité</a> pour les mesures de comptage.</p>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-muon.png"><img loading="lazy" src="images/microlab-muon.png" width="1366" height="860" alt="Capture de MicroLab : tableau des classes de durées de vie du muon, effectifs avec barres d’erreur √N et modèle exponentiel décroissant ajusté"></a>
+    <figcaption>Vie du muon : 1 523 mesures regroupées en classes de 1 µs, τ = 2,1 ± 0,2 µs.</figcaption></figure>
+    <div>
+      <h3>Classes et durée de vie</h3>
+      <ul>
+        <li>À partir d’une colonne de mesures brutes (par exemple les durées enregistrées par le détecteur de vie du muon), on règle le <strong>début</strong>, la <strong>largeur</strong> et la <strong>fin</strong> des classes dans l’onglet Statistiques.</li>
+        <li><strong>Créer le tableau des classes</strong> ouvre une <strong>nouvelle page</strong> : centre de chaque classe, effectif N et son incertitude √N, dans l’ordre.</li>
+        <li>Le modèle <code>N = A·exp(−t/τ) + B</code> est ajusté aussitôt : τ est le temps de vie moyen, B le fond de coïncidences fortuites.</li>
+        <li>On passe d’une page à l’autre par la liste en haut de l’écran ; le tableau se trie selon n’importe quelle colonne.</li>
+      </ul>
+      <p class="note">Écarter les premières centaines de nanosecondes, où le détecteur enregistre des événements parasites, améliore nettement l’ajustement.</p>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/microlab-titrage-ph.png"><img loading="lazy" src="images/microlab-titrage-ph.png" width="920" height="1077" alt="Capture de l’onglet Titrage de MicroLab : courbe pH = f(V), tangentes parallèles et parallèle médiane, courbe dérivée dpH/dV, VE = 12,60 mL par les deux méthodes et pH = 4,76 à la demi-équivalence"></a>
+    <figcaption>Titrage pH-métrique de l’acide éthanoïque : tangentes parallèles et dérivée.</figcaption></figure>
+    <div>
+      <h3>Titrages</h3>
+      <ul>
+        <li><strong>pH-métrique</strong> : méthode des <strong>tangentes parallèles</strong> (tangentes, parallèle médiane et point équivalent tracés sur le graphe) et méthode de la <strong>dérivée</strong> (maximum de dpH/dV, avec un lissage réglable).</li>
+        <li>Le point de contact de la première tangente se choisit à la main pour vérifier que le résultat n’en dépend presque pas.</li>
+        <li>pH à la <strong>demi-équivalence</strong>, égal au pK<sub>a</sub> pour un acide faible titré par une base forte.</li>
+        <li><strong>Conductimétrique</strong> : deux droites ajustées avant et après l’équivalence, intervalles choisis automatiquement, au clavier ou à la souris sur le graphe ; V<sub>E</sub> à leur intersection, avec son incertitude.</li>
+      </ul>
+      <figure class="cadre" style="margin-top:14px"><a href="images/microlab-titrage-cond.png"><img loading="lazy" src="images/microlab-titrage-cond.png" width="920" height="634" alt="Capture d’un titrage conductimétrique dans MicroLab : conductivité corrigée de la dilution en fonction du volume, deux demi-droites et leur intersection à VE = 11,2 mL"></a>
+      <figcaption>Titrage conductimétrique : intersection des deux demi-droites.</figcaption></figure>
     </div>
   </div>
 </section>
@@ -186,7 +218,7 @@
     </div>
   </div>
   <div class="encart">
-    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, réfraction (angles en degrés), période d’un pendule, comptage radioactif, oscillations amorties.</p>
+    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, réfraction (angles en degrés), période d’un pendule, comptage radioactif, vie du muon, titrages pH-métrique et conductimétrique, oscillations amorties.</p>
   </div>
 </section>
 
