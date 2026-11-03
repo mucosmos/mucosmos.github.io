@@ -307,3 +307,24 @@ td.muted { color: var(--muted); font-family: var(--f-sans) !important; }
 .angle select { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); padding: 3px 6px; font-size: 13px; color: var(--ink); }
 .range-row .angle { margin-left: auto; }
 .range-row .angle + .weight { margin-left: 0; }
+
+/* pages */
+.pagebar { display: inline-flex; align-items: center; gap: 2px; min-width: 0; }
+.pagebar select { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); padding: 3px 6px; font-size: 13px; max-width: 34ch; }
+.sortsel { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r); padding: 3px 4px; font-size: 13px; max-width: 10ch; }
+
+/* titrage */
+.titr-opts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; }
+.titr-opts .field input { width: 13ch; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 5px 8px; font-size: 14px; color: var(--ink); }
+.rng { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.rng input { width: 9ch !important; }
+.titr-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.tcard { border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; border-top: 3px solid var(--line); min-width: 0; }
+.tcard.t-tang { border-top-color: var(--model); }
+.tcard.t-der { border-top-color: var(--s2); }
+.tcard .k { font-size: 12px; color: var(--muted); font-weight: 500; }
+.tcard .big { font-family: var(--f-mono); font-size: 20px; font-weight: 500; margin: 2px 0; font-variant-numeric: tabular-nums; }
+.tcard .eqline { font-family: var(--f-mono); font-size: 14px; margin: 4px 0 2px; }
+.tcard .sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.toolbar { flex-wrap: wrap; row-gap: 6px; }
+.count { white-space: nowrap; }

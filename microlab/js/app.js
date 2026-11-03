@@ -48,8 +48,10 @@
   const angleScope = base => isDeg() ? Object.assign({}, base, TRIG_DEG) : Object.assign({}, base);
 
   /* ---------- état ---------- */
-  let S = null;          // état sérialisable
+  let S = null;          // page courante (état sérialisable)
   let D = null;          // données dérivées (colonnes calculées, incertitudes)
+  let DOC = { pages: [], cur: 0 };   // le projet : une ou plusieurs pages de données
+  function setDoc(pages, cur = 0) { DOC = { pages, cur }; S = DOC.pages[cur]; }
 
   function emptyState() {
     return {
@@ -69,6 +71,8 @@
     st.calc = ex.calc || '';
     st.angle = ex.angle || 'rad';
     st.uCalc = Object.assign({}, ex.uCalc || {});
+    if (ex.titr) st.titr = Object.assign({}, ex.titr);
+    st.ui = { atab: ex.tab && ex.tab !== 'table' ? ex.tab : 'model' };
     Object.assign(st.graph, ex.graph);
     Object.assign(st.model, ex.model, { expr: '', init: {}, fixed: {}, result: null, range: null });
     st.hist = Object.assign({ width: '', start: '', law: '' }, ex.hist || {});
@@ -218,9 +222,31 @@
       try { localStorage.setItem(STORE, JSON.stringify(serialize())); } catch (e) { /* stockage indisponible */ }
     }, 400);
   }
-  function serialize() {
-    const m = Object.assign({}, S.model, { result: null });
-    return Object.assign({}, S, { model: m, vars: S.vars.map(v => ({ ...v, data: v.data.map(x => isFinite(x) ? x : null) })) });
+  function serializePage(st) {
+    const m = Object.assign({}, st.model, { result: null });
+    return Object.assign({}, st, { model: m, vars: st.vars.map(v => ({ ...v, data: v.data.map(x => isFinite(x) ? x : null) })) });
+  }
+  function serialize() { return { app: 'MicroLab', version: 2, cur: DOC.cur, pages: DOC.pages.map(serializePage) }; }
+  function loadDoc(o) {
+    const list = o && Array.isArray(o.pages) ? o.pages : [o];
+    const pages = list.filter(p => p && Array.isArray(p.vars) && p.vars.length).map(deserialize);
+    if (!pages.length) throw new Error('Projet vide');
+    setDoc(pages, Math.min(Math.max(0, (o && o.cur) | 0), pages.length - 1));
+  }
+  function gotoPage(i) {
+    if (i < 0 || i >= DOC.pages.length) return;
+    if (pickMode) setPick(false);
+    DOC.cur = i; S = DOC.pages[i];
+    $('calcText').value = S.calc || '';
+    refreshAll();
+    switchTab((S.ui && S.ui.atab) || 'model');
+    if (S.model.expr && S.model.y && (!S.ui || S.ui.atab !== 'titr')) doFit(true);
+  }
+  function addPage(st) { DOC.pages.push(st); gotoPage(DOC.pages.length - 1); }
+  function renderPageBar() {
+    const many = DOC.pages.length > 1;
+    $('pageBar').hidden = !many; $('projName').hidden = many;
+    if (many) $('selPage').innerHTML = DOC.pages.map((p, i) => `<option value="${i}" ${i === DOC.cur ? 'selected' : ''}>Page ${i + 1} · ${esc(p.title || 'Sans titre')}</option>`).join('');
   }
   function deserialize(o) {
     const st = emptyState();
@@ -236,12 +262,14 @@
     recompute();
     fixSelections();
     $('projName').textContent = S.title || '';
+    renderPageBar();
     renderTable();
     renderVarList();
     renderCalcMsg();
     renderGraphControls();
     renderModelControls(opts.keepParams);
     renderAngle();
+    if (titrActive()) renderTitr(false);
     renderPlot();
     renderStats();
     save();
@@ -278,6 +306,23 @@
     h += '</tbody>';
     t.innerHTML = h;
     $('rowCount').textContent = `${n} ligne${n > 1 ? 's' : ''} · ${names.length} grandeur${names.length > 1 ? 's' : ''}`;
+    $('selSort').innerHTML = '<option value="">Trier…</option>' + names.map(nm =>
+      `<option value="${esc(nm)}|1">${esc(nm)} croissant</option><option value="${esc(nm)}|-1">${esc(nm)} décroissant</option>`).join('');
+  }
+
+  /* Trie toutes les lignes selon une colonne (mesurée ou calculée) ; les cases vides vont à la fin. */
+  function sortRows(name, dir) {
+    const key = D.cols[name]; if (!key) return;
+    const idx = [...Array(D.n).keys()].sort((a, b) => {
+      const x = key[a], y = key[b], fx = isFinite(x), fy = isFinite(y);
+      if (!fx || !fy) return fx === fy ? a - b : fx ? -1 : 1;
+      return dir * (x - y) || a - b;
+    });
+    S.vars.forEach(v => { v.data = idx.map(i => v.data[i]); });
+    S.model.result = null;
+    refreshAll({ keepParams: true });
+    if (S.model.expr && !titrActive()) doFit(true);
+    toast(`Lignes triées par ${name} ${dir > 0 ? 'croissant' : 'décroissant'}`);
   }
 
   function startEdit(td) {
@@ -325,6 +370,7 @@
       const last = document.querySelector(`#dataTable td.edit[data-r="${D.n - 1}"]`); if (last) startEdit(last);
     };
     $('btnAddVar').onclick = () => { switchTab('vars'); showNewVar(); };
+    $('selSort').onchange = e => { const v = e.target.value; if (!v) return; const k = v.lastIndexOf('|'); sortRows(v.slice(0, k), +v.slice(k + 1)); };
     // collage d'un tableau dans la page
     document.addEventListener('paste', e => {
       const a = document.activeElement;
@@ -479,7 +525,8 @@
     const X = D.cols[S.graph.x] || [], colors = seriesColors();
     const ux = D.unc[S.graph.x];
     const traces = [];
-    const res = S.model.result;
+    const titr = titrActive();
+    const res = titr ? null : S.model.result;
     const showRes = res && S.graph.res !== false;
     S.graph.ys.forEach((y, k) => {
       const Y = D.cols[y]; if (!Y) return;
@@ -503,7 +550,7 @@
           marker: { color: cssVar('--model'), size: 5 }, hovertemplate: (res.normRes ? 'écart normalisé = %{y}' : 'résidu = %{y}') + '<extra></extra>' });
       }
     }
-    if (S.model.range) {
+    if (S.model.range && !titr) {
       shapes.push({ type: 'rect', xref: 'x', yref: 'paper', x0: S.model.range[0], x1: S.model.range[1], y0: showRes ? 0.3 : 0, y1: 1,
         fillcolor: cssVar('--model-soft'), line: { width: 0 }, layer: 'below' });
     }
@@ -517,6 +564,7 @@
       layout.yaxis2.title.font.size = 11;
       layout.xaxis.anchor = 'y2';
     }
+    if (titr) titrOverlay(traces, shapes, layout, axis);
     layout.showlegend = traces.length > 1;
     layout.shapes = shapes;
     layout.datarevision = ++plotRev;
@@ -535,18 +583,29 @@
         else if (ev && ev.range && ev.range.x && !S.graph.logx) r = ev.range.x;
         if (!r) { setPick(false); toast('Sélectionnez au moins deux points.'); return; }
         setPick(false);
-        S.model.range = [Math.min(r[0], r[1]), Math.max(r[0], r[1])];
+        const rr = [Math.min(r[0], r[1]), Math.max(r[0], r[1])];
+        if (pickTarget === 'r1' || pickTarget === 'r2') { titrState()[pickTarget] = rr; renderTitr(); save(); return; }
+        S.model.range = rr;
         S.model.result = null; renderModelRange(); doFit(true);
       });
     }
   }
 
-  function setPick(on) {
+  let pickTarget = 'model';
+  function setPick(on, target = 'model') {
     pickMode = on;
-    $('btnPickRange').textContent = on ? 'Glissez sur le graphe…' : 'Choisir sur le graphe';
-    $('btnPickRange').classList.toggle('primary', on);
-    if (window.Plotly) Plotly.relayout($('plot'), { dragmode: on ? 'select' : 'zoom', selections: [] });
-    if (on) { toast('Faites glisser horizontalement sur le graphe pour délimiter la zone à modéliser.'); $('plot').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    if (on) pickTarget = target;
+    [['btnPickRange', 'model'], ['btnPick1', 'r1'], ['btnPick2', 'r2']].forEach(([id, t]) => {
+      const act = on && pickTarget === t;
+      $(id).textContent = act ? 'Glissez sur le graphe…' : 'Choisir sur le graphe';
+      $(id).classList.toggle('primary', act);
+    });
+    if (window.Plotly && $('plot').data) Plotly.relayout($('plot'), { dragmode: on ? 'select' : 'zoom', selections: [] });
+    if (on) {
+      toast(target === 'model' ? 'Faites glisser horizontalement sur le graphe pour délimiter la zone à modéliser.'
+        : `Faites glisser horizontalement sur les points de la droite ${target === 'r1' ? 1 : 2}.`);
+      $('plot').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   /* ---------- modélisation ---------- */
@@ -584,6 +643,7 @@
 
   function fitData() {
     const X = D.cols[S.graph.x], Y = D.cols[S.model.y];
+    if (!X || !Y) return { xs: [], ys: [], sx: null, sy: null };
     const ux = D.unc[S.graph.x], uy = D.unc[S.model.y];
     const r = S.model.range;
     const xs = [], ys = [], sx = [], sy = [];
@@ -850,7 +910,7 @@
       renderParams(); toast('Valeurs initiales estimées à partir des données');
     };
     $('btnClearModel').onclick = () => { S.model.result = null; S.model.range = null; renderModelRange(); renderParams(); renderFitResult(); renderPlot(); save(); };
-    $('btnPickRange').onclick = () => setPick(!pickMode);
+    $('btnPickRange').onclick = () => setPick(!(pickMode && pickTarget === 'model'), 'model');
     $('btnClearRange').onclick = () => { S.model.range = null; renderModelRange(); if (S.model.result) doFit(true); else renderPlot(); save(); };
     $('optWeight').onchange = e => { S.model.weight = e.target.checked; if (S.model.result) doFit(true); else save(); };
     $('btnCopyRes').onclick = async () => {
@@ -922,23 +982,28 @@
   }
 
   function renderHisto(vals, st, ref) {
-    const H = S.hist = Object.assign({ width: '', start: '', law: '' }, S.hist);
+    const H = S.hist = Object.assign({ width: '', start: '', end: '', law: '' }, S.hist);
     $('binWidth').value = document.activeElement === $('binWidth') ? $('binWidth').value : H.width;
     $('binStart').value = document.activeElement === $('binStart') ? $('binStart').value : H.start;
+    $('binEnd').value = document.activeElement === $('binEnd') ? $('binEnd').value : (H.end || '');
     $('selLaw').value = H.law;
-    const userW = E.parseNumber(H.width), userS = E.parseNumber(H.start);
+    const userW = E.parseNumber(H.width), userS = E.parseNumber(H.start), userE = E.parseNumber(H.end);
     const auto = autoBins(vals, userW);
     const w = userW > 0 ? userW : auto.w;
     const start = isFinite(userS) ? userS : auto.start;
     $('binWidth').placeholder = 'auto (' + E.sig(auto.w, 4) + ')';
     $('binStart').placeholder = 'auto (' + E.sig(auto.start, 6) + ')';
+    $('binEnd').placeholder = 'auto (' + E.sig(Math.max(...vals), 6) + ')';
     let hist;
-    try { hist = E.histogram(vals, w, start); } catch (e) { $('binInfo').textContent = e.message; return; }
+    lastBins = null;
+    try { hist = E.histogram(vals, w, start, isFinite(userE) && userE > start ? userE : undefined); } catch (e) { $('binInfo').textContent = e.message; return; }
+    lastBins = { w, start, hist, name: S.statVar };
     const centers = hist.counts.map((_, k) => start + (k + 0.5) * w);
     const ints = vals.every(x => Number.isInteger(x));
-    let bi = `${hist.counts.length} classe${hist.counts.length > 1 ? 's' : ''}` + (hist.below ? ` · ${hist.below} valeur${hist.below > 1 ? 's' : ''} avant la 1re classe` : '');
+    const out = hist.below + hist.above;
+    let bi = `${hist.counts.length} classe${hist.counts.length > 1 ? 's' : ''}` + (out ? ` · ${out} valeur${out > 1 ? 's' : ''} hors des classes (${hist.below} avant, ${hist.above} après)` : '');
     if (hist.counts.length > 150) bi += ' · beaucoup de classes : vérifiez qu’aucune valeur aberrante (une ligne de total par exemple) ne s’est glissée dans les données';
-    else if (ints && Number.isInteger(w) && Number.isInteger(start)) bi += ` · conseil : début à ${E.sig(start - 0.5, 6)} pour centrer chaque classe sur une valeur entière`;
+    else if (ints && w === 1 && Number.isInteger(start)) bi += ` · conseil : début à ${E.sig(start - 0.5, 6)} pour centrer chaque classe sur une valeur entière`;
     $('binInfo').textContent = bi;
     const N = vals.length;
     const ranges = hist.counts.map((_, k) => `[${E.sig(hist.edges[k], 5)} ; ${E.sig(hist.edges[k + 1], 5)}[`);
@@ -955,7 +1020,8 @@
       const cx = [], cy = [];
       for (let i = 0; i <= 300; i++) { const x = lo + (hi - lo) * i / 300; cx.push(x); cy.push(N * w * Math.exp(-((x - mu) ** 2) / (2 * s * s)) / (s * Math.sqrt(2 * Math.PI))); }
       traces.push({ x: cx, y: cy, mode: 'lines', name: 'loi normale', line: { color: model, width: 2.2 }, hoverinfo: 'skip' });
-      const expc = hist.counts.map((_, k) => N * ((k === hist.counts.length - 1 ? 1 : E.normCdf(hist.edges[k + 1], mu, s)) - (k === 0 ? 0 : E.normCdf(hist.edges[k], mu, s))));
+      const lastK = hist.counts.length - 1;
+      const expc = hist.counts.map((_, k) => N * ((k === lastK && !hist.above ? 1 : E.normCdf(hist.edges[k + 1], mu, s)) - (k === 0 && !hist.below ? 0 : E.normCdf(hist.edges[k], mu, s))));
       traces.push({ x: centers, y: expc, mode: 'markers', name: 'effectif attendu', marker: { color: model, size: 7, symbol: 'diamond-open', line: { width: 1.6 } }, hovertemplate: 'attendu : %{y:.1f}<extra></extra>' });
       const fm = E.formatValU(mu, st.u), fs = E.formatValU(s, s / Math.sqrt(2 * (N - 1)));
       lawHtml = lawBlock('Loi normale', [
@@ -969,7 +1035,7 @@
       if (lam > 0) {
         const pmfBin = (a, b) => { let p = 0; for (let k = Math.max(0, Math.ceil(a - 1e-9)); k < b - 1e-9; k++) p += E.poissonPmf(k, lam); return p; };
         const expc = hist.counts.map((_, k) => {
-          const a = k === 0 ? -0.5 : hist.edges[k], b = k === hist.counts.length - 1 ? lam + 20 * Math.sqrt(lam) + 50 : hist.edges[k + 1];
+          const a = k === 0 && !hist.below ? -0.5 : hist.edges[k], b = k === hist.counts.length - 1 && !hist.above ? lam + 20 * Math.sqrt(lam) + 50 : hist.edges[k + 1];
           return N * pmfBin(a, b);
         });
         traces.push({ x: centers, y: expc, mode: 'lines+markers', name: 'loi de Poisson', line: { color: model, width: 1.5, dash: 'dot' },
@@ -997,6 +1063,35 @@
     Plotly.react($('histo'), traces, layout, { displaylogo: false, responsive: true, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
   }
 
+  let lastBins = null;
+  const TIME_UNITS = /^(fs|ps|ns|µs|μs|us|ms|s|min|h|j|jours?|ans?|années?)$/i;
+
+  /* Nouvelle page : centre et effectif de chaque classe, u(N) = √N, prête à modéliser. */
+  function createClassPage() {
+    if (!lastBins || !lastBins.hist.counts.length) { toast('Réglez d’abord les classes de l’histogramme.'); return; }
+    const { w, start, hist, name } = lastBins;
+    const unit = unitOf(name);
+    const xn = TIME_UNITS.test(unit.trim()) ? 't' : 'x';
+    const centers = hist.counts.map((_, k) => +(start + (k + 0.5) * w).toPrecision(12));
+    const st = emptyState();
+    st.title = `Classes de ${name}`;
+    st.vars = [
+      { name: xn, unit, u: '', data: centers },
+      { name: 'N', unit: '', u: 'sqrt(max(N, 1))', data: hist.counts.slice() }
+    ];
+    st.calc = `# ${hist.counts.length} classes de largeur ${E.sig(w, 6)}${unit ? ' ' + unit : ''} à partir de ${E.sig(start, 6)}, `
+      + `${xn} = centre de la classe ; incertitude u(N) = √N (comptage)`
+      + (hist.below + hist.above ? `\n# ${hist.below + hist.above} valeurs hors des classes ne sont pas comptées` : '');
+    st.angle = S.angle;
+    st.graph = Object.assign(st.graph, { x: xn, ys: ['N'], err: true });
+    const c = hist.counts, half = Math.floor(c.length / 2);
+    const first = c.slice(0, half).reduce((a, b) => a + b, 0), second = c.slice(half).reduce((a, b) => a + b, 0);
+    st.model = Object.assign(st.model, { y: 'N', preset: first > 1.5 * second ? 'expdec' : 'gauss', expr: '', init: {}, weight: true });
+    st.ui = { atab: 'model' };
+    addPage(st);
+    toast(`Page ${DOC.pages.length} créée : ${c.length} classes. Modèle ajusté, à vérifier.`);
+  }
+
   function pct(vals, a, b) { return E.sig(100 * vals.filter(x => x >= a && x <= b).length / vals.length, 2) + ' %'; }
 
   function lawBlock(title, params, test, N, note) {
@@ -1017,7 +1112,187 @@
     const H = () => (S.hist = Object.assign({ width: '', start: '', law: '' }, S.hist));
     $('binWidth').addEventListener('input', e => { H().width = e.target.value.trim(); renderStats(); save(); });
     $('binStart').addEventListener('input', e => { H().start = e.target.value.trim(); renderStats(); save(); });
+    $('binEnd').addEventListener('input', e => { H().end = e.target.value.trim(); renderStats(); save(); });
+    $('btnClassPage').onclick = createClassPage;
     $('selLaw').onchange = e => { H().law = e.target.value; renderStats(); save(); };
+  }
+
+  /* ---------- titrages ---------- */
+  let titrRes = null, titrErr = '';
+  function titrState() {
+    return (S.titr = Object.assign({ type: 'ph', w: '3', v1: '', tang: true, der: true, r1: null, r2: null }, S.titr));
+  }
+  const fv = (v, n = 4) => E.sig(v, n);
+  // volumes affichés avec un nombre de décimales fixe, lié au pas des mesures
+  let vDec = 2;
+  const fx = v => isFinite(v) ? v.toFixed(vDec).replace('.', ',') : '—';
+  const withU = (v, name) => fv(v) + (unitOf(name) ? ' ' + esc(unitOf(name)) : '');
+
+  function computeTitr() {
+    const T = titrState(), xn = S.graph.x, yn = S.graph.ys[0];
+    titrRes = null; titrErr = '';
+    const X = D.cols[xn], Y = D.cols[yn];
+    if (!X || !Y) { titrErr = 'Choisissez le volume versé et la grandeur mesurée.'; return; }
+    try {
+      if (T.type === 'ph') titrRes = Object.assign({ type: 'ph' }, E.titrationPH(X, Y, { w: +T.w, v1: E.parseNumber(T.v1) }));
+      else titrRes = Object.assign({ type: 'cond' }, E.titrationCond(X, Y, { r1: T.r1, r2: T.r2 }));
+    } catch (e) { titrErr = e.message; }
+  }
+
+  function renderTitr(plot = true) {
+    const T = titrState(), names = D.colNames, xn = S.graph.x, yn = S.graph.ys[0];
+    $('selTitrType').value = T.type;
+    $('selTitrX').innerHTML = names.map(n => `<option ${n === xn ? 'selected' : ''} value="${esc(n)}">${esc(labelOf(n))}</option>`).join('');
+    $('selTitrY').innerHTML = names.filter(n => n !== xn).map(n => `<option ${n === yn ? 'selected' : ''} value="${esc(n)}">${esc(labelOf(n))}</option>`).join('');
+    $('titrPhOpts').hidden = T.type !== 'ph'; $('titrCondOpts').hidden = T.type !== 'cond';
+    $('selTitrW').value = String(T.w);
+    $('optTitrTang').checked = T.tang !== false; $('optTitrDer').checked = T.der !== false;
+    if (document.activeElement !== $('titrV1')) $('titrV1').value = T.v1 || '';
+    computeTitr();
+    const r = titrRes;
+    if (r) {
+      const steps = r.X.slice(1).map((v, i) => v - r.X[i]).filter(v => v > 0);
+      const st = steps.length ? Math.min(...steps) : 1;
+      vDec = Math.min(4, Math.max(1, Math.ceil(-Math.log10(st) - 1e-9) + 1));
+    }
+    // valeurs automatiques affichées en grisé
+    if (r && r.type === 'ph' && r.tang) $('titrV1').placeholder = 'auto (' + fx(r.tang.xL) + ')';
+    else $('titrV1').placeholder = 'auto';
+    [['titrA1', 'r1', 0], ['titrB1', 'r1', 1], ['titrA2', 'r2', 0], ['titrB2', 'r2', 1]].forEach(([id, k, j]) => {
+      if (document.activeElement !== $(id)) $(id).value = T[k] ? E.sig(T[k][j], 6) : '';
+      $(id).placeholder = r && r.type === 'cond' ? E.sig(r[k][j], 6) : '';
+    });
+    $('titrMsg').innerHTML = titrErr ? `<span class="err">${esc(titrErr)}</span>`
+      : r && r.type === 'ph' && r.tangErr && T.tang !== false ? `<span class="warn">${esc(r.tangErr)}</span>` : '';
+    $('titrResult').innerHTML = r ? (r.type === 'ph' ? phResultHtml(r, xn, yn) : condResultHtml(r, xn, yn)) : '';
+    if (plot) renderPlot();
+  }
+
+  const derUnit = (xn, yn) => {
+    const ux = unitOf(xn), uy = unitOf(yn);
+    return ux || uy ? ' ' + (uy ? esc(uy) + (ux ? '/' + esc(ux) : '') : esc(ux) + '<sup>−1</sup>') : '';
+  };
+  function phResultHtml(r, xn, yn) {
+    const ux = unitOf(xn) ? ' ' + esc(unitOf(xn)) : '';
+    const yl = esc(yn), sub = s => `${yl}<sub>${s}</sub>`;
+    const cards = [];
+    if (r.tang) cards.push(`<div class="tcard t-tang"><div class="k">Méthode des tangentes parallèles</div>
+      <div class="big">V<sub>E</sub> = ${fx(r.tang.ve)}${ux}</div>
+      <div class="sub">${sub('E')} = ${fv(r.tang.ye, 3)} · tangentes en ${fx(r.tang.xL)} et ${fx(r.tang.xR)}${ux}</div></div>`);
+    cards.push(`<div class="tcard t-der"><div class="k">Méthode de la dérivée</div>
+      <div class="big">V<sub>E</sub> = ${fx(r.deriv.ve)}${ux}</div>
+      <div class="sub">${sub('E')} = ${fv(r.deriv.ye, 3)} · maximum de |d${yl}/d${esc(xn)}| = ${fv(Math.abs(r.deriv.dmax), 3)}${derUnit(xn, yn)}</div></div>`);
+    const ve = r.tang ? r.tang.ve : r.deriv.ve;
+    const yh = E.interp(r.X, r.Y, ve / 2);
+    cards.push(`<div class="tcard"><div class="k">Demi-équivalence</div>
+      <div class="big">${yl} = ${fv(yh, 3)}</div>
+      <div class="sub">pour ${esc(xn)} = V<sub>E</sub>/2 = ${fx(ve / 2)}${ux}</div></div>`);
+    const gap = r.tang ? Math.abs(r.tang.ve - r.deriv.ve) : NaN;
+    return `<div class="titr-cards">${cards.join('')}</div>
+      <p class="note">${isFinite(gap) ? `Écart entre les deux méthodes : ${gap < 0.5 * 10 ** -vDec ? 'moins de ' + fx(10 ** -vDec) : fx(gap)}${ux}. ` : ''}Pas des mesures autour du saut : ${fv(r.step, 3)}${ux} ; un pas plus fin près de l’équivalence améliore la précision.
+      Pour un acide faible titré par une base forte (ou l’inverse), le pH à la demi-équivalence est égal au pK<sub>a</sub> du couple.
+      La méthode des tangentes parallèles ne dépend presque pas de la position des tangentes : modifiez le point de contact pour le vérifier.</p>`;
+  }
+
+  function condResultHtml(r, xn, yn) {
+    const ux = unitOf(xn) ? ' ' + esc(unitOf(xn)) : '';
+    const line = (L, k, rg, n) => {
+      rg = [Math.min(...rg), Math.max(...rg)];
+      const ua = Math.sqrt(L.cov[0][0]), ub = Math.sqrt(L.cov[1][1]);
+      const fa = E.formatValU(L.a, ua), fb = E.formatValU(L.b, ub);
+      const ex = f => f.exp !== undefined ? ` ×10<sup>${f.exp}</sup>` : '';
+      return `<div class="tcard ${k === 1 ? 't-tang' : 't-der'}"><div class="k">Droite ${k} : ${n} points, de ${fx(rg[0])} à ${fx(rg[1])}${ux}</div>
+        <div class="eqline">${esc(yn)} = a·${esc(xn)} + b</div>
+        <div class="sub">a = ${fa.v}${fa.u ? ' ± ' + fa.u : ''}${ex(fa)} · b = ${fb.v}${fb.u ? ' ± ' + fb.u : ''}${ex(fb)} · R² = ${isFinite(L.r2) ? L.r2.toFixed(4).replace('.', ',') : '—'}</div></div>`;
+    };
+    const fe = E.formatValU(r.ve, r.uve);
+    return `<div class="titr-cards">
+      ${line(r.L1, 1, r.r1, r.n1)}${line(r.L2, 2, r.r2, r.n2)}
+      <div class="tcard"><div class="k">Intersection des deux droites</div>
+        <div class="big">V<sub>E</sub> = ${fe.v}${fe.u ? ' ± ' + fe.u : ''}${fe.exp !== undefined ? ` ×10<sup>${fe.exp}</sup>` : ''}${ux}</div>
+        <div class="sub">${esc(yn)}<sub>E</sub> = ${withU(r.ye, yn)}${r.auto ? ' · découpage automatique' : ''}</div></div>
+    </div>
+    <p class="note">L’incertitude-type sur V<sub>E</sub> vient de la dispersion des points autour des deux droites.
+      Les points proches de l’équivalence s’écartent souvent des droites : réduisez les intervalles pour les exclure.
+      Si le volume versé n’est pas négligeable devant le volume initial V<sub>0</sub>, corrigez la dilution dans l’onglet Grandeurs :
+      <code>sigma_c = sigma*(V0 + V)/V0</code>.</p>`;
+  }
+
+  /* Tracés ajoutés au graphe quand l'onglet Titrage est ouvert. */
+  function titrOverlay(traces, shapes, layout, axis) {
+    const r = titrRes, T = titrState(); if (!r) return;
+    const mc = cssVar('--model'), dc = cssVar('--s2'), ink = cssVar('--ink');
+    const xs = r.X, ys = r.Y;
+    const xmin = Math.min(...xs), xmax = Math.max(...xs), ymin = Math.min(...ys), ymax = Math.max(...ys), dy = (ymax - ymin) || 1;
+    const lo = ymin - 0.04 * dy, hi = ymax + 0.04 * dy;
+    // segment de la droite y = m x + c limité au cadre des mesures
+    const seg = (m, c, x0 = xmin, x1 = xmax) => {
+      let a = x0, b = x1;
+      if (m !== 0) { const xa = (lo - c) / m, xb = (hi - c) / m; a = Math.max(a, Math.min(xa, xb)); b = Math.min(b, Math.max(xa, xb)); }
+      return a < b ? { x: [a, b], y: [m * a + c, m * b + c] } : { x: [], y: [] };
+    };
+    const vline = (x, color, dash) => shapes.push({ type: 'line', xref: 'x', yref: 'paper', x0: x, x1: x, y0: 0, y1: 1, line: { color, width: 1.4, dash } });
+    const ann = [];
+    const xl = esc(S.graph.x), yl = esc(S.graph.ys[0]), ux = unitOf(S.graph.x) ? ' ' + unitOf(S.graph.x) : '';
+    if (r.type === 'ph') {
+      if (T.der !== false) {
+        traces.push({ x: xs, y: r.d, name: `d${yl}/d${xl}`, yaxis: 'y3', mode: 'lines+markers', line: { color: dc, width: 1.6 }, marker: { color: dc, size: 4 },
+          hovertemplate: `${xl} = %{x}<br>d${yl}/d${xl} = %{y:.3g}<extra></extra>` });
+        layout.yaxis3 = Object.assign(axis(`d${yl}/d${xl}`, false), { overlaying: 'y', side: 'right', showgrid: false, mirror: false, zeroline: false, minor: { showgrid: false } });
+        layout.yaxis3.title.font.color = dc; layout.yaxis3.tickfont = { color: dc };
+        layout.yaxis.mirror = false; layout.margin.r = 64;
+        vline(r.deriv.ve, dc, 'dot');
+        ann.push({ x: r.deriv.ve, y: 1, yref: 'paper', text: `dérivée : V<sub>E</sub> = ${fx(r.deriv.ve)}${ux}`, showarrow: false, xanchor: 'left', xshift: 4, yanchor: 'top', yshift: -22, font: { color: dc, size: 12 } });
+      }
+      if (T.tang !== false && r.tang) {
+        const t = r.tang;
+        const s1 = seg(t.slope, t.cL), s2 = seg(t.slope, t.cR), s3 = seg(t.slope, t.cM);
+        traces.push({ x: s1.x, y: s1.y, name: 'tangentes', mode: 'lines', line: { color: mc, width: 1.5, dash: 'dash' }, hoverinfo: 'skip' });
+        traces.push({ x: s2.x, y: s2.y, name: 'tangente 2', showlegend: false, mode: 'lines', line: { color: mc, width: 1.5, dash: 'dash' }, hoverinfo: 'skip' });
+        traces.push({ x: s3.x, y: s3.y, name: 'parallèle médiane', mode: 'lines', line: { color: mc, width: 1.5, dash: 'dot' }, hoverinfo: 'skip' });
+        traces.push({ x: [t.xL, t.xR], y: [t.yL, t.yR], name: 'points de contact', showlegend: false, mode: 'markers', marker: { color: mc, size: 8, symbol: 'circle-open', line: { width: 2 } }, hovertemplate: 'contact : %{x:.4g}<extra></extra>' });
+        traces.push({ x: [t.ve], y: [t.ye], name: 'équivalence', mode: 'markers', marker: { color: mc, size: 13, symbol: 'x-thin', line: { width: 3, color: mc } }, hovertemplate: `V<sub>E</sub> = %{x:.4g}<br>${yl} = %{y:.3g}<extra></extra>` });
+        vline(t.ve, mc, 'dash');
+        ann.push({ x: t.ve, y: 1, yref: 'paper', text: `tangentes : V<sub>E</sub> = ${fx(t.ve)}${ux}`, showarrow: false, xanchor: 'right', xshift: -4, yanchor: 'top', yshift: -4, font: { color: mc, size: 12 } });
+      }
+    } else {
+      const { L1, L2, ve, ye } = r;
+      const a1 = Math.min(...r.r1), b2 = Math.max(...r.r2);
+      const l1 = seg(L1.a, L1.b, Math.min(a1, ve), Math.max(a1, ve)), l2 = seg(L2.a, L2.b, Math.min(ve, b2), Math.max(ve, b2));
+      [[r.r1, 1], [r.r2, 2]].forEach(([rg, k]) => shapes.push({ type: 'rect', xref: 'x', yref: 'paper', x0: Math.min(...rg), x1: Math.max(...rg), y0: 0, y1: 1,
+        fillcolor: k === 1 ? cssVar('--model-soft') : 'rgba(11,127,134,.07)', line: { width: 0 }, layer: 'below' }));
+      traces.push({ x: l1.x, y: l1.y, name: 'droite 1', mode: 'lines', line: { color: mc, width: 2 }, hoverinfo: 'skip' });
+      traces.push({ x: l2.x, y: l2.y, name: 'droite 2', mode: 'lines', line: { color: dc, width: 2 }, hoverinfo: 'skip' });
+      traces.push({ x: [ve], y: [ye], name: 'équivalence', mode: 'markers', marker: { color: ink, size: 13, symbol: 'x-thin', line: { width: 3, color: ink } }, hovertemplate: `V<sub>E</sub> = %{x:.4g}<br>${yl} = %{y:.4g}<extra></extra>` });
+      vline(ve, ink, 'dash');
+      ann.push({ x: ve, y: 1, yref: 'paper', text: `V<sub>E</sub> = ${fx(ve)}${ux}`, showarrow: false, xanchor: 'left', xshift: 4, yanchor: 'top', yshift: -4, font: { color: ink, size: 12 } });
+    }
+    layout.annotations = ann;
+  }
+
+  function bindTitr() {
+    const T = () => titrState();
+    const upd = () => { renderTitr(); save(); };
+    $('selTitrType').onchange = e => { T().type = e.target.value; if (pickMode) setPick(false); upd(); };
+    $('selTitrX').onchange = e => { S.graph.x = e.target.value; T().r1 = T().r2 = null; T().v1 = ''; refreshAll(); };
+    $('selTitrY').onchange = e => { S.graph.ys = [e.target.value]; T().r1 = T().r2 = null; T().v1 = ''; refreshAll(); };
+    $('selTitrW').onchange = e => { T().w = e.target.value; upd(); };
+    $('optTitrTang').onchange = e => { T().tang = e.target.checked; upd(); };
+    $('optTitrDer').onchange = e => { T().der = e.target.checked; upd(); };
+    let tm;
+    $('titrV1').addEventListener('input', e => { T().v1 = e.target.value.trim(); clearTimeout(tm); tm = setTimeout(upd, 250); });
+    const rng = (k, j) => e => {
+      const t = T(), v = E.parseNumber(e.target.value);
+      const cur = t[k] ? t[k].slice() : (titrRes && titrRes.type === 'cond' ? titrRes[k].slice() : [NaN, NaN]);
+      cur[j] = v;
+      t[k] = isFinite(cur[0]) && isFinite(cur[1]) ? cur : null;
+      clearTimeout(tm); tm = setTimeout(upd, 300);
+    };
+    $('titrA1').addEventListener('input', rng('r1', 0)); $('titrB1').addEventListener('input', rng('r1', 1));
+    $('titrA2').addEventListener('input', rng('r2', 0)); $('titrB2').addEventListener('input', rng('r2', 1));
+    $('btnPick1').onclick = () => setPick(!(pickMode && pickTarget === 'r1'), 'r1');
+    $('btnPick2').onclick = () => setPick(!(pickMode && pickTarget === 'r2'), 'r2');
+    $('btnTitrAuto').onclick = () => { T().r1 = T().r2 = null; upd(); toast('Découpage automatique des deux droites'); };
   }
 
   /* ---------- onglets ---------- */
@@ -1029,9 +1304,17 @@
       b.setAttribute('aria-selected', b.dataset.tab === name);
       $('pane-' + b.dataset.tab).hidden = b.dataset.tab !== name;
     });
+    if (['model', 'stats', 'titr'].includes(name) && S) {
+      const prev = S.ui && S.ui.atab;
+      S.ui = Object.assign({}, S.ui, { atab: name });
+      if (prev !== name) { if (pickMode) setPick(false); save(); }
+      if (name === 'titr') renderTitr();
+      if ((prev === 'titr') !== (name === 'titr')) renderPlot();
+    }
     if (name === 'stats') renderStats();
     if (name === 'model' && window.Plotly) Plotly.Plots.resize($('plot'));
   }
+  const titrActive = () => !!(S && S.ui && S.ui.atab === 'titr');
 
   /* ---------- import ---------- */
   // Rien n'est importé sans clic sur « Remplacer » ou « Ajouter » : l'aperçu montre
@@ -1181,7 +1464,7 @@
     const reader = new FileReader();
     if (ext === 'json') {
       reader.onload = () => {
-        try { S = deserialize(JSON.parse(reader.result)); $('calcText').value = S.calc; refreshAll(); if (S.model.expr) doFit(true); toast('Projet ouvert : ' + name); }
+        try { loadDoc(JSON.parse(reader.result)); gotoPage(DOC.cur); toast('Projet ouvert : ' + name); }
         catch (e) { toast('Ce fichier .json n’est pas un projet MicroLab.'); }
       };
       reader.readAsText(file); return;
@@ -1220,11 +1503,18 @@
       vars.forEach(v => { let nm = v.name, k = 2; while (used.has(nm)) nm = v.name + '_' + (k++); v.name = nm; used.add(nm); });
       S.vars.push(...vars);
     } else {
+      if (vars.length === 1) { // une seule colonne : numéro de la mesure en abscisse
+        const nm = vars[0].name === 'n' ? 'num' : 'n';
+        vars.unshift({ name: nm, unit: '', u: '', data: vars[0].data.map((_, i) => i + 1) });
+      }
       S = emptyState(); S.vars = vars; S.title = pendingName || 'Données importées';
       S.graph.x = vars[0].name; S.graph.ys = vars.length > 1 ? [vars[1].name] : []; S.model.y = S.graph.ys[0] || '';
+      if (vars.length === 2 && /^(n|num)$/.test(vars[0].name) && pending.vars.length === 1) { S.statVar = vars[1].name; S.model.preset = 'const'; S.ui = { atab: 'stats' }; }
+      DOC.pages[DOC.cur] = S;
       $('calcText').value = '';
     }
     closeImport(); refreshAll(); switchTab('table');
+    if (!append && S.ui && S.ui.atab) switchTab(S.ui.atab);
     toast(append ? `${vars.length} colonne(s) ajoutée(s)` : `${pending.nrows} lignes importées`);
   }
 
@@ -1278,7 +1568,7 @@
     $('btnSave').onclick = () => { download(fileBase() + '.json', JSON.stringify(serialize(), null, 1), 'application/json'); toast('Projet enregistré : rouvrez-le avec « Ouvrir un fichier ».'); };
     $('btnNew').onclick = e => {
       const b = e.currentTarget;
-      if (b.dataset.armed) { delete b.dataset.armed; b.textContent = 'Nouveau'; b.classList.remove('danger'); S = emptyState(); $('calcText').value = ''; refreshAll(); switchTab('table'); toast('Nouveau tableau vide'); return; }
+      if (b.dataset.armed) { delete b.dataset.armed; b.textContent = 'Nouveau'; b.classList.remove('danger'); setDoc([emptyState()]); $('calcText').value = ''; refreshAll(); switchTab('table'); toast('Nouveau tableau vide'); return; }
       b.dataset.armed = '1'; b.textContent = 'Effacer tout ?'; b.classList.add('danger');
       setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = 'Nouveau'; b.classList.remove('danger'); } }, 3500);
     };
@@ -1290,23 +1580,36 @@
 
   function loadExample(id) {
     const ex = window.Examples[id]();
-    S = fromExample(ex); $('calcText').value = S.calc;
+    setDoc([fromExample(ex)]); $('calcText').value = S.calc;
     refreshAll();
     switchTab(ex.tab || 'model');
-    if (S.model.preset) doFit(true);
+    if (S.model.preset && ex.tab !== 'titr') doFit(true);
     toast('Exemple chargé : ' + ex.title);
   }
 
   /* ---------- démarrage ---------- */
   function init() {
     document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-    bindTable(); bindVars(); bindGraph(); bindModel(); bindStats(); bindImport(); bindExport();
+    bindTable(); bindVars(); bindGraph(); bindModel(); bindStats(); bindTitr(); bindImport(); bindExport();
+    $('selPage').onchange = e => gotoPage(+e.target.value);
+    $('btnDelPage').onclick = e => {
+      const b = e.currentTarget;
+      if (!b.dataset.armed) {
+        b.dataset.armed = '1'; b.textContent = 'Supprimer la page ?'; b.classList.add('danger');
+        setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = '×'; b.classList.remove('danger'); } }, 3500);
+        return;
+      }
+      delete b.dataset.armed; b.textContent = '×'; b.classList.remove('danger');
+      if (DOC.pages.length < 2) return;
+      DOC.pages.splice(DOC.cur, 1);
+      gotoPage(Math.max(0, DOC.cur - 1));
+      toast('Page supprimée');
+    };
     let saved = null;
     try { const t = localStorage.getItem(STORE) || localStorage.getItem('modelab.v1'); if (t) saved = JSON.parse(t); } catch (e) { /* rien */ }
-    if (saved && saved.vars && saved.vars.length) {
-      S = deserialize(saved); $('calcText').value = S.calc; refreshAll();
-      if (S.model.expr && S.model.y) doFit(true);
-    } else loadExample('rc');
+    let ok = false;
+    if (saved) { try { loadDoc(saved); gotoPage(DOC.cur); ok = true; } catch (e) { ok = false; } }
+    if (!ok) loadExample('rc');
     // suivre le thème clair / sombre
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const rerender = () => { renderGraphControls(); renderPlot(); if (!$('pane-stats').hidden) renderStats(); };

@@ -82,6 +82,77 @@
         model: { y: 'sin_i1', preset: 'lin' }
       };
     },
+    titrage_ph() {
+      // 20,0 mL d'acide éthanoïque (pKa 4,76, c = 0,063 mol/L) titré par la soude à 0,100 mol/L : VE = 12,6 mL
+      const g = rng(31), Ka = 10 ** -4.76, Kw = 1e-14, Ca = 0.063, Va = 20, Cb = 0.100;
+      const V = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10.5, 11, 11.5, 12, 12.2, 12.4, 12.6, 12.8, 13, 13.2, 13.5, 14, 14.5, 15, 16, 17, 18, 19, 20, 22];
+      const pH = V.map(v => {
+        const c = Ca * Va / (Va + v), na = Cb * v / (Va + v);
+        let lo = -14, hi = 0;
+        for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2, h = 10 ** m; if (h + na - Kw / h - c * Ka / (Ka + h) > 0) hi = m; else lo = m; }
+        return Math.round((-(lo + hi) / 2 + 0.015 * g()) * 100) / 100;
+      });
+      return {
+        title: 'Titrage pH-métrique',
+        vars: [
+          { name: 'V', unit: 'mL', u: '', data: V },
+          { name: 'pH', unit: '', u: '', data: pH }
+        ],
+        calc: '# dérivée affichée par l’onglet Titrage ; on peut aussi la calculer ici\ndpH = deriv(pH, V)',
+        graph: { x: 'V', ys: ['pH'] },
+        model: { y: 'pH', preset: 'aff' },
+        titr: { type: 'ph' },
+        tab: 'titr'
+      };
+    },
+    titrage_cond() {
+      // 10 mL d'acide chlorhydrique + 190 mL d'eau, titrés par la soude à 0,100 mol/L : VE = 11,2 mL
+      const g = rng(41), n = 1.12, V0 = 200, Cb = 0.100; // n en mmol
+      const lH = 34.98, lNa = 5.01, lCl = 7.63, lOH = 19.86;  // mS·m²/mol
+      const V = Array.from({ length: 21 }, (_, i) => i);
+      const s = V.map(v => {
+        const vt = V0 + v, nb = Cb * v;
+        const H = Math.max(n - nb, 0) / vt, OH = Math.max(nb - n, 0) / vt, Na = nb / vt, Cl = n / vt; // mol/L
+        const sig = (lH * H + lOH * OH + lNa * Na + lCl * Cl) * 1000 / 100; // mS/cm
+        return Math.round(sig * (1 + 0.004 * g()) * 1000) / 1000;
+      });
+      return {
+        title: 'Titrage conductimétrique',
+        vars: [
+          { name: 'V', unit: 'mL', u: '', data: V },
+          { name: 'sigma', unit: 'mS/cm', u: '', data: s }
+        ],
+        calc: '# correction de la dilution : volume initial V0 = 200 mL\nV0 (mL) = 200\nsigma_c (mS/cm) = sigma*(V0 + V)/V0',
+        graph: { x: 'V', ys: ['sigma_c'] },
+        model: { y: 'sigma_c', preset: 'aff' },
+        titr: { type: 'cond' },
+        tab: 'titr'
+      };
+    },
+    muon() {
+      // durées entre l'arrivée d'un muon et l'électron de désintégration (τ = 2,197 µs),
+      // mêlées à des coïncidences fortuites réparties sur toute la fenêtre de 525 µs
+      let a = 77;
+      const u = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+      const d = [];
+      for (let i = 0; i < 650; i++) d.push(Math.round((100 - 2197 * Math.log(1 - u())) / 8) * 8);
+      for (let i = 0; i < 850; i++) d.push(Math.round(525000 * u() / 8) * 8);
+      for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(u() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
+      return {
+        title: 'Vie du muon (simulation)',
+        vars: [
+          { name: 'n', unit: '', u: '', data: d.map((_, i) => i + 1) },
+          { name: 'duree', unit: 'ns', u: '', data: d }
+        ],
+        calc: '',
+        graph: { x: 'n', ys: ['duree'] },
+        model: { y: 'duree', preset: 'const' },
+        hist: { width: '500', start: '500', end: '15000' },
+        statVar: 'duree',
+        tab: 'stats'
+      };
+    },
     comptage() {
       // nombre de désintégrations détectées par intervalle de 10 s (loi de Poisson, λ ≈ 4,3)
       let a = 2026;

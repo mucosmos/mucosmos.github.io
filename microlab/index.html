@@ -15,7 +15,12 @@
 </head>
 <body>
 <header class="bar">
-  <div class="brand"><span class="mark">μ</span><span class="name">MicroLab</span><span class="file" id="projName">—</span></div>
+  <div class="brand"><span class="mark">μ</span><span class="name">MicroLab</span><span class="file" id="projName">—</span>
+    <span class="pagebar" id="pageBar" hidden>
+      <select id="selPage" aria-label="Page de données"></select>
+      <button class="btn sm ghost" id="btnDelPage" title="Supprimer cette page" aria-label="Supprimer cette page">×</button>
+    </span>
+  </div>
   <nav class="actions">
     <button id="btnOpen" class="btn primary" title="CSV, TXT, ODS, XLSX ou projet .json">Ouvrir un fichier</button>
     <button id="btnPaste" class="btn">Coller</button>
@@ -28,6 +33,9 @@
         <option value="refraction">Réfraction (angles en degrés)</option>
         <option value="pendule">Période d’un pendule (mesures répétées)</option>
         <option value="comptage">Comptage radioactif (loi de Poisson)</option>
+        <option value="muon">Vie du muon (classes et exponentielle)</option>
+        <option value="titrage_ph">Titrage pH-métrique</option>
+        <option value="titrage_cond">Titrage conductimétrique</option>
         <option value="ressort">Oscillations amorties</option>
       </select>
     </label>
@@ -50,6 +58,7 @@
       <div class="toolbar">
         <span class="count" id="rowCount"></span>
         <span class="spacer"></span>
+        <select id="selSort" class="sortsel" aria-label="Trier les lignes du tableau"></select>
         <button class="btn sm" id="btnAddRow">+ Ligne</button>
         <button class="btn sm" id="btnAddVar">+ Variable</button>
       </div>
@@ -118,6 +127,7 @@
       <div class="tabs" role="tablist">
         <button class="tab active" data-tab="model" role="tab">Modélisation</button>
         <button class="tab" data-tab="stats" role="tab">Statistiques</button>
+        <button class="tab" data-tab="titr" role="tab">Titrage</button>
       </div>
 
       <div class="tabpane" id="pane-model">
@@ -162,6 +172,7 @@
         <div class="histo-opts">
           <label class="field"><span>Largeur des classes</span><input id="binWidth" inputmode="decimal" placeholder="auto"></label>
           <label class="field"><span>Début de la 1<sup>re</sup> classe</span><input id="binStart" inputmode="decimal" placeholder="auto"></label>
+          <label class="field"><span>Fin de la dernière classe</span><input id="binEnd" inputmode="decimal" placeholder="auto"></label>
           <label class="field"><span>Loi superposée</span>
             <select id="selLaw">
               <option value="">Aucune</option>
@@ -169,6 +180,7 @@
               <option value="poisson">Loi de Poisson</option>
             </select>
           </label>
+          <button class="btn sm" id="btnClassPage" title="Crée une nouvelle page avec le centre et l’effectif de chaque classe, prête à modéliser">Créer le tableau des classes</button>
           <span class="bin-info" id="binInfo"></span>
         </div>
         <div class="stats-grid">
@@ -178,6 +190,45 @@
             <div id="lawResult" class="law"></div>
           </div>
         </div>
+      </div>
+
+      <div class="tabpane" id="pane-titr" hidden>
+        <div class="model-head">
+          <label class="field"><span>Type de titrage</span>
+            <select id="selTitrType">
+              <option value="ph">pH-métrique (saut de pH)</option>
+              <option value="cond">Conductimétrique (deux droites)</option>
+            </select>
+          </label>
+          <label class="field"><span>Volume versé</span><select id="selTitrX"></select></label>
+          <label class="field"><span>Grandeur mesurée</span><select id="selTitrY"></select></label>
+        </div>
+        <div class="titr-opts" id="titrPhOpts">
+          <label class="field"><span>Lissage de la dérivée</span>
+            <select id="selTitrW">
+              <option value="3">aucun (3 points)</option>
+              <option value="5">5 points</option>
+              <option value="7">7 points</option>
+              <option value="9">9 points</option>
+            </select>
+          </label>
+          <label class="field"><span>1<sup>re</sup> tangente au point d’abscisse</span><input id="titrV1" inputmode="decimal" placeholder="auto"></label>
+          <div class="toggles">
+            <label><input type="checkbox" id="optTitrTang" checked> Tangentes</label>
+            <label><input type="checkbox" id="optTitrDer" checked> Dérivée</label>
+          </div>
+        </div>
+        <div class="titr-opts" id="titrCondOpts" hidden>
+          <div class="field"><span>Droite 1 : de … à …</span>
+            <div class="rng"><input id="titrA1" inputmode="decimal" aria-label="Début de la droite 1"><input id="titrB1" inputmode="decimal" aria-label="Fin de la droite 1"><button class="btn sm" id="btnPick1">Choisir sur le graphe</button></div>
+          </div>
+          <div class="field"><span>Droite 2 : de … à …</span>
+            <div class="rng"><input id="titrA2" inputmode="decimal" aria-label="Début de la droite 2"><input id="titrB2" inputmode="decimal" aria-label="Fin de la droite 2"><button class="btn sm" id="btnPick2">Choisir sur le graphe</button></div>
+          </div>
+          <button class="btn sm ghost" id="btnTitrAuto">Découpage automatique</button>
+        </div>
+        <div id="titrMsg" class="msg"></div>
+        <div id="titrResult" class="result"></div>
       </div>
     </div>
   </section>

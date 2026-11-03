@@ -15,6 +15,10 @@ Aucun serveur n’est nécessaire : ce sont des fichiers HTML, CSS et JavaScript
 - **Modélisation** : modèles prédéfinis (linéaire, affine, parabole, exponentielles, 1er ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne…) ou expression libre. Algorithme de Levenberg-Marquardt, valeurs initiales estimées automatiquement, paramètres fixables, domaine choisi à la souris.
 - **Estimateurs** : valeurs ± incertitude-type, incertitude relative, intervalle de confiance à 95 % (Student), R², χ² réduit et probabilité du χ² si l’ajustement est pondéré, écart-type des résidus sinon, graphe des résidus (normalisés par l’incertitude quand elle existe).
 - **Statistiques** : moyenne, écart-type, incertitude-type s/√n, intervalle à 95 %, écart normalisé à une valeur de référence. Histogramme avec largeur et début des classes réglables, et superposition d’une loi normale (Gauss) ou d’une loi de Poisson : paramètres estimés avec leur incertitude, effectifs attendus par classe et test d’adéquation du χ².
+- **Classes** : début, largeur et fin des classes réglables ; « Créer le tableau des classes » ouvre une nouvelle page (centre de classe, effectif N, incertitude √N) prête à modéliser, par exemple par une exponentielle décroissante pour mesurer la durée de vie du muon.
+- **Pages** : un projet peut contenir plusieurs pages de données (données brutes, tableau des classes…), choisies dans la barre du haut.
+- **Tri** des lignes du tableau selon n’importe quelle colonne.
+- **Titrages** (onglet Titrage) : titrage pH-métrique par la méthode des tangentes parallèles et par la méthode de la dérivée (maximum de dpH/dV, lissage réglable), pH à la demi-équivalence ; titrage conductimétrique par l’intersection de deux droites, intervalles choisis automatiquement ou à la souris, avec l’incertitude sur V_E.
 - **Sauvegarde** automatique dans le navigateur, export CSV, projet `.json` à rouvrir.
 
 ## Mise en ligne sur GitHub Pages

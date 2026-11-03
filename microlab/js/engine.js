@@ -441,27 +441,189 @@
 
   /* ---------- Histogramme et lois ---------- */
 
-  function histogram(values, width, start) {
+  /* Classes [start ; start + width[, … jusqu'à end (exclu) si end est fini, sinon jusqu'au maximum. */
+  function histogram(values, width, start, end) {
     const v = values.filter(x => isFinite(x));
-    if (!v.length || !(width > 0)) return { edges: [], counts: [] };
+    if (!v.length || !(width > 0)) return { edges: [], counts: [], below: 0, above: 0 };
+    const hasEnd = isFinite(end) && end > start;
     const max = Math.max(...v);
-    let nb = Math.floor((max - start) / width + 1e-9) + 1;
-    if (nb > 2000) throw new Error('Trop de classes : augmentez la largeur.');
+    let nb = hasEnd ? Math.ceil((end - start) / width - 1e-9) : Math.floor((max - start) / width + 1e-9) + 1;
+    if (nb > 2000) throw new Error('Trop de classes : augmentez la largeur ou réduisez l’intervalle.');
     nb = Math.max(1, nb);
     const counts = new Array(nb).fill(0);
-    let below = 0;
+    let below = 0, above = 0;
+    const last = start + nb * width;
     v.forEach(x => {
+      if (x < start - 1e-12 * Math.abs(start || 1)) { below++; return; }
+      if (hasEnd && x >= last) { above++; return; }
       const k = Math.floor((x - start) / width + 1e-9);
-      if (k < 0) below++; else counts[Math.min(k, nb - 1)]++;
+      counts[Math.min(k, nb - 1)]++;
     });
     const edges = Array.from({ length: nb + 1 }, (_, i) => start + i * width);
-    return { edges, counts, below };
+    return { edges, counts, below, above };
   }
 
   function normCdf(x, mu, s) { return 0.5 * (1 + (x - mu >= 0 ? 1 : -1) * gammp(0.5, ((x - mu) / s) ** 2 / 2)); }
   function poissonPmf(k, lam) { return k < 0 || k !== Math.floor(k) ? 0 : Math.exp(-lam + k * Math.log(lam) - lnGamma(k + 1)); }
 
-  const Engine = { parseNumber, textToRows, textLines, splitLine, detectDecimal, detectLayout, histogram, normCdf, poissonPmf, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
+  /* ---------- Titrages ---------- */
+
+  /* Trie par x croissant, retire les valeurs manquantes et moyenne les x identiques. */
+  function cleanXY(x, y) {
+    const p = x.map((v, i) => [v, y[i]]).filter(q => isFinite(q[0]) && isFinite(q[1])).sort((a, b) => a[0] - b[0]);
+    const X = [], Y = [];
+    for (let i = 0; i < p.length;) {
+      let j = i, s = 0;
+      while (j < p.length && p[j][0] === p[i][0]) { s += p[j][1]; j++; }
+      X.push(p[i][0]); Y.push(s / (j - i)); i = j;
+    }
+    return { X, Y };
+  }
+
+  /* Lissage par polynôme local de degré 2 sur w points (w impair ≥ 3) :
+     valeur lissée et dérivée en chaque point. Avec w = 3, c'est la dérivée de la
+     parabole passant par le point et ses deux voisins (valable pour un pas irrégulier). */
+  function localQuad(X, Y, w) {
+    const n = X.length, h = Math.floor(w / 2), ys = new Array(n).fill(NaN), d = new Array(n).fill(NaN);
+    for (let i = 0; i < n; i++) {
+      let a = i - h, b = i + h;
+      if (a < 0) { b -= a; a = 0; }
+      if (b > n - 1) { a -= b - (n - 1); b = n - 1; }
+      a = Math.max(0, a);
+      const m = b - a + 1;
+      if (m < 3) continue;
+      const A = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+      for (let j = a; j <= b; j++) {
+        const t = X[j] - X[i], pw = [1, t, t * t];
+        for (let p = 0; p < 3; p++) { r[p] += pw[p] * Y[j]; for (let q = 0; q < 3; q++) A[p][q] += pw[p] * pw[q]; }
+      }
+      const c = solve(A, r);
+      if (c) { ys[i] = c[0]; d[i] = c[1]; }
+    }
+    return { ys, d };
+  }
+
+  function interp(X, Y, x) {
+    if (x <= X[0]) return Y[0];
+    for (let i = 1; i < X.length; i++) if (x <= X[i]) return Y[i - 1] + (Y[i] - Y[i - 1]) * (x - X[i - 1]) / (X[i] - X[i - 1]);
+    return Y[Y.length - 1];
+  }
+
+  /* Titrage pH-métrique : méthode de la dérivée et méthode des tangentes parallèles.
+     opts.w : nombre de points du lissage de la dérivée ; opts.v1 : abscisse imposée
+     pour le point de contact d'une des deux tangentes (sinon choisie automatiquement). */
+  function titrationPH(x, y, opts = {}) {
+    const { X, Y } = cleanXY(x, y);
+    const n = X.length;
+    if (n < 7) throw new Error('Il faut au moins 7 mesures pour repérer le saut.');
+    const w = Math.max(3, (opts.w | 0) || 3);
+    const { d } = localQuad(X, Y, w);
+    const sgn = Y[n - 1] >= Y[0] ? 1 : -1;            // courbe croissante ou décroissante
+    const dd = d.map(v => sgn * v);
+    let ip = 0;
+    for (let i = 1; i < n; i++) if (dd[i] > dd[ip]) ip = i;
+    if (ip < 1 || ip > n - 2) throw new Error('Le saut de pH est au bord des mesures : l’équivalence n’est pas encadrée.');
+    // sommet de la parabole passant par les trois points autour du maximum de la dérivée
+    const [x0, x1, x2] = [X[ip - 1], X[ip], X[ip + 1]], [d0, d1, d2] = [dd[ip - 1], dd[ip], dd[ip + 1]];
+    const den = (x0 - x1) * (x0 - x2) * (x1 - x2);
+    const A2 = (x2 * (d1 - d0) + x1 * (d0 - d2) + x0 * (d2 - d1)) / den;
+    const B2 = (x2 * x2 * (d0 - d1) + x1 * x1 * (d2 - d0) + x0 * x0 * (d1 - d2)) / den;
+    let vD = A2 < 0 ? -B2 / (2 * A2) : x1;
+    if (!(vD >= x0 && vD <= x2)) vD = x1;
+    const deriv = { ve: vD, ye: interp(X, Y, vD), dmax: sgn * (A2 < 0 ? d1 - A2 * (vD - x1) ** 2 : d1) };
+    const step = Math.min(X[ip] - X[ip - 1], X[ip + 1] - X[ip]);
+
+    // tangentes parallèles : dérivée lissée sur au moins 5 points, plus robuste au bruit
+    const S5 = localQuad(X, Y, Math.max(5, w));
+    const ds = S5.d.map(v => sgn * v), ysm = S5.ys;
+    let jp = 0;
+    for (let i = 1; i < n; i++) if (ds[i] > ds[jp]) jp = i;
+    let iL = jp; while (iL > 0 && ds[iL - 1] < ds[iL]) iL--;
+    let iR = jp; while (iR < n - 1 && ds[iR + 1] < ds[iR]) iR++;
+    const crossL = m => { for (let i = jp; i > iL; i--) if (ds[i - 1] <= m && m <= ds[i]) return X[i - 1] + (X[i] - X[i - 1]) * (m - ds[i - 1]) / (ds[i] - ds[i - 1]); return NaN; };
+    const crossR = m => { for (let i = jp; i < iR; i++) if (ds[i] >= m && m >= ds[i + 1]) return X[i] + (X[i + 1] - X[i]) * (ds[i] - m) / (ds[i] - ds[i + 1]); return NaN; };
+    let m, xL, xR, err = '';
+    const dsAt = v => interp(X, ds, v);
+    if (isFinite(opts.v1)) {
+      m = dsAt(opts.v1);
+      if (opts.v1 < X[jp]) { xL = opts.v1; xR = crossR(m); } else { xR = opts.v1; xL = crossL(m); }
+      if (!isFinite(xL) || !isFinite(xR)) err = 'Aucune tangente parallèle de l’autre côté du saut : choisissez un point plus proche du saut.';
+    } else {
+      const lo = Math.max(ds[iL], ds[iR]);
+      m = lo + 0.15 * (ds[jp] - lo);
+      xL = crossL(m); xR = crossR(m);
+      if (!isFinite(xL) || !isFinite(xR)) err = 'Impossible de placer automatiquement les tangentes : indiquez le point de contact de la première tangente.';
+    }
+    let tang = null;
+    if (!err) {
+      const M = sgn * m, yL = interp(X, ysm, xL), yR = interp(X, ysm, xR);
+      const cL = yL - M * xL, cR = yR - M * xR, cM = (cL + cR) / 2;
+      // intersection de la parallèle médiane avec la courbe (interpolation linéaire des mesures)
+      let ve = NaN;
+      const g = i => Y[i] - (M * X[i] + cM);
+      for (let i = 0; i < n - 1; i++) {
+        if (X[i + 1] < xL || X[i] > xR) continue;
+        const g0 = g(i), g1 = g(i + 1);
+        if (g0 === 0) { ve = X[i]; break; }
+        if (g0 * g1 < 0) { ve = X[i] + (X[i + 1] - X[i]) * g0 / (g0 - g1); break; }
+      }
+      if (!isFinite(ve)) err = 'La parallèle médiane ne coupe pas la courbe entre les deux tangentes.';
+      else tang = { ve, ye: M * ve + cM, slope: M, xL, yL, xR, yR, cL, cR, cM };
+    }
+    return { X, Y, d, w, deriv, tang, tangErr: err, step, sgn };
+  }
+
+  /* Droite y = a x + b par moindres carrés (pondérée si sy), avec matrice de covariance. */
+  function linFit(x, y, sy) {
+    const n = x.length;
+    if (n < 2) throw new Error('Il faut au moins deux points par droite.');
+    const w = sy && sy.every(s => s > 0) ? sy.map(s => 1 / (s * s)) : x.map(() => 1);
+    let S = 0, Sx = 0, Sy = 0, Sxx = 0, Sxy = 0;
+    for (let i = 0; i < n; i++) { S += w[i]; Sx += w[i] * x[i]; Sy += w[i] * y[i]; Sxx += w[i] * x[i] * x[i]; Sxy += w[i] * x[i] * y[i]; }
+    const Dl = S * Sxx - Sx * Sx;
+    if (!(Math.abs(Dl) > 0)) throw new Error('Points alignés verticalement : droite impossible.');
+    const a = (S * Sxy - Sx * Sy) / Dl, b = (Sxx * Sy - Sx * Sxy) / Dl;
+    let chi = 0; for (let i = 0; i < n; i++) chi += w[i] * (y[i] - a * x[i] - b) ** 2;
+    const weighted = w !== undefined && sy && sy.every(s => s > 0);
+    const sc = weighted ? 1 : (n > 2 ? chi / (n - 2) : 0);
+    const cov = [[S / Dl * sc, -Sx / Dl * sc], [-Sx / Dl * sc, Sxx / Dl * sc]];
+    const my = y.reduce((p, q) => p + q, 0) / n, sst = y.reduce((p, q) => p + (q - my) ** 2, 0);
+    const sse = y.reduce((p, q, i) => p + (q - a * x[i] - b) ** 2, 0);
+    return { a, b, cov, n, r2: sst > 0 ? 1 - sse / sst : NaN, sse };
+  }
+
+  /* Titrage conductimétrique : deux droites, équivalence à leur intersection.
+     r1, r2 : intervalles [x min, x max] des deux droites ; découpage automatique sinon. */
+  function titrationCond(x, y, opts = {}) {
+    const { X, Y } = cleanXY(x, y);
+    const n = X.length;
+    if (n < 6) throw new Error('Il faut au moins 6 mesures (3 par droite).');
+    let r1 = opts.r1, r2 = opts.r2, auto = false;
+    if (!(r1 && r2 && isFinite(r1[0]) && isFinite(r1[1]) && isFinite(r2[0]) && isFinite(r2[1]))) {
+      auto = true;
+      let best = Infinity, kb = -1;
+      for (let k = 2; k <= n - 4; k++) {
+        try {
+          const s = linFit(X.slice(0, k + 1), Y.slice(0, k + 1)).sse + linFit(X.slice(k + 1), Y.slice(k + 1)).sse;
+          if (s < best) { best = s; kb = k; }
+        } catch (e) { /* découpage impossible */ }
+      }
+      if (kb < 0) throw new Error('Découpage automatique impossible.');
+      r1 = [X[0], X[kb]]; r2 = [X[kb + 1], X[n - 1]];
+    }
+    const pick = r => { const i = X.map((v, k) => k).filter(k => X[k] >= Math.min(r[0], r[1]) - 1e-12 && X[k] <= Math.max(r[0], r[1]) + 1e-12); return { x: i.map(k => X[k]), y: i.map(k => Y[k]), sy: opts.sy ? i.map(k => opts.syAt(X[k])) : null }; };
+    const p1 = pick(r1), p2 = pick(r2);
+    if (p1.x.length < 2 || p2.x.length < 2) throw new Error('Chaque droite doit contenir au moins deux points.');
+    const L1 = linFit(p1.x, p1.y, p1.sy), L2 = linFit(p2.x, p2.y, p2.sy);
+    if (Math.abs(L1.a - L2.a) < 1e-15) throw new Error('Les deux droites sont parallèles : pas d’intersection.');
+    const da = L1.a - L2.a, ve = (L2.b - L1.b) / da;
+    const g1 = [-ve / da, -1 / da], g2 = [ve / da, 1 / da];
+    const q = (g, C) => g[0] * g[0] * C[0][0] + 2 * g[0] * g[1] * C[0][1] + g[1] * g[1] * C[1][1];
+    const uve = Math.sqrt(Math.max(0, q(g1, L1.cov) + q(g2, L2.cov)));
+    return { X, Y, L1, L2, r1, r2, n1: p1.x.length, n2: p2.x.length, ve, uve, ye: L1.a * ve + L1.b, auto };
+  }
+
+  const Engine = { titrationPH, titrationCond, linFit, localQuad, cleanXY, interp, parseNumber, textToRows, textLines, splitLine, detectDecimal, detectLayout, histogram, normCdf, poissonPmf, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
     fit, linreg, describe, studentT, chi2Q, derivative, integral, solve, invert, sig, formatValU };
   if (typeof module !== 'undefined' && module.exports) module.exports = Engine;
   else root.Engine = Engine;
