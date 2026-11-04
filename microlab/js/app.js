@@ -203,6 +203,19 @@
 
   /* ---------- utilitaires d'affichage ---------- */
   const fmt = v => (v === null || v === undefined || !isFinite(v)) ? '' : E.sig(v, 6);
+  /* Puissances de 10 lisibles : la puissance s'applique à la valeur ET à l'incertitude,
+     d'où les parenthèses « (2,562 ± 0,078) × 10⁻⁷ ». */
+  const pow10 = e => ` × 10<sup>${String(e).replace('-', '−')}</sup>`;
+  const vuHtml = f => f.exp !== undefined
+    ? (f.u ? `(${f.v} ± ${f.u})${pow10(f.exp)}` : `${f.v}${pow10(f.exp)}`)
+    : (f.u ? `${f.v} ± ${f.u}` : f.v);
+  const vuText = f => f.exp !== undefined
+    ? (f.u ? `(${f.v} ± ${f.u}) × 10^${f.exp}` : `${f.v} × 10^${f.exp}`)
+    : (f.u ? `${f.v} ± ${f.u}` : f.v);
+  // 2,562e-7 → 2,562 × 10⁻⁷ dans un texte déjà échappé ; m^3 → m³
+  const expHtml = str => String(str)
+    .replace(/(\d)e([+-]?)(\d+)/g, (m, d, sg, n) => `${d}${pow10((sg === '-' ? '-' : '') + n)}`)
+    .replace(/\^(-?\d+)/g, (m, n) => `<sup>${n.replace('-', '−')}</sup>`);
   const unitOf = name => (D && D.units[name]) || '';
   const labelOf = name => unitOf(name) ? `${name} (${unitOf(name)})` : name;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -776,8 +789,9 @@
       if (k >= 0) {
         const v = res.fit.p[k], uu = res.fit.u[k];
         const f = S.model.fixed[p] ? { v: E.sig(v, 6), u: '' } : E.formatValU(v, uu);
-        const ex = f.exp !== undefined ? ` ×10<sup>${f.exp}</sup>` : '';
-        val = `<span class="val">${f.v}</span>${f.u ? '' : ex}`;
+        // la puissance de 10 est écrite dans les deux colonnes : chacune se lit seule
+        const ex = f.exp !== undefined ? pow10(f.exp) : '';
+        val = `<span class="val">${expHtml(f.v)}${ex}</span>`;
         u = f.u ? `${f.u}${ex}` : (S.model.fixed[p] ? 'fixé' : '—');
         rel = uu > 0 && v !== 0 && !S.model.fixed[p] ? E.sig(100 * uu / Math.abs(v), 2) + ' %' : '';
       }
@@ -847,19 +861,19 @@
       items.push(['χ² réduit', E.sig(c, 3), c < 0.2 ? ['mid', 'u surestimées ?'] : c <= 2 ? ['good', 'compatible'] : c <= 5 ? ['mid', 'limite'] : ['badp', 'incompatible']]);
       items.push(['Probabilité du χ²', isFinite(f.chi2p) ? (100 * f.chi2p).toFixed(f.chi2p < 0.01 ? 2 : 0).replace('.', ',') + ' %' : '—']);
     } else {
-      items.push(['Écart-type des résidus', E.sig(f.sres, 3) + (unitOf(res.y) ? ' ' + unitOf(res.y) : '')]);
+      items.push(['Écart-type des résidus', expHtml(E.sig(f.sres, 3) + (unitOf(res.y) ? ' ' + esc(unitOf(res.y)) : ''))]);
     }
     items.push(['Coefficient de Student (95 %)', isFinite(f.t95) ? E.sig(f.t95, 4) : '—']);
     const ind = items.map(([k, v, pill]) => `<div class="ind"><div class="k">${k}</div><div class="v">${v}${pill ? `<span class="pill ${pill[0]}">${pill[1]}</span>` : ''}</div></div>`).join('');
     const ci = res.params.filter(p => !S.model.fixed[p]).map(p => {
       const k = res.params.indexOf(p), U = f.u[k] * f.t95;
       const fv = E.formatValU(f.p[k], U);
-      return `<code>${esc(p)} = ${fv.v} ± ${fv.u}${fv.exp !== undefined ? ` ×10<sup>${fv.exp}</sup>` : ''}</code>`;
+      return `<code style="white-space:nowrap">${esc(p)} = ${vuHtml(fv)}</code>`;
     }).join(' · ');
     const note = f.weighted
       ? 'Ajustement pondéré par les incertitudes (méthode des moindres carrés généralisée). Un χ² réduit proche de 1 indique que les écarts au modèle sont du même ordre que les incertitudes de mesure. Les résidus sont affichés divisés par l’incertitude : ils doivent rester majoritairement entre −2 et 2.'
       : 'Ajustement non pondéré. Les incertitudes sur les paramètres sont estimées à partir de la dispersion des points autour du modèle. Les résidus doivent se répartir au hasard autour de zéro, sans tendance.';
-    out.innerHTML = `<div class="eq">${esc(res.y)} = ${esc(equationText(res))}</div>
+    out.innerHTML = `<div class="eq">${esc(res.y)} = ${expHtml(esc(equationText(res)))}</div>
       <div class="indic">${ind}</div>
       ${ci && isFinite(f.t95) ? `<p class="note">Intervalles de confiance à 95 % (u × t) : ${ci}</p>` : ''}
       <p class="note">${note}</p>`;
@@ -869,7 +883,7 @@
     const res = S.model.result; if (!res) return '';
     const f = res.fit;
     let s = `Modèle : ${res.y} = ${res.expr}\n`;
-    res.params.forEach((p, k) => { const fv = E.formatValU(f.p[k], f.u[k]); s += `${p} = ${fv.v}${fv.u ? ' ± ' + fv.u : ''}${fv.exp !== undefined ? ' ×10^' + fv.exp : ''}${S.model.fixed[p] ? ' (fixé)' : ''}\n`; });
+    res.params.forEach((p, k) => { const fv = E.formatValU(f.p[k], f.u[k]); s += `${p} = ${vuText(fv)}${S.model.fixed[p] ? ' (fixé)' : ''}\n`; });
     s += `n = ${f.n}, ddl = ${f.dof}, R² = ${f.r2.toFixed(5)}`;
     if (f.weighted) s += `, χ² réduit = ${E.sig(f.chi2red, 3)}`; else s += `, écart-type des résidus = ${E.sig(f.sres, 3)}`;
     return s.replace(/(\d)\.(\d)/g, '$1,$2') + '\n';
@@ -929,13 +943,12 @@
     const v = D.cols[S.statVar] || [], st = E.describe(v), un = unitOf(S.statVar), U = un ? ' ' + esc(un) : '';
     if (!st.n || !window.Plotly) { $('statTable').innerHTML = '<p class="note">Aucune valeur numérique.</p>'; if (window.Plotly) Plotly.purge($('histo')); $('lawResult').innerHTML = ''; return; }
     const fu = E.formatValU(st.mean, st.u);
-    const ex = fu.exp !== undefined ? ` ×10<sup>${fu.exp}</sup>` : '';
     const rows = [
       ['Nombre de mesures n', st.n],
       ['Moyenne', E.sig(st.mean, 6) + U],
       ['Écart-type expérimental s', E.sig(st.s, 3) + U],
       ['Incertitude-type u = s/√n', E.sig(st.u, 2) + U, 'hl'],
-      ['Résultat', `${fu.v}${fu.u ? ' ± ' + fu.u : ''}${ex}${U}`, 'hl'],
+      ['Résultat', `${vuHtml(fu)}${U}`, 'hl'],
       ['Intervalle à 95 % (t = ' + E.sig(st.t95, 3) + ')', '± ' + E.sig(st.u * st.t95, 2) + U],
       ['Médiane', E.sig(st.median, 6) + U],
       ['Minimum', E.sig(st.min, 6) + U],
@@ -946,7 +959,7 @@
       const z = Math.abs(st.mean - ref) / st.u;
       rows.push(['Écart normalisé z = |x̄ − réf| / u', `${E.sig(z, 2)} <span class="pill ${z <= 2 ? 'good' : 'badp'}">${z <= 2 ? 'compatible' : 'non compatible'}</span>`, 'hl']);
     }
-    $('statTable').innerHTML = `<table class="stat-table"><tbody>${rows.map(r => `<tr class="${r[2] || ''}"><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table>`;
+    $('statTable').innerHTML = `<table class="stat-table"><tbody>${rows.map(r => `<tr class="${r[2] || ''}"><td>${r[0]}</td><td>${expHtml(r[1])}</td></tr>`).join('')}</tbody></table>`;
     renderHisto(v.filter(isFinite), st, ref);
   }
 
@@ -1095,7 +1108,7 @@
   function pct(vals, a, b) { return E.sig(100 * vals.filter(x => x >= a && x <= b).length / vals.length, 2) + ' %'; }
 
   function lawBlock(title, params, test, N, note) {
-    const val = f => `${f.v}${f.u ? ' ± ' + f.u : ''}${f.exp !== undefined ? ` ×10<sup>${f.exp}</sup>` : ''}`;
+    const val = f => vuHtml(f);
     let t = '';
     if (test.dof > 0) {
       const p = test.p, pill = p >= 0.05 ? ['good', 'compatible'] : p >= 0.01 ? ['mid', 'douteux'] : ['badp', 'rejeté'];
@@ -1200,16 +1213,15 @@
       rg = [Math.min(...rg), Math.max(...rg)];
       const ua = Math.sqrt(L.cov[0][0]), ub = Math.sqrt(L.cov[1][1]);
       const fa = E.formatValU(L.a, ua), fb = E.formatValU(L.b, ub);
-      const ex = f => f.exp !== undefined ? ` ×10<sup>${f.exp}</sup>` : '';
       return `<div class="tcard ${k === 1 ? 't-tang' : 't-der'}"><div class="k">Droite ${k} : ${n} points, de ${fx(rg[0])} à ${fx(rg[1])}${ux}</div>
         <div class="eqline">${esc(yn)} = a·${esc(xn)} + b</div>
-        <div class="sub">a = ${fa.v}${fa.u ? ' ± ' + fa.u : ''}${ex(fa)} · b = ${fb.v}${fb.u ? ' ± ' + fb.u : ''}${ex(fb)} · R² = ${isFinite(L.r2) ? L.r2.toFixed(4).replace('.', ',') : '—'}</div></div>`;
+        <div class="sub">a = ${vuHtml(fa)} · b = ${vuHtml(fb)} · R² = ${isFinite(L.r2) ? L.r2.toFixed(4).replace('.', ',') : '—'}</div></div>`;
     };
     const fe = E.formatValU(r.ve, r.uve);
     return `<div class="titr-cards">
       ${line(r.L1, 1, r.r1, r.n1)}${line(r.L2, 2, r.r2, r.n2)}
       <div class="tcard"><div class="k">Intersection des deux droites</div>
-        <div class="big">V<sub>E</sub> = ${fe.v}${fe.u ? ' ± ' + fe.u : ''}${fe.exp !== undefined ? ` ×10<sup>${fe.exp}</sup>` : ''}${ux}</div>
+        <div class="big">V<sub>E</sub> = ${vuHtml(fe)}${ux}</div>
         <div class="sub">${esc(yn)}<sub>E</sub> = ${withU(r.ye, yn)}${r.auto ? ' · découpage automatique' : ''}</div></div>
     </div>
     <p class="note">L’incertitude-type sur V<sub>E</sub> vient de la dispersion des points autour des deux droites.
