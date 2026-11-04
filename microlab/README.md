@@ -10,6 +10,7 @@ Aucun serveur n’est nécessaire : ce sont des fichiers HTML, CSS et JavaScript
 - **Tableau** éditable (double-clic), ajout et suppression de lignes et de variables.
 - **Grandeurs calculées** : `v (m/s) = deriv(x, t)`, `Ec (J) = 0.5*m*v^2`, constantes (`m (kg) = 0.250`), `integ`, `mean`, `std`…
 - **Angles en degrés ou en radians** : un réglage s’applique à `sin`, `cos`, `tan` et à leurs inverses dans les calculs, les incertitudes et les modèles (les modèles sinusoïdaux s’écrivent alors avec 360 au lieu de 2π). On peut aussi écrire `sin(30 deg)`.
+- **Notation scientifique** : les très grands et très petits nombres s’affichent en puissances de 10 (2,568 × 10⁻⁸) dans le tableau, les résultats et les champs ; on peut les saisir sous la forme `2,5×10^-7`, `2,5·10^-7` ou `2,5e-7`. Les unités écrites avec `^` prennent le bon format : `m^3` → m³, `m/s^2` → m/s², `mol.L^-1` → mol.L⁻¹.
 - **Incertitudes** par variable : un nombre ou une formule (`0.02*U + 0.01`), affichées en barres d’erreur.
 - **Graphe** sur fond millimétré : plusieurs ordonnées, échelles logarithmiques, zoom, export PNG.
 - **Modélisation** : modèles prédéfinis (linéaire, affine, parabole, exponentielles, 1er ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne…) ou expression libre. Algorithme de Levenberg-Marquardt, valeurs initiales estimées automatiquement, paramètres fixables, domaine choisi à la souris.

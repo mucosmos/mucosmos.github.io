@@ -7,6 +7,18 @@
 
   /* ---------- Nombres ---------- */
 
+  // exposants en caractères Unicode : utilisables partout (tableau, champs, graphes, listes)
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻', '−': '⁻', '+': '⁺' };
+  const UNSUP = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-', '⁺': '+' };
+  const sup = str => String(str).split('').map(c => SUP[c] || c).join('');
+  /* « 10⁻⁷ » à partir de l'exposant -7 */
+  const pow10 = e => '10' + sup(String(+e));
+
+  /* Unités : m^3 → m³, s^-2 → s⁻², kg.m^(-1) → kg.m⁻¹, m^{2} → m² */
+  function unitFmt(u) {
+    return String(u ?? '').replace(/\^\s*[\(\{]?\s*([+\-−]?\d+)\s*[\)\}]?/g, (m, n) => sup(n));
+  }
+
   /* dec : 'auto' (virgule ou point), ',' ou '.' ; l'autre caractère est alors
      traité comme séparateur de milliers. */
   function parseNumber(v, dec = 'auto') {
@@ -14,7 +26,8 @@
     if (v === null || v === undefined) return NaN;
     let s = String(v).trim().replace(/[  \s]+/g, '');
     if (s === '') return NaN;
-    s = s.replace(/×10\^?/i, 'e');
+    // accepte 2,5×10⁻⁷, 2,5×10^-7, 2,5·10^-7, 2,5*10^-7 et 2,5e-7
+    s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g, c => UNSUP[c]).replace(/(?:×|·|\*|x)10\^?/i, 'e');
     if (dec === ',') s = s.replace(/\./g, '').replace(/,/g, '.');
     else if (dec === '.') s = s.replace(/,/g, '');
     else s = s.replace(/,/g, '.');
@@ -154,6 +167,7 @@
       let name = sanitizeName(nu.name, j);
       let unit = nu.unit;
       if (units && String(units[j] ?? '').trim()) unit = String(units[j]).trim().replace(/^[\(\[]|[\)\]]$/g, '');
+      unit = unitFmt(unit);
       let base = name, k = 2;
       while (used.has(name)) name = base + '_' + (k++);
       const numeric = col.filter(v => !isNaN(v)).length;
@@ -419,7 +433,7 @@
     if (!isFinite(x)) return x === Infinity ? '∞' : '—';
     if (x === 0) return '0';
     const a = Math.abs(x);
-    if (a >= 1e5 || a < 1e-3) return x.toExponential(n - 1).replace('.', ',');
+    if (a >= 1e5 || a < 1e-3) { const [m, e] = x.toExponential(n - 1).split('e'); return m.replace('.', ',') + ' × ' + pow10(e); }
     return String(+x.toPrecision(n)).replace('.', ',');
   }
 
@@ -623,7 +637,7 @@
     return { X, Y, L1, L2, r1, r2, n1: p1.x.length, n2: p2.x.length, ve, uve, ye: L1.a * ve + L1.b, auto };
   }
 
-  const Engine = { titrationPH, titrationCond, linFit, localQuad, cleanXY, interp, parseNumber, textToRows, textLines, splitLine, detectDecimal, detectLayout, histogram, normCdf, poissonPmf, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
+  const Engine = { sup, pow10, unitFmt, titrationPH, titrationCond, linFit, localQuad, cleanXY, interp, parseNumber, textToRows, textLines, splitLine, detectDecimal, detectLayout, histogram, normCdf, poissonPmf, rowsToTable, splitNameUnit, sanitizeName, detectSeparator,
     fit, linreg, describe, studentT, chi2Q, derivative, integral, solve, invert, sig, formatValU };
   if (typeof module !== 'undefined' && module.exports) module.exports = Engine;
   else root.Engine = Engine;

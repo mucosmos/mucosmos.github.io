@@ -207,7 +207,7 @@ textarea {
 .params td.pname { font-family: var(--f-mono); font-weight: 500; color: var(--model); }
 .params td.num { font-family: var(--f-mono); text-align: right; }
 .params th.num { text-align: right; }
-.params input[type="text"] { width: 13ch; border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; background: var(--panel); font-family: var(--f-mono); font-size: 13px; }
+.params input[type="text"] { width: 17ch; border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; background: var(--panel); font-family: var(--f-mono); font-size: 13px; }
 .params .val { font-weight: 500; }
 .params .rel { color: var(--muted); }
 .params .empty td { color: var(--muted); text-align: center; padding: 12px; }

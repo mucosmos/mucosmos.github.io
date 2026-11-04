@@ -99,7 +99,7 @@
   /* Évalue une expression ligne par ligne. Les fonctions deriv/integ et
      les agrégats (mean, max…) sont d'abord remplacés par des colonnes ou des constantes. */
   function evalColumn(expr, cols, consts, n) {
-    let node = math.parse(expr);
+    let node = math.parse(String(expr).replace(/[×·]/g, '*'));
     let tmp = 0;
     const extra = {};
     const rowEval = (nd) => {
@@ -205,18 +205,17 @@
   const fmt = v => (v === null || v === undefined || !isFinite(v)) ? '' : E.sig(v, 6);
   /* Puissances de 10 lisibles : la puissance s'applique à la valeur ET à l'incertitude,
      d'où les parenthèses « (2,562 ± 0,078) × 10⁻⁷ ». */
-  const pow10 = e => ` × 10<sup>${String(e).replace('-', '−')}</sup>`;
+  const pow10 = e => ' × ' + E.pow10(e);
   const vuHtml = f => f.exp !== undefined
     ? (f.u ? `(${f.v} ± ${f.u})${pow10(f.exp)}` : `${f.v}${pow10(f.exp)}`)
     : (f.u ? `${f.v} ± ${f.u}` : f.v);
   const vuText = f => f.exp !== undefined
     ? (f.u ? `(${f.v} ± ${f.u}) × 10^${f.exp}` : `${f.v} × 10^${f.exp}`)
     : (f.u ? `${f.v} ± ${f.u}` : f.v);
-  // 2,562e-7 → 2,562 × 10⁻⁷ dans un texte déjà échappé ; m^3 → m³
-  const expHtml = str => String(str)
-    .replace(/(\d)e([+-]?)(\d+)/g, (m, d, sg, n) => `${d}${pow10((sg === '-' ? '-' : '') + n)}`)
-    .replace(/\^(-?\d+)/g, (m, n) => `<sup>${n.replace('-', '−')}</sup>`);
-  const unitOf = name => (D && D.units[name]) || '';
+  // 2,562e-7 → 2,562 × 10⁻⁷ ; m^3 → m³
+  const expHtml = str => E.unitFmt(String(str)
+    .replace(/(\d)e([+-]?)(\d+)/g, (m, d, sg, n) => `${d}${pow10((sg === '-' ? '-' : '') + n)}`));
+  const unitOf = name => E.unitFmt((D && D.units[name]) || '');
   const labelOf = name => unitOf(name) ? `${name} (${unitOf(name)})` : name;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -402,7 +401,7 @@
     S.vars.forEach((v, k) => {
       h += `<div class="varrow">
         <input data-k="${k}" data-f="name" value="${esc(v.name)}" aria-label="Nom">
-        <input data-k="${k}" data-f="unit" value="${esc(v.unit)}" placeholder="—" aria-label="Unité de ${esc(v.name)}">
+        <input data-k="${k}" data-f="unit" value="${esc(E.unitFmt(v.unit))}" placeholder="—" aria-label="Unité de ${esc(v.name)}">
         <input data-k="${k}" data-f="u" value="${esc(v.u)}" placeholder="aucune" aria-label="Incertitude de ${esc(v.name)}" title="Nombre ou formule, par ex. 0.02*${esc(v.name)} + 0.01">
         <button class="btn sm ghost" data-delvar="${k}" title="Supprimer la variable ${esc(v.name)}" aria-label="Supprimer ${esc(v.name)}">×</button></div>`;
     });
@@ -410,12 +409,12 @@
     if (calcCols.length) {
       h += '<div class="varrow varhead" style="margin-top:6px"><span>calculée</span><span></span><span>incertitude</span><span></span></div>';
       calcCols.forEach(c => {
-        h += `<div class="varrow"><input value="${esc(c.name)}" disabled aria-label="Nom"><input value="${esc(c.unit)}" disabled placeholder="—" aria-label="Unité">
+        h += `<div class="varrow"><input value="${esc(c.name)}" disabled aria-label="Nom"><input value="${esc(E.unitFmt(c.unit))}" disabled placeholder="—" aria-label="Unité">
           <input data-uc="${esc(c.name)}" value="${esc((S.uCalc || {})[c.name] || '')}" placeholder="aucune" aria-label="Incertitude de ${esc(c.name)}"><span></span></div>`;
       });
     }
     const sc = D.calcVars.filter(c => 'scalar' in c);
-    if (sc.length) h += `<p class="hint">Constantes : ${sc.map(c => `<code>${esc(c.name)} = ${fmt(c.scalar)}${c.unit ? ' ' + esc(c.unit) : ''}</code>`).join(', ')}</p>`;
+    if (sc.length) h += `<p class="hint">Constantes : ${sc.map(c => `<code>${esc(c.name)} = ${fmt(c.scalar)}${c.unit ? ' ' + esc(E.unitFmt(c.unit)) : ''}</code>`).join(', ')}</p>`;
     L.innerHTML = h;
   }
 
@@ -434,7 +433,7 @@
         if (S.model.y === old) S.model.y = nn;
         S.calc = S.calc.replace(new RegExp(`\\b${old}\\b`, 'g'), nn);
         $('calcText').value = S.calc;
-      } else v[f] = inp.value.trim();
+      } else v[f] = f === 'unit' ? E.unitFmt(inp.value.trim()) : inp.value.trim();
       refreshAll({ keepParams: f !== 'name' });
     });
     $('varList').addEventListener('click', e => {
@@ -447,7 +446,7 @@
       const nm = E.sanitizeName($('newVarName').value, S.vars.length);
       if (!$('newVarName').value.trim()) { $('newVarName').focus(); return; }
       if (D.colNames.includes(nm)) { toast('Ce nom est déjà utilisé.'); return; }
-      S.vars.push({ name: nm, unit: $('newVarUnit').value.trim(), u: '', data: Array(Math.max(nrows(), 1)).fill(NaN) });
+      S.vars.push({ name: nm, unit: E.unitFmt($('newVarUnit').value.trim()), u: '', data: Array(Math.max(nrows(), 1)).fill(NaN) });
       $('newVarForm').hidden = true; refreshAll(); switchTab('table');
       toast(`Variable ${nm} ajoutée : saisissez ses valeurs dans le tableau.`);
     };
@@ -839,7 +838,7 @@
       const node = math.parse(res.expr).transform(nd => {
         if (nd.isSymbolNode && res.params.includes(nd.name)) {
           const k = res.params.indexOf(nd.name);
-          return new math.ConstantNode(+E.sig(res.fit.p[k], 4).replace(',', '.').replace(/e/, 'e'));
+          return new math.ConstantNode(+(+res.fit.p[k]).toPrecision(4));
         }
         return nd;
       });
