@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cinq Sigma — MicroCosmos</title>
+<meta name="description" content="Cinq Sigma : logiciel libre de traitement des données expérimentales dans le navigateur, pour la physique, la chimie et les sciences. Import CSV, TXT, ODS, grandeurs calculées, modélisation avec incertitudes, statistiques, titrages.">
+<meta property="og:title" content="Cinq Sigma — MicroCosmos">
+<meta property="og:description" content="Statistiques, Incertitudes, Graphes, Modélisation et Analyse : le traitement des données expérimentales dans le navigateur, dans l’esprit de Regressi.">
+<meta property="og:image" content="https://mucosmos.github.io/images/cinq-sigma-accueil.png">
+<meta name="theme-color" content="#0d1430">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=20261019b">
+</head>
+<body>
+<header class="entete">
+  <div class="barre">
+    <a class="logo" href="index.html"><span class="mu">µ</span>MicroCosmos</a>
+    <button class="burger" aria-expanded="false" aria-controls="menu">Menu</button>
+    <nav class="nav" id="menu"><a href="index.html">Accueil</a><a href="logiciel.html">Logiciel</a><a href="detecteur.html">Détecteur</a><a href="rayons-cosmiques.html">Rayons cosmiques</a><a href="radioactivite.html">Radioactivité</a><a href="cosmodetecteur.html">Cosmodétecteur</a><a href="cinq-sigma.html" aria-current="page">Cinq Sigma</a><a href="ressources.html">Ressources</a></nav>
+   </div>
+</header>
+<section class="bandeau"><div class="contenu"><span class="surtitre">Logiciel libre · GPL v3 · dans le navigateur</span><h1>Cinq Sigma</h1><p class="chapo"><strong style="color:#fff">S</strong>tatistiques, <strong style="color:#fff">I</strong>ncertitudes, <strong style="color:#fff">G</strong>raphes, <strong style="color:#fff">M</strong>odélisation et <strong style="color:#fff">A</strong>nalyse. Un logiciel de traitement des données expérimentales pour la physique, la chimie et toutes les sciences expérimentales, dans l’esprit de Regressi : on importe ou on saisit des mesures, on calcule de nouvelles grandeurs, on trace, on modélise avec les incertitudes et on étudie la dispersion des résultats. Rien à installer.</p>
+<div class="actions"><a class="bouton" href="https://cinq-sigma.github.io/">▶ Lancer Cinq Sigma</a><a class="bouton second" href="#aide">Aide-mémoire</a></div>
+<nav class="sommaire" aria-label="Sur cette page"><a href="#presentation">Présentation</a><a href="#usages">Pour quelles activités</a><a href="#utiliser">Utiliser Cinq Sigma</a><a href="#installation">Mise en route</a><a href="#fonctions">Les fonctions</a><a href="#aide">Aide-mémoire</a><a href="#licence">Auteurs et licence</a></nav></div></section>
+<main>
+
+<section class="section" id="presentation">
+  <div class="duo">
+    <div>
+      <h2>Des mesures au résultat avec son incertitude</h2>
+      <p><strong>Cinq Sigma</strong> fait ce que l’on attend d’un logiciel de traitement de données en travaux pratiques, directement dans le navigateur, sur n’importe quel ordinateur ou tablette.</p>
+      <ul class="activites">
+        <li><span class="pastille ard">Importer</span> fichiers CSV, TXT, ODS ou XLSX venant d’un tableur, d’une console d’acquisition, d’un pointage vidéo ou d’une carte Arduino, ou simple copier-coller.</li>
+        <li><span class="pastille cos">Calculer</span> nouvelles grandeurs, dérivées et intégrales : <code>v = deriv(x, t)</code>, <code>Ec = 0.5*m*v^2</code>, avec les incertitudes en barres d’erreur.</li>
+        <li><span class="pastille dv">Modéliser</span> treize modèles prêts à l’emploi ou une expression libre ; paramètres avec leur incertitude, R², χ² et graphe des résidus.</li>
+        <li><span class="pastille rad">Statistiques</span> moyenne, écart-type, incertitude-type s/√n, histogramme réglable, lois de Gauss et de Poisson.</li>
+        <li><span class="pastille cos">Titrer</span> équivalence d’un titrage pH-métrique (tangentes parallèles et dérivée) ou conductimétrique (deux demi-droites).</li>
+      </ul>
+      <p class="note">Le nom fait référence au seuil de « cinq sigma » : en physique des particules, un écart de cinq écarts-types est exigé avant d’annoncer une découverte, comme celle du boson de Higgs en 2012.</p>
+    </div>
+    <figure class="cadre"><a href="images/cinq-sigma-accueil.png"><img src="images/cinq-sigma-accueil.png" width="1366" height="860" alt="Capture de Cinq Sigma : tableau de mesures de la décharge d’un condensateur, graphe de uC en fonction de t avec barres d’erreur, courbe du modèle exponentiel et graphe des résidus"></a>
+    <figcaption>Décharge d’un condensateur : mesures, modèle exponentiel et résidus. Cliquer pour agrandir.</figcaption></figure>
+  </div>
+</section>
+
+<section class="section" id="usages">
+  <h2>Pour quelles activités</h2>
+  <p class="texte">Cinq Sigma ne dépend d’aucun appareil de mesure : toute série de valeurs rangées en colonnes peut être traitée. Quelques exemples d’activités, du collège au post-bac :</p>
+  <div class="tableau">
+    <table>
+      <thead><tr><th>Domaine</th><th>Exemples de traitements</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Mécanique</strong></td><td>pointage vidéo d’une chute ou d’un projectile, vitesse et accélération par dérivation, énergies ; période d’un pendule et loi en √L ; oscillations amorties</td></tr>
+        <tr><td><strong>Électricité</strong></td><td>loi d’Ohm, caractéristiques de dipôles, charge et décharge d’un condensateur (constante de temps τ), circuits RL</td></tr>
+        <tr><td><strong>Optique et ondes</strong></td><td>loi de Snell-Descartes avec les angles en degrés, relation de conjugaison, longueur d’onde et célérité, atténuation</td></tr>
+        <tr><td><strong>Chimie</strong></td><td>titrages pH-métriques et conductimétriques, pK<sub>a</sub> à la demi-équivalence, loi de Beer-Lambert et droite d’étalonnage, cinétique (ordre 1, temps de demi-réaction)</td></tr>
+        <tr><td><strong>Thermodynamique</strong></td><td>loi de Mariotte, dilatation, refroidissement d’un corps (loi de Newton), capacités thermiques</td></tr>
+        <tr><td><strong>Radioactivité et particules</strong></td><td>comptages et loi de Poisson, décroissance radioactive, durée de vie du muon à partir d’un histogramme de durées, fichiers du <a href="logiciel.html">logiciel Microcosmos</a></td></tr>
+        <tr><td><strong>Mesures et incertitudes</strong></td><td>séries de mesures répétées, incertitude-type de type A, écart normalisé à une valeur de référence, comparaison de deux méthodes</td></tr>
+        <tr><td><strong>SVT et autres sciences</strong></td><td>croissance d’une population, relevés de terrain, toute série de données à représenter, ajuster ou résumer statistiquement</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="utiliser">
+  <h2>Utiliser Cinq Sigma</h2>
+  <p class="texte">Cinq Sigma fonctionne en ligne, sans installation ni compte. Les mesures restent sur l’ordinateur : rien n’est envoyé sur un serveur.</p>
+  <div class="grille g2">
+    <div class="version web">
+      <span class="lettre">▶</span>
+      <h3>Version web</h3>
+      <p class="sous">rien à installer</p>
+      <a class="bouton" href="https://cinq-sigma.github.io/">▶ Lancer Cinq Sigma</a>
+      <ul class="plus-moins">
+        <li class="p">Firefox, Chrome, Edge, Safari, sur ordinateur ou tablette</li>
+        <li class="p">travail enregistré automatiquement dans le navigateur, retrouvé à la prochaine ouverture</li>
+        <li class="p">projet <code>.json</code> à enregistrer et à rouvrir, export CSV pour le tableur</li>
+        <li class="m">connexion internet nécessaire au lancement (bibliothèques de calcul et de graphes)</li>
+        <li class="m">sur téléphone, l’écran est petit pour le tableau et le graphe</li>
+      </ul>
+    </div>
+    <div class="carte">
+      <h3>Fichiers acceptés</h3>
+      <div class="tableau">
+        <table>
+          <thead><tr><th>Format</th><th>D’où il vient</th></tr></thead>
+          <tbody>
+            <tr><td><code>.csv</code> <code>.txt</code> <code>.dat</code></td><td>consoles d’acquisition, logiciels de pointage vidéo, Arduino, Microcosmos, exports de tableur</td></tr>
+            <tr><td><code>.ods</code> <code>.xlsx</code> <code>.xls</code></td><td>LibreOffice Calc, Excel (choix de la feuille)</td></tr>
+            <tr><td>copier-coller</td><td>colonnes copiées dans un tableur ou une page web (Ctrl+V)</td></tr>
+            <tr><td><code>.json</code></td><td>projet Cinq Sigma enregistré</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Séparateur point-virgule, virgule, tabulation, espace ou autre ; virgule ou point décimal ; noms et unités en tête de colonne (<code>t (s)</code>) ou sur une ligne à part.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="installation">
+  <h2>Mise en route</h2>
+  <div class="grille g3">
+    <div class="carte"><h3>1 · Saisir ou importer</h3>
+      <p>Saisissez les mesures dans le tableau (double-clic sur une cellule), ou cliquez sur <strong>Ouvrir un fichier</strong>, glissez un fichier dans la page ou collez un tableau.</p>
+      <p>L’aperçu indique pour chaque ligne si elle est lue comme <strong>noms</strong>, <strong>unités</strong>, <strong>données</strong> ou <strong>ignorée</strong> ; tout se corrige à la main avant de valider.</p></div>
+    <div class="carte"><h3>2 · Calculer et tracer</h3>
+      <p>Onglet <strong>Grandeurs</strong> : une ligne par grandeur calculée, par exemple <code>vy (m/s) = deriv(y, t)</code>. Indiquez l’incertitude de chaque variable : un nombre ou une formule.</p>
+      <p>Choisissez l’abscisse et les ordonnées au-dessus du graphe.</p></div>
+    <div class="carte"><h3>3 · Modéliser et conclure</h3>
+      <p>Choisissez un modèle : les valeurs initiales sont estimées et l’ajustement est immédiat. <strong>Choisir sur le graphe</strong> limite le modèle à une partie des points.</p>
+      <p class="note">Pour essayer sans fichier, le menu <strong>Exemples</strong> propose dix jeux de données.</p></div>
+  </div>
+</section>
+
+<section class="section" id="fonctions">
+  <h2>Les fonctions</h2>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-import.png"><img loading="lazy" src="images/cinq-sigma-import.png" width="980" height="716" alt="Capture de la fenêtre d’import de Cinq Sigma : réglages des séparateurs et des lignes, aperçu indiquant le rôle de chaque ligne du fichier"></a>
+    <figcaption>Import d’un fichier texte avec un en-tête de plusieurs lignes.</figcaption></figure>
+    <div>
+      <h3>Importer sans surprise</h3>
+      <ul>
+        <li>Les réglages sont proposés automatiquement et <strong>tous modifiables</strong> : séparateur de colonnes, séparateur décimal, ligne des noms, ligne des unités, première et dernière ligne de données.</li>
+        <li>L’<strong>aperçu</strong> montre le rôle de chaque ligne ; les cellules qui ne sont pas des nombres apparaissent en rouge et resteront vides.</li>
+        <li>Chaque colonne se coche ou se décoche ; les lignes de titre et les lignes de total en fin de fichier sont écartées.</li>
+        <li><strong>Ajouter les colonnes</strong> complète un tableau existant avec une seconde série de même longueur.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-grandeurs.png"><img loading="lazy" src="images/cinq-sigma-grandeurs.png" width="1366" height="860" alt="Capture de l’onglet Grandeurs de Cinq Sigma pour une chute libre : incertitudes des variables, grandeurs calculées vy et ay, graphe de y et vy en fonction de t"></a>
+    <figcaption>Chute libre : vitesse et accélération calculées par dérivation.</figcaption></figure>
+    <div>
+      <h3>Grandeurs calculées et incertitudes</h3>
+      <ul>
+        <li>Une ligne par grandeur : <code>nom (unité) = expression</code>. Une expression sans variable définit une constante.</li>
+        <li>Fonctions usuelles (<code>sqrt</code>, <code>exp</code>, <code>ln</code>, <code>sin</code>…), angles en <strong>degrés ou en radians</strong> au choix, dérivée <code>deriv(y, t)</code>, intégrale <code>integ(y, t)</code>, et <code>mean</code>, <code>std</code>, <code>max</code> sur toute une colonne.</li>
+        <li>L’incertitude d’une variable est un nombre (<code>0.005</code>) ou une formule (<code>0.02*U + 0.01</code>) ; elle s’affiche en barres d’erreur et sert à pondérer la modélisation.</li>
+        <li>Notation scientifique en puissances de 10 et unités avec exposants (<code>m/s^2</code> s’affiche m/s²).</li>
+        <li>Graphe sur papier millimétré : plusieurs ordonnées, échelles logarithmiques, zoom et export en image. Tri du tableau selon n’importe quelle colonne.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-modelisation.png"><img loading="lazy" src="images/cinq-sigma-modelisation.png" width="920" height="729" alt="Capture du panneau Modélisation de Cinq Sigma : modèle A exp(-t/tau) + B, paramètres ajustés avec incertitudes, R², χ² réduit et intervalles de confiance à 95 %"></a>
+    <figcaption>Modélisation pondérée par les incertitudes.</figcaption></figure>
+    <div>
+      <h3>Modélisation</h3>
+      <ul>
+        <li>Linéaire, affine, parabole, exponentielles, charge du premier ordre, puissance, logarithme, sinusoïde, sinusoïde amortie, gaussienne… ou <strong>expression libre</strong> avec n’importe quels paramètres.</li>
+        <li>Chaque paramètre est donné avec son <strong>incertitude-type</strong>, son incertitude relative et son intervalle de confiance à 95 % (coefficient de Student). Un paramètre peut être fixé.</li>
+        <li><strong>R²</strong> et, quand les mesures ont une incertitude, <strong>χ² réduit</strong> et sa probabilité : un χ² réduit proche de 1 signifie que le modèle est compatible avec les incertitudes.</li>
+        <li>Le <strong>graphe des résidus</strong> sous la courbe permet de repérer un modèle mal choisi.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-statistiques.png"><img loading="lazy" src="images/cinq-sigma-statistiques.png" width="920" height="738" alt="Capture de l’onglet Statistiques de Cinq Sigma : histogramme de comptages, loi de Poisson superposée, paramètre λ avec son incertitude et test du χ²"></a>
+    <figcaption>Série de comptages comparée à la loi de Poisson.</figcaption></figure>
+    <div>
+      <h3>Statistiques et lois de probabilité</h3>
+      <ul>
+        <li>Moyenne, écart-type expérimental, <strong>incertitude-type s/√n</strong>, intervalle à 95 %, médiane ; écart normalisé à une valeur de référence.</li>
+        <li><strong>Histogramme</strong> : largeur, début et fin des classes choisis à la main, ou automatiques.</li>
+        <li><strong>Loi normale</strong> ou <strong>loi de Poisson</strong> superposée, avec les paramètres estimés, les effectifs attendus et un <strong>test du χ²</strong> d’adéquation.</li>
+        <li>Pour les comptages, le rapport variance / moyenne, proche de 1 pour une loi de Poisson.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-titrage-ph.png"><img loading="lazy" src="images/cinq-sigma-titrage-ph.png" width="920" height="1077" alt="Capture de l’onglet Titrage de Cinq Sigma : courbe pH = f(V), tangentes parallèles et parallèle médiane, courbe dérivée dpH/dV, VE = 12,60 mL par les deux méthodes et pH = 4,76 à la demi-équivalence"></a>
+    <figcaption>Titrage pH-métrique de l’acide éthanoïque : tangentes parallèles et dérivée.</figcaption></figure>
+    <div>
+      <h3>Titrages</h3>
+      <ul>
+        <li><strong>pH-métrique</strong> : méthode des <strong>tangentes parallèles</strong> (tangentes, parallèle médiane et point équivalent tracés sur le graphe) et méthode de la <strong>dérivée</strong> (maximum de dpH/dV, avec un lissage réglable).</li>
+        <li>Le point de contact de la première tangente se choisit à la main pour vérifier que le résultat n’en dépend presque pas.</li>
+        <li>pH à la <strong>demi-équivalence</strong>, égal au pK<sub>a</sub> pour un acide faible titré par une base forte.</li>
+        <li><strong>Conductimétrique</strong> : deux droites ajustées avant et après l’équivalence, intervalles choisis automatiquement, au clavier ou à la souris ; V<sub>E</sub> à leur intersection, avec son incertitude.</li>
+      </ul>
+      <figure class="cadre" style="margin-top:14px"><a href="images/cinq-sigma-titrage-cond.png"><img loading="lazy" src="images/cinq-sigma-titrage-cond.png" width="920" height="634" alt="Capture d’un titrage conductimétrique dans Cinq Sigma : conductivité corrigée de la dilution en fonction du volume, deux demi-droites et leur intersection à VE = 11,2 mL"></a>
+      <figcaption>Titrage conductimétrique : intersection des deux demi-droites.</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="onglet-bloc">
+    <figure class="cadre"><a href="images/cinq-sigma-muon.png"><img loading="lazy" src="images/cinq-sigma-muon.png" width="1366" height="860" alt="Capture de Cinq Sigma : tableau des classes de durées, effectifs avec barres d’erreur √N et modèle exponentiel décroissant ajusté"></a>
+    <figcaption>Durée de vie du muon : 1 523 durées regroupées en classes de 1 µs, τ = 2,1 ± 0,2 µs.</figcaption></figure>
+    <div>
+      <h3>Classes, histogrammes et durées de vie</h3>
+      <ul>
+        <li>À partir d’une colonne de mesures brutes (durées, énergies, tailles…), on règle le <strong>début</strong>, la <strong>largeur</strong> et la <strong>fin</strong> des classes.</li>
+        <li><strong>Créer le tableau des classes</strong> ouvre une <strong>nouvelle page</strong> : centre de chaque classe, effectif N et son incertitude √N.</li>
+        <li>Ce tableau se modélise comme les autres, par exemple <code>N = A·exp(−t/τ) + B</code> pour une décroissance radioactive ou la durée de vie du muon.</li>
+        <li>Un projet peut contenir plusieurs pages de données ; on passe de l’une à l’autre par la liste en haut de l’écran.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="aide">
+  <h2>Aide-mémoire</h2>
+  <div class="grille g2">
+    <div style="min-width:0">
+      <h3 style="margin-top:0">Écrire un calcul</h3>
+<pre><span class="c"># une ligne par grandeur, unité facultative</span>
+<span class="n">m</span> (kg) = 0.250
+<span class="n">v</span> (m/s) = <span class="k">deriv</span>(x, t)
+<span class="n">Ec</span> (J) = 0.5*m*v^2
+<span class="n">A</span> = <span class="k">log10</span>(I0/I)
+<span class="n">lnC</span> = <span class="k">ln</span>(C)</pre>
+      <p class="note">Point décimal dans les formules (<code>0.5</code>) ; virgule ou point dans le tableau. <code>^</code> pour les puissances, <code>pi</code> pour π, <code>2.5e-7</code> ou <code>2.5×10^-7</code> pour la notation scientifique. Angles de <code>sin</code>, <code>cos</code>, <code>tan</code> en radians ou en <strong>degrés</strong> selon le réglage « Angles ».</p>
+    </div>
+    <div style="min-width:0">
+      <h3 style="margin-top:0">Lire les résultats</h3>
+      <div class="tableau">
+        <table>
+          <tbody>
+            <tr><td style="white-space:nowrap"><strong>a = 2,00 ± 0,03</strong></td><td>valeur ± incertitude-type ; l’incertitude est arrondie à 2 chiffres</td></tr>
+            <tr><td><strong>R²</strong></td><td>part de la variation expliquée par le modèle ; ne suffit pas à valider un modèle</td></tr>
+            <tr><td><strong>χ² réduit</strong></td><td>≈ 1 : écarts du même ordre que les incertitudes ; ≫ 1 : modèle ou incertitudes à revoir</td></tr>
+            <tr><td><strong>résidus</strong></td><td>doivent se répartir au hasard autour de 0, sans tendance</td></tr>
+            <tr><td><strong>p du test χ²</strong></td><td>p &lt; 5 % : écart significatif entre l’histogramme et la loi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="encart">
+    <p><strong>Exemples intégrés</strong> (menu Exemples) : décharge d’un condensateur, chute libre filmée, loi d’Ohm, réfraction (angles en degrés), période d’un pendule, oscillations amorties, titrages pH-métrique et conductimétrique, comptage radioactif, durée de vie du muon.</p>
+  </div>
+</section>
+
+<section class="section" id="licence">
+  <div class="duo" style="align-items:start">
+    <div>
+      <h2>Sauvegarder et partager</h2>
+      <p>Le travail en cours est gardé dans le navigateur et retrouvé à la prochaine ouverture sur le même ordinateur.
+      Pour le conserver ou le rendre, <strong>Enregistrer le projet</strong> produit un fichier <code>.json</code> (données, calculs, modèle et pages) qui se rouvre avec <strong>Ouvrir un fichier</strong>.</p>
+      <p><strong>Exporter CSV</strong> donne le tableau complet, grandeurs calculées comprises, avec point-virgule et virgule décimale pour LibreOffice et Excel. Le bouton appareil photo du graphe l’enregistre en image.</p>
+    </div>
+    <div>
+      <h2>Auteurs et licence</h2>
+      <p><strong>Cinq Sigma</strong>, conception et direction du projet : <strong>Cédric Vanden Driessche</strong> (2026), professeur de physique-chimie au lycée Charles de Gaulle à Caen (<a href="mailto:cedric.vanden-driessche@ac-normandie.fr">cedric.vanden-driessche@ac-normandie.fr</a>) ; développement du code : Claude (Anthropic), sous sa direction.</p>
+      <p>Logiciel libre sous licence <a href="https://mucosmos.github.io/microcosmosWeb/LICENSE.txt">GNU GPL v3 ou ultérieure</a>, distribué sans aucune garantie. Cinq Sigma utilise les bibliothèques libres math.js, Plotly et SheetJS.</p>
+      <p class="note">Code source : dépôt <a href="https://github.com/cinq-sigma/cinq-sigma.github.io">cinq-sigma/cinq-sigma.github.io</a> sur GitHub.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="pied">
+  <div class="contenu">
+    <div>
+      <h4>MicroCosmos · Micro(K)osmos</h4>
+      <p>Étude des rayons cosmiques et de la radioactivité à l’aide d’un Arduino et de tubes Geiger.<br>
+      Cédric Vanden Driessche, professeur de physique-chimie, lycée Charles de Gaulle, Caen.</p>
+      <p>Le site et son contenu sont placés sous <a href="licence.html">licence GNU GPL</a>, © Cédric Vanden Driessche, 2024-2026.</p>
+    </div>
+    <div>
+      <h4>Le projet</h4>
+      <ul><li><a href="logiciel.html">Logiciel Microcosmos</a></li><li><a href="cinq-sigma.html">Cinq Sigma</a></li><li><a href="detecteur.html">Le détecteur</a></li>
+      <li><a href="detecteur.html#coincidence">La coïncidence</a></li><li><a href="detecteur.html#autonomes">Détecteurs autonomes</a></li></ul>
+    </div>
+    <div>
+      <h4>Physique</h4>
+      <ul><li><a href="rayons-cosmiques.html">Rayons cosmiques</a></li><li><a href="radioactivite.html">Radioactivité</a></li>
+      <li><a href="cosmodetecteur.html">Cosmodétecteur</a></li><li><a href="ressources.html">Ressources</a></li><li><a href="https://github.com/mucosmos/mucosmos.github.io">Dépôt GitHub</a></li></ul>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+<script data-goatcounter="https://mucosmos.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
